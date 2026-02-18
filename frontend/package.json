@@ -1,0 +1,36 @@
+{
+  "name": "tamiledu-ai-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for TamilEdu AI Learning Assistant",
+  "private": true,
+  "dependencies": {
+    "@heroicons/react": "^2.1.1",
+    "axios": "^1.6.2",
+    "date-fns": "^3.0.6",
+    "framer-motion": "^10.16.16",
+    "postcss-import": "^16.1.1",
+    "postcss-nesting": "^14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.4.1",
+    "react-router-dom": "^6.21.0",
+    "recharts": "^2.10.3",
+    "tamiledu-ai-fullstack": "file:..",
+    "zustand": "^4.4.7"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react": "^7.33.2",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0",
+    "vite": "^5.0.8"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext js,jsx"
+  }
+}
