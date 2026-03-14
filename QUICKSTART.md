@@ -1,8 +1,6 @@
-# 🚀 Quick Start Guide - TamilEdu AI Full-Stack Project
-
+# 🚀 Quick Start Guide - Vidal
 ## Complete Setup in 10 Minutes!
-
-This guide will help you get the complete TamilEdu AI platform running on your local machine.
+This guide will help you get the complete Vidal platform running on your local machine.
 
 ---
 
@@ -100,10 +98,21 @@ Open browser and go to:
 - **Frontend:** http://localhost:3000
 - **Backend API:** http://localhost:5000
 
-### Step 9: Test Login
-Use seeded credentials:
-- **Email:** rajesh@annauniv.edu
-- **Password:** password123
+### Step 9: Access Application
+Open browser and go to:
+- **Frontend:** http://localhost:3000
+- **Backend API:** http://localhost:5000
+
+### Step 10: Test Login
+The system **automatically creates** a default admin on the first run:
+- **Email:** `admin@tamiledu.com`
+- **Password:** `AdminPassword123!`
+- **Portal:** Staff Portal (`/staff-login`)
+
+For sample student data, use:
+- **Email:** `rajesh@annauniv.edu`
+- **Password:** `password123`
+- **Portal:** Student Portal (`/login`)
 
 ---
 

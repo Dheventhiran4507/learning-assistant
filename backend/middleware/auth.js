@@ -2,14 +2,10 @@ const jwt = require('jsonwebtoken');
 const Student = require('../models/Student');
 const logger = require('../utils/logger');
 
-/**
- * Protect routes - verify JWT token
- */
 exports.protect = async (req, res, next) => {
     try {
         let token;
 
-        // Check for token in headers
         if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
             token = req.headers.authorization.split(' ')[1];
         }
@@ -61,9 +57,6 @@ exports.protect = async (req, res, next) => {
     }
 };
 
-/**
- * Authorize roles
- */
 exports.authorize = (...roles) => {
     return (req, res, next) => {
         if (!roles.includes(req.user.role)) {

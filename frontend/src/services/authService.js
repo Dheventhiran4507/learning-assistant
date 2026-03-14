@@ -20,6 +20,21 @@ const authService = {
         const response = await api.put('/auth/profile', profileData);
         return response.data;
     },
+
+    getSystemStatus: async () => {
+        const response = await api.get('/auth/status');
+        return response.data;
+    },
+
+    setupInitialAdmin: async (adminData) => {
+        const response = await api.post('/auth/setup-initial-admin', adminData);
+        return response.data;
+    },
+
+    seedSyllabus: async () => {
+        const response = await api.post('/auth/seed-syllabus');
+        return response.data;
+    },
 };
 
 export default authService;

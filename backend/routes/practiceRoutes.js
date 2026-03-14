@@ -6,6 +6,7 @@ const practiceController = require('../controllers/practiceController');
 // New session-based routes
 router.post('/start', protect, practiceController.startSession);
 router.post('/submit', protect, practiceController.submitAnswer);
+router.post('/complete', protect, practiceController.completeSession);
 router.get('/session/:sessionId', protect, practiceController.getSession);
 
 // Maintain legacy routes for compatibility during transition

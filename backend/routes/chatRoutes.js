@@ -21,6 +21,11 @@ router.post('/send', chatController.sendMessage);
 // @access  Private
 router.get('/history', chatController.getConversationHistory);
 
+// @route   GET /api/chat/sessions
+// @desc    Get grouped chat sessions list
+// @access  Private
+router.get('/sessions', chatController.getChatSessions);
+
 // @route   GET /api/chat/subject/:subjectCode
 // @desc    Get subject-specific chats
 // @access  Private

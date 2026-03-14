@@ -1,12 +1,10 @@
 const Question = require('../models/Question');
 const Syllabus = require('../models/Syllabus');
-const claudeService = require('../services/claudeAIService');
+const aiService = require('../services/geminiAIService');
 const logger = require('../utils/logger');
 const { v4: uuidv4 } = require('uuid');
 
 // Generate bulk questions for a subject/unit
-const textbookGenerator = require('../utils/textbookGenerator');
-
 exports.generateBulkQuestions = async (req, res) => {
     try {
         const { subjectCode, unit, difficulty = 'medium', count = 10 } = req.body;
@@ -14,44 +12,7 @@ exports.generateBulkQuestions = async (req, res) => {
         // 1. Fetch Syllabus
         const syllabus = await Syllabus.findOne({ subjectCode });
         if (!syllabus) {
-            return res.status(404).json({ success: false, message: 'Subject not found' });
-        }
-
-        // 2. Try textbook generator first if subject is supported
-        if (textbookGenerator.SUBJECT_MAP[subjectCode] || textbookGenerator.TEXTBOOKS[subjectCode]) {
-            const unitInt = unit ? parseInt(unit) : null;
-            let allTextbookQs = [];
-
-            if (unitInt) {
-                allTextbookQs = textbookGenerator.generateTextbookQuestions(subjectCode, unitInt);
-            } else {
-                // Generate for all units if not specified
-                for (let i = 1; i <= 5; i++) {
-                    allTextbookQs.push(...textbookGenerator.generateTextbookQuestions(subjectCode, i));
-                }
-            }
-
-            if (allTextbookQs.length > 0) {
-                // Shuffle and take requested count
-                const selectedQs = allTextbookQs
-                    .sort(() => 0.5 - Math.random())
-                    .slice(0, count);
-
-                const docs = selectedQs.map(q => ({
-                    ...q,
-                    aiGenerated: false,
-                    generationId: uuidv4()
-                }));
-
-                await Question.insertMany(docs);
-
-                return res.json({
-                    success: true,
-                    message: `Successfully generated ${docs.length} questions from textbook content.`,
-                    count: docs.length,
-                    fromTextbook: true
-                });
-            }
+            return res.status(404).json({ success: false, message: 'Subject not found in Anna University Master Syllabus' });
         }
 
         // 3. Identify Topics for AI Fallback
@@ -98,7 +59,7 @@ exports.generateBulkQuestions = async (req, res) => {
         const limitedTopics = topicsToCover.slice(0, 3);
 
         for (const topic of limitedTopics) {
-            const questions = await claudeService.generateBulkQuestions(topic.name, difficulty, 5); // 5 per topic
+            const questions = await aiService.generateBulkQuestions(topic.name, difficulty, 5); // 5 per topic
 
             if (questions.length > 0) {
                 const docs = questions.map(q => ({
@@ -143,7 +104,7 @@ async function processBackgroundGeneration(topics, subjectCode, difficulty, batc
             const existingCount = await Question.countDocuments({ subjectCode, topic: topic.name });
             if (existingCount >= 20) continue; // Skip if already populated
 
-            const questions = await claudeService.generateBulkQuestions(topic.name, difficulty, 10);
+            const questions = await aiService.generateBulkQuestions(topic.name, difficulty, 10);
             if (questions.length > 0) {
                 const docs = questions.map(q => ({
                     subjectCode,

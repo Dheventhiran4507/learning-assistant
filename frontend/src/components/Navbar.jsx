@@ -2,6 +2,15 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
+import {
+    ChartBarIcon,
+    ChatBubbleLeftRightIcon,
+    CursorArrowRaysIcon,
+    PresentationChartLineIcon,
+    ArrowRightOnRectangleIcon,
+    AcademicCapIcon,
+    UserCircleIcon
+} from '@heroicons/react/24/outline';
 
 const Navbar = () => {
     const { user, logout } = useAuthStore();
@@ -14,12 +23,16 @@ const Navbar = () => {
         navigate('/login');
     };
 
-    const navLinks = [
-        { name: 'Dashboard', path: '/dashboard', icon: '📊' },
-        { name: 'AI Chat', path: '/chat', icon: '🤖' },
-        { name: 'Practice', path: '/practice', icon: '⚡' },
-        { name: 'Analytics', path: '/analytics', icon: '📈' },
-    ];
+    const isAdmin = user?.role === 'admin' || user?.role === 'hod' || user?.role === 'advisor';
+
+    const navLinks = isAdmin
+        ? [{ name: 'Academic Admin', path: '/admin/dashboard', icon: <UserCircleIcon className="w-5 h-5" /> }]
+        : [
+            { name: 'Dashboard', path: '/dashboard', icon: <ChartBarIcon className="w-5 h-5" /> },
+            { name: 'AI Assistant', path: '/chat', icon: <ChatBubbleLeftRightIcon className="w-5 h-5" /> },
+            { name: 'Practice Hub', path: '/practice', icon: <CursorArrowRaysIcon className="w-5 h-5" /> },
+            { name: 'Analytics', path: '/analytics', icon: <PresentationChartLineIcon className="w-5 h-5" /> },
+        ];
 
     return (
         <motion.nav
@@ -34,12 +47,12 @@ const Navbar = () => {
 
                     <div className="flex items-center gap-12 relative z-10">
                         <Link to="/dashboard" className="flex items-center gap-3 group">
-                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-2xl shadow-xl shadow-indigo-500/20 group-hover:rotate-6 transition-transform">
-                                🎓
+                            <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center shadow-xl shadow-slate-900/10 group-hover:rotate-3 transition-transform">
+                                <AcademicCapIcon className="w-7 h-7 text-white" />
                             </div>
                             <div className="hidden lg:block">
-                                <span className="text-xl font-black text-gray-900 block leading-none">TAMILEDU</span>
-                                <span className="text-[10px] font-black text-primary-600 tracking-[0.3em] uppercase">ENGINEERING EXCELLENCE</span>
+                                <span className="text-xl font-black text-gray-900 block leading-none tracking-tighter uppercase">LUMINA</span>
+                                <span className="text-[10px] font-black text-primary-600 tracking-[0.3em] uppercase">PORTAL</span>
                             </div>
                         </Link>
 
@@ -78,9 +91,10 @@ const Navbar = () => {
 
                         <button
                             onClick={handleLogout}
-                            className="w-12 h-12 rounded-2xl bg-white/50 border border-gray-200 flex items-center justify-center text-xl hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all group"
+                            className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all group"
+                            title="Sign Out"
                         >
-                            <span className="group-hover:scale-110 transition-transform">🚪</span>
+                            <ArrowRightOnRectangleIcon className="w-5 h-5 group-hover:scale-110 transition-transform" />
                         </button>
                     </div>
                 </div>

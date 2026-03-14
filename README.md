@@ -1,8 +1,6 @@
-# TamilEdu AI - Complete Full-Stack Learning Assistant
-
+# Vidal - Lumina Portal
 ## 🎓 Complete End-to-End Project for Anna University Students
-
-A production-ready, full-stack AI-powered learning assistant specifically designed for Anna University R2021 Computer Science Engineering curriculum with Tamil-English bilingual support.
+A production-ready, full-stack intelligence platform specifically designed for Anna University R2021 Computer Science Engineering curriculum with Tamil-English bilingual support.
 
 ---
 
@@ -73,7 +71,7 @@ Full-stack AI-powered learning platform with:
 ## 📁 Project Structure
 
 ```
-tamiledu-ai-fullstack/
+vidal-fullstack/
 │
 ├── backend/                      # Node.js Backend
 │   ├── config/                   # Configuration files
@@ -220,7 +218,7 @@ cp .env.example .env
 
 # Edit .env and add your credentials
 # - ANTHROPIC_API_KEY=your_key_here
-# - MONGODB_URI=mongodb://localhost:27017/tamiledu-ai
+# - MONGODB_URI=mongodb://localhost:27017/vidal
 # - JWT_SECRET=your_secret_key
 
 # Create logs directory
@@ -466,7 +464,7 @@ npm install -g heroku
 heroku login
 
 # Create new app
-heroku create tamiledu-ai-backend
+heroku create vidal-backend
 
 # Set environment variables
 heroku config:set ANTHROPIC_API_KEY=your_key
@@ -512,7 +510,7 @@ PORT=5000
 MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/tamiledu
 JWT_SECRET=super-secret-production-key
 ANTHROPIC_API_KEY=your-anthropic-key
-FRONTEND_URL=https://tamiledu-ai.vercel.app
+FRONTEND_URL=https://vidal.vercel.app
 ```
 
 ---
@@ -539,7 +537,7 @@ npm test
 ### API Testing (Postman)
 
 Import the provided Postman collection:
-- `/docs/TamilEdu-AI.postman_collection.json`
+- `/docs/Vidal.postman_collection.json`
 
 ---
 
@@ -668,7 +666,7 @@ This project is licensed under the MIT License.
 
 For issues and questions:
 - Create an issue on GitHub
-- Email: support@tamiledu-ai.com
+- Email: support@vidal.com
 - Documentation: `/docs`
 
 ---

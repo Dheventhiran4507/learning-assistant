@@ -20,8 +20,8 @@ const syllabusSchema = new mongoose.Schema({
     },
     semester: {
         type: Number,
-        required: true,
-        min: 1,
+        required: false,
+        min: 0,
         max: 8
     },
     credits: Number,
@@ -116,6 +116,10 @@ const syllabusSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true
+    },
+    dataSource: {
+        type: String,
+        default: 'unknown'
     },
     lastUpdated: {
         type: Date,

@@ -1,12 +1,9 @@
 const Chat = require('../models/Chat');
 const Student = require('../models/Student');
 const Syllabus = require('../models/Syllabus');
-const claudeAIService = require('../services/claudeAIService');
+const aiService = require('../services/geminiAIService');
 const logger = require('../utils/logger');
 
-/**
- * Send a message and get AI response
- */
 exports.sendMessage = async (req, res) => {
     try {
         const { message, sessionId, inputMethod = 'text' } = req.body;
@@ -29,17 +26,17 @@ exports.sendMessage = async (req, res) => {
         }
 
         // Detect language and intent
-        const detectedLanguage = claudeAIService.detectLanguage(message);
-        const intent = claudeAIService.classifyIntent(message);
-        const subjectCode = claudeAIService.extractSubject(message);
+        const detectedLanguage = aiService.detectLanguage(message);
+        const intent = aiService.classifyIntent(message);
+        const subjectCode = aiService.extractSubject(message);
 
         // Get conversation history for context
         const conversationHistory = await Chat.find({
             student: studentId,
             sessionId: sessionId || 'default'
         })
-        .sort({ createdAt: -1 })
-        .limit(5);
+            .sort({ createdAt: -1 })
+            .limit(5);
 
         // Get subject information if detected
         let subjectInfo = null;
@@ -59,14 +56,15 @@ exports.sendMessage = async (req, res) => {
             subjectInfo: subjectInfo ? {
                 subjectCode: subjectInfo.subjectCode,
                 subjectName: subjectInfo.subjectName,
-                regulation: subjectInfo.regulation
+                regulation: subjectInfo.regulation,
+                units: subjectInfo.units // Pass the unit data
             } : null,
             conversationHistory: conversationHistory.reverse(),
             relatedTopics: []
         };
 
         // Get AI response
-        const aiResult = await claudeAIService.sendMessage(message, context);
+        const aiResult = await aiService.sendMessage(message, context);
 
         // Save chat to database
         const chat = new Chat({
@@ -90,10 +88,12 @@ exports.sendMessage = async (req, res) => {
         // Update student stats
         student.learningStats.totalDoubtsCleared += 1;
         student.learningStats.lastActiveDate = new Date();
-        student.learningStats.averageResponseTime = 
-            ((student.learningStats.averageResponseTime * (student.learningStats.totalDoubtsCleared - 1)) + 
-            aiResult.metadata.responseTime) / student.learningStats.totalDoubtsCleared;
-        
+
+        const responseTime = aiResult.metadata?.responseTime || 100;
+        student.learningStats.averageResponseTime =
+            ((student.learningStats.averageResponseTime * (student.learningStats.totalDoubtsCleared - 1)) +
+                responseTime) / student.learningStats.totalDoubtsCleared;
+
         await student.save();
 
         logger.info(`Chat processed for student ${student.studentId}`);
@@ -123,9 +123,6 @@ exports.sendMessage = async (req, res) => {
     }
 };
 
-/**
- * Get conversation history
- */
 exports.getConversationHistory = async (req, res) => {
     try {
         const studentId = req.user.id;
@@ -157,9 +154,42 @@ exports.getConversationHistory = async (req, res) => {
     }
 };
 
-/**
- * Provide feedback on chat
- */
+exports.getChatSessions = async (req, res) => {
+    try {
+        const studentId = req.user.id;
+        
+        // Aggregate to find unique sessions, their first message, and last updated time
+        const sessions = await Chat.aggregate([
+            { $match: { student: new (require('mongoose').Types.ObjectId)(studentId) } },
+            { $sort: { createdAt: 1 } }, // Sort ascending to get the very first message as title
+            { 
+                $group: { 
+                    _id: "$sessionId",
+                    firstMessage: { $first: "$userMessage" },
+                    createdAt: { $first: "$createdAt" },
+                    updatedAt: { $last: "$createdAt" },
+                    messageCount: { $sum: 1 }
+                }
+            },
+            { $sort: { updatedAt: -1 } } // Return most recently active sessions first
+        ]);
+        
+        res.status(200).json({
+            success: true,
+            count: sessions.length,
+            data: sessions
+        });
+
+    } catch (error) {
+        logger.error('Get chat sessions error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to get chat sessions',
+            error: error.message
+        });
+    }
+};
+
 exports.provideFeedback = async (req, res) => {
     try {
         const { chatId } = req.params;
@@ -197,9 +227,6 @@ exports.provideFeedback = async (req, res) => {
     }
 };
 
-/**
- * Get subject-specific chats
- */
 exports.getSubjectChats = async (req, res) => {
     try {
         const studentId = req.user.id;
@@ -223,9 +250,6 @@ exports.getSubjectChats = async (req, res) => {
     }
 };
 
-/**
- * Delete chat
- */
 exports.deleteChat = async (req, res) => {
     try {
         const { chatId } = req.params;
@@ -263,7 +287,7 @@ function extractTopic(message) {
         .split(' ')
         .filter(word => word.length > 4)
         .slice(0, 3);
-    
+
     return keywords.join(' ');
 }
 

@@ -1,0 +1,30 @@
+[
+    {
+        "subjectCode": "CS3251",
+        "unitNumber": 1,
+        "topicName": "Structure of C",
+        "content": "A C program follows a specific structure that includes preprocessor directives, a main function, and other user-defined functions and global variables. The basic structure starts with #include for header files like stdio.h.",
+        "keyPoints": [
+            "Starts with #include",
+            "Main function is entry point",
+            "Ends with return 0"
+        ],
+        "examples": [
+            "#include <stdio.h>\nint main() {\n  printf(\"Hello World\");\n  return 0;\n}"
+        ]
+    },
+    {
+        "subjectCode": "CS3251",
+        "unitNumber": 2,
+        "topicName": "1D Arrays",
+        "content": "A one-dimensional array is a linear collection of elements of the same data type stored in contiguous memory locations. In C, arrays start with index 0.",
+        "keyPoints": [
+            "Contiguous memory",
+            "Same data type",
+            "Zero-indexed"
+        ],
+        "examples": [
+            "int marks[5] = {90, 85, 88, 75, 95};"
+        ]
+    }
+]

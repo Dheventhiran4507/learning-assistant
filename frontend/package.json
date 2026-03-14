@@ -1,20 +1,26 @@
 {
-  "name": "tamiledu-ai-frontend",
+  "name": "vidal-frontend",
   "version": "1.0.0",
-  "description": "Frontend for TamilEdu AI Learning Assistant",
+  "description": "Frontend for Vidal - Lumina Portal",
+  "type": "module",
   "private": true,
   "dependencies": {
     "@heroicons/react": "^2.1.1",
+    "@tailwindcss/typography": "^0.5.19",
     "axios": "^1.6.2",
     "date-fns": "^3.0.6",
     "framer-motion": "^10.16.16",
+    "katex": "^0.16.28",
     "postcss-import": "^16.1.1",
     "postcss-nesting": "^14.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
+    "react-katex": "^3.1.0",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^6.21.0",
     "recharts": "^2.10.3",
+    "remark-gfm": "^4.0.1",
     "tamiledu-ai-fullstack": "file:..",
     "zustand": "^4.4.7"
   },
@@ -25,7 +31,8 @@
     "eslint-plugin-react": "^7.33.2",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.4.0",
-    "vite": "^5.0.8"
+    "vite": "^5.0.8",
+    "vite-plugin-pwa": "^1.2.0"
   },
   "scripts": {
     "dev": "vite",

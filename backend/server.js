@@ -15,9 +15,7 @@ const chatRoutes = require('./routes/chatRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const syllabusRoutes = require('./routes/syllabusRoutes');
 const practiceRoutes = require('./routes/practiceRoutes');
-const syllabusUploadRoutes = require('./routes/syllabusUploadRoutes');
 
-// Import middleware
 const errorHandler = require('./middleware/errorHandler');
 const logger = require('./utils/logger');
 
@@ -43,7 +41,6 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// Health check
 app.get('/health', (req, res) => {
     res.status(200).json({
         status: 'OK',
@@ -53,15 +50,12 @@ app.get('/health', (req, res) => {
     });
 });
 
-
-
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/syllabus', syllabusRoutes);
-app.use('/api/syllabus-upload', syllabusUploadRoutes);
 app.use('/api/practice', practiceRoutes);
 app.use('/api/questions', require('./routes/questionRoutes'));
 
@@ -83,7 +77,7 @@ app.get('*', (req, res) => {
 app.use(errorHandler);
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tamiledu-ai')
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/vidal')
     .then(() => {
         logger.info('✅ MongoDB connected successfully');
 
@@ -111,4 +105,6 @@ process.on('uncaughtException', (err) => {
     process.exit(1);
 });
 
+// Backend server entry point
+// Triggered restart at 2026-02-23
 module.exports = app;

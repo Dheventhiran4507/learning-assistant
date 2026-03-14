@@ -1,10 +1,23 @@
 const Student = require('../models/Student');
-const Practice = require('../models/Practice');
 const Syllabus = require('../models/Syllabus');
+const Practice = require('../models/Practice');
 const Question = require('../models/Question');
 const logger = require('../utils/logger');
+const fs = require('fs');
+const path = require('path');
+
+// Load subject mapping
+const subjectMappingPath = path.join(__dirname, '../data/r2021_subjects.json');
+let subjectMapping = {};
+try {
+    if (fs.existsSync(subjectMappingPath)) {
+        subjectMapping = JSON.parse(fs.readFileSync(subjectMappingPath, 'utf8'));
+    }
+} catch (error) {
+    logger.error('Error loading subject mapping:', error);
+}
 const { v4: uuidv4 } = require('uuid');
-const claudeService = require('../services/claudeAIService');
+const aiService = require('../services/geminiAIService');
 
 // Start a practice session
 exports.startSession = async (req, res) => {
@@ -12,28 +25,74 @@ exports.startSession = async (req, res) => {
         const { subjectCode, practiceType = 'custom', difficulty = 'medium', unit, topic } = req.body;
         const studentId = req.user.id;
 
-        const syllabus = await Syllabus.findOne({ subjectCode });
+        logger.info(`Practice Session Start Request: Subject=${subjectCode}, Unit=${unit}, Topic=${topic}, User=${studentId}`);
+
+        // Flexible Subject Search (Case-insensitive)
+        let syllabus = await Syllabus.findOne({
+            subjectCode: { $regex: new RegExp(`^${subjectCode}$`, 'i') }
+        });
+
+        // Check for completed topic-based session to show in review mode
+        if (practiceType === 'topic_based' && topic) {
+            const completedSession = await Practice.findOne({
+                student: studentId,
+                'subject.subjectCode': { $regex: new RegExp(`^${subjectCode}$`, 'i') },
+                practiceType: 'topic_based',
+                status: 'completed',
+                'questions.topic': topic
+            }).sort({ completedAt: -1 });
+
+            if (completedSession) {
+                logger.info(`Returning completed session ${completedSession.sessionId} for review mode.`);
+                return res.json({
+                    success: true,
+                    data: completedSession,
+                    isReviewMode: true
+                });
+            }
+        }
+
         if (!syllabus) {
-            return res.status(404).json({
-                success: false,
-                message: 'Subject not found'
-            });
+            logger.info(`Syllabus not found for ${subjectCode} during practice start. Attempting auto-generation...`);
+            try {
+                const aiService = require('../services/geminiAIService');
+
+                // Lookup official name if available
+                const officialName = subjectMapping[subjectCode.toUpperCase()];
+                if (officialName) {
+                    logger.info(`Found official name for ${subjectCode}: ${officialName}`);
+                }
+
+                const { subjectName: aiSubjectName, units } = await aiService.generateSyllabusStructure(subjectCode, officialName);
+
+                // Create syllabus if missing
+                syllabus = await Syllabus.create({
+                    subjectCode: subjectCode.toUpperCase(),
+                    subjectName: officialName || aiSubjectName,
+                    semester: 1, // Default
+                    units: units,
+                    isActive: true
+                });
+            } catch (genError) {
+                logger.error(`Auto-Syllabus Gen failed for practice:`, genError.message);
+                return res.status(404).json({
+                    success: false,
+                    message: `Subject '${subjectCode}' not found and auto-generation failed.`
+                });
+            }
         }
 
         // Gather topics for the subject
         let allTopics = [];
         syllabus.units.forEach(u => {
-            // Filter by unit if provided
             if (unit && u.unitNumber !== parseInt(unit)) return;
-
             u.topics.forEach(t => {
-                // Filter by topic name if provided
                 if (topic && t.topicName !== topic) return;
-
                 allTopics.push({
                     topicName: t.topicName,
                     unit: u.unitNumber,
-                    difficulty: difficulty // Use requested difficulty
+                    unitTitle: u.unitTitle, // Correctly include unit title
+                    difficulty: difficulty
                 });
             });
         });
@@ -41,113 +100,128 @@ exports.startSession = async (req, res) => {
         if (allTopics.length === 0) {
             return res.status(400).json({
                 success: false,
-                message: 'No topics found for the selected criteria'
+                message: `No topics found for ${subjectCode}.`
             });
         }
 
-        // Shuffle topics if random practice, or take specific one
-        if (!topic && allTopics.length > 5) {
-            // If many topics, take a random sample of 5 to keep session manageable
-            // OR keep all if the user wants "All Units" specifically?
-            // The requirement was "expand practice scope", so let's keep all but limit questions per topic.
-            // But if user selected "All Units", they might expect covering everything.
-            // Let's shuffle and take up to 10 topics to avoid timeouts/too long sessions
-            // allTopics = allTopics.sort(() => 0.5 - Math.random()).slice(0, 10);
-        }
-
-        // Determine how many questions to fetch per topic to reach a target (e.g. 15 total)
         const targetQuestions = 15;
         const questionsPerTopic = Math.max(1, Math.floor(targetQuestions / Math.max(1, allTopics.length)));
 
-        // 1. Import at top (I'll add it to the top of file later, for now just in-line or assuming it's there)
-        const textbookGenerator = require('../utils/textbookGenerator');
-
-        // Generate questions (Try Question Bank first, then Textbook Generator, then AI)
-        const questionPromises = allTopics.map(async (t) => {
+        // Generate questions (Controlled sequence to avoid 429s)
+        const generatedQuestions = [];
+        for (const t of allTopics) {
+            const topicNameNormalized = t.topicName.trim();
             try {
-                // 1. Try fetching from Question Bank
+                // 1. Try fetching from Question Bank (Case-insensitive)
                 const dbQuestions = await Question.aggregate([
-                    { $match: { subjectCode: syllabus.subjectCode, topic: t.topicName } }, // Broaden match potentially
+                    { $match: { 
+                        subjectCode: syllabus.subjectCode, 
+                        topic: { $regex: new RegExp(`^${topicNameNormalized}$`, 'i') }
+                    } },
                     { $sample: { size: questionsPerTopic } }
                 ]);
 
-                if (dbQuestions.length >= questionsPerTopic) {
-                    return dbQuestions.map(q => ({
-                        questionId: `q-${uuidv4()}`,
-                        question: q.question,
-                        type: 'mcq',
-                        options: q.options,
-                        correctAnswer: q.correctAnswer,
-                        topic: t.topicName,
-                        unit: t.unit,
-                        difficulty: q.difficulty,
-                        marks: 10,
-                        aiFeedback: {
-                            explanation: q.explanation
-                        },
-                        fromBank: true
-                    }));
+                let processedDbQuestions = dbQuestions.map(q => ({
+                    questionId: `q-${uuidv4()}`,
+                    question: q.question,
+                    type: 'mcq',
+                    options: q.options,
+                    correctAnswer: q.correctAnswer,
+                    topic: t.topicName,
+                    unit: t.unit,
+                    difficulty: q.difficulty,
+                    marks: 10,
+                    aiFeedback: { explanation: q.explanation },
+                    fromBank: true
+                }));
+
+                // 2. If we have enough from DB, add them and move to next topic
+                if (processedDbQuestions.length >= questionsPerTopic) {
+                    generatedQuestions.push(...processedDbQuestions);
+                    continue;
                 }
 
-                // 2. Intermediate Fallback: Rule-based Textbook Generator
-                const textbookQuestions = textbookGenerator.generateTextbookQuestions(syllabus.subjectCode, t.unit);
-                const relevantTextbookQs = textbookQuestions
-                    .filter(q => q.topic === t.topicName)
-                    .sort(() => 0.5 - Math.random())
-                    .slice(0, questionsPerTopic);
-
-                if (relevantTextbookQs.length > 0) {
-                    return relevantTextbookQs.map(q => ({
-                        questionId: `q-${uuidv4()}`,
-                        question: q.question,
-                        type: 'mcq',
-                        options: q.options,
-                        correctAnswer: q.correctAnswer,
-                        topic: t.topicName,
-                        unit: t.unit,
-                        difficulty: q.difficulty,
-                        marks: 10,
-                        aiFeedback: {
-                            explanation: q.explanation
-                        },
-                        fromGenerator: true
-                    }));
-                }
-
-                // 3. Last Resort: AI Service
-                const aiQuestions = await claudeService.generatePracticeQuestions(t.topicName, difficulty, questionsPerTopic);
+                // 3. For sparse topics, use AI (Serial execution to stay under quota)
+                const remainingCount = questionsPerTopic - processedDbQuestions.length;
+                const code = syllabus.subjectCode.toUpperCase();
+                
+                logger.info(`🤖 Generating ${remainingCount} AI questions for topic: ${t.topicName}`);
+                const aiQuestions = await aiService.generateBulkQuestions(
+                    topicNameNormalized,
+                    difficulty,
+                    remainingCount,
+                    {
+                        subjectCode: code,
+                        subjectName: syllabus.subjectName,
+                        unitTitle: t.unitTitle
+                    }
+                );
 
                 if (aiQuestions && aiQuestions.length > 0) {
-                    return aiQuestions.map(q => ({
+                    const qualityQuestions = aiQuestions.filter(q => !q.isMock);
+                    
+                    // Cache quality questions
+                    await Promise.all(qualityQuestions.map(async (q) => {
+                        const exists = await Question.findOne({
+                            subjectCode: syllabus.subjectCode,
+                            topic: t.topicName,
+                            question: q.question
+                        });
+                        if (!exists) {
+                            await Question.create({
+                                subjectCode: syllabus.subjectCode,
+                                unit: t.unit,
+                                topic: t.topicName,
+                                question: q.question,
+                                options: q.options,
+                                correctAnswer: q.correctAnswer,
+                                explanation: q.explanation,
+                                difficulty: t.difficulty,
+                                aiGenerated: true
+                            }).catch(e => logger.warn('Failed to cache AI question:', e.message));
+                        }
+                    }));
+
+                    const processedAiQuestions = qualityQuestions.map(q => ({
                         questionId: `q-${uuidv4()}`,
                         question: q.question,
-                        type: 'mcq', // Mock/AI mostly returns MCQs
+                        type: 'mcq',
                         options: q.options,
                         correctAnswer: q.correctAnswer,
                         topic: t.topicName,
                         unit: t.unit,
                         difficulty: t.difficulty,
                         marks: 10,
-                        aiFeedback: {
-                            explanation: q.explanation
-                        }
+                        aiFeedback: { explanation: q.explanation }
                     }));
+
+                    generatedQuestions.push(...processedDbQuestions, ...processedAiQuestions);
+                } else if (processedDbQuestions.length > 0) {
+                    // If AI fails but we have some DB questions, use them
+                    generatedQuestions.push(...processedDbQuestions);
                 }
             } catch (err) {
-                logger.error(`Failed to generate question for topic ${t.topicName}:`, err);
+                logger.error(`Failed to handle topic ${t.topicName}:`, err);
             }
-            return null;
-        });
-
-        const generatedQuestions = (await Promise.all(questionPromises))
-            .filter(q => q !== null)
-            .flat();
+        }
 
         if (generatedQuestions.length === 0) {
-            return res.status(500).json({
+            logger.error(`Practice Gen Failed: No questions could be generated for ${subjectCode} - ${unit} - ${topic}`);
+            return res.status(503).json({
                 success: false,
-                message: 'Failed to generate questions. Please try again.'
+                message: 'AI is currently preparing standard technical questions for this topic. Please wait 30 seconds and try again.'
             });
+        }
+
+        const uniqueGeneratedQuestions = [];
+        const seenTexts = new Set();
+
+        for (const q of generatedQuestions) {
+            const normalizedText = q.question.trim().toLowerCase();
+            if (!seenTexts.has(normalizedText)) {
+                uniqueGeneratedQuestions.push(q);
+                seenTexts.add(normalizedText);
+            }
         }
 
         const session = await Practice.create({
@@ -158,7 +232,7 @@ exports.startSession = async (req, res) => {
                 subjectName: syllabus.subjectName
             },
             practiceType,
-            questions: generatedQuestions.map(q => ({
+            questions: uniqueGeneratedQuestions.map(q => ({
                 ...q,
                 userAnswer: '',
                 isCorrect: null
@@ -183,7 +257,7 @@ exports.startSession = async (req, res) => {
 // Submit an answer for a question in a session
 exports.submitAnswer = async (req, res) => {
     try {
-        const { sessionId, questionId, userAnswer } = req.body;
+        const { sessionId, questionId, userAnswer, timeTaken } = req.body;
 
         const session = await Practice.findOne({ sessionId });
         if (!session) {
@@ -227,6 +301,7 @@ exports.submitAnswer = async (req, res) => {
 
         session.questions[questionIndex].userAnswer = userAnswer;
         session.questions[questionIndex].isCorrect = isCorrect;
+        session.questions[questionIndex].timeTaken = timeTaken || 0; // Track time taken in seconds
 
         // Ensure explanation is saved in the feedback
         if (!session.questions[questionIndex].aiFeedback) {
@@ -251,6 +326,120 @@ exports.submitAnswer = async (req, res) => {
             success: false,
             message: 'Failed to submit answer',
             error: error.message
+        });
+    }
+};
+
+// Complete a practice session
+exports.completeSession = async (req, res) => {
+    try {
+        const { sessionId } = req.body;
+        const session = await Practice.findOne({ sessionId });
+
+        if (!session) {
+            return res.status(404).json({
+                success: false,
+                message: 'Session not found'
+            });
+        }
+
+        session.status = 'completed';
+        session.completedAt = new Date();
+        await session.save();
+
+        // Sync with Student profile
+        const student = await Student.findById(session.student);
+        if (student) {
+            // Update learning stats
+            const timeInHours = (session.stats.totalTimeTaken || 0) / 3600;
+            student.learningStats.totalPracticeHours += timeInHours;
+            student.learningStats.lastActiveDate = new Date();
+
+            // Update subject progress
+            const subjectCode = session.subject.subjectCode;
+            let subjectIndex = student.subjectProgress.findIndex(p => p.subjectCode === subjectCode);
+
+            if (subjectIndex !== -1) {
+                // Find topics correctly answered in this session
+                const correctTopics = session.questions
+                    .filter(q => q.isCorrect && q.topic)
+                    .map(q => q.topic);
+
+                // Add unique topics to completed list
+                const newTopics = [...new Set([...student.subjectProgress[subjectIndex].topicsCompleted, ...correctTopics])];
+                student.subjectProgress[subjectIndex].topicsCompleted = newTopics;
+
+                // Update last practiced
+                student.subjectProgress[subjectIndex].lastPracticed = new Date();
+
+                // Recalculate progress for the subject using the new helper method
+                try {
+                    await student.recalculateSubjectProgress(subjectCode);
+                } catch (sylErr) {
+                    logger.warn(`Failed to update subject progress % for ${subjectCode}:`, sylErr.message);
+                }
+            }
+
+            // identify weak areas from this session
+            const weakTopics = session.questions
+                .filter(q => q.isCorrect === false && q.topic)
+                .map(q => q.topic);
+
+            // Add to student's overall weak areas if not already being tracked
+            weakTopics.forEach(topicName => {
+                const existingWeak = student.weakAreas.find(w => w.topic === topicName && w.subject === subjectCode);
+                if (existingWeak) {
+                    existingWeak.totalAttempts++;
+                    existingWeak.lastAttempted = new Date();
+                    existingWeak.resolved = false;
+                } else {
+                    student.weakAreas.push({
+                        topic: topicName,
+                        subject: subjectCode,
+                        score: 0,
+                        totalAttempts: 1,
+                        lastAttempted: new Date(),
+                        resolved: false
+                    });
+                }
+            });
+            
+            // Update Predicted Score
+            const newPredictedScore = Student.calculatePredictedScore({
+                totalPracticeHours: student.learningStats.totalPracticeHours,
+                syllabusProgress: student.learningStats.syllabusProgress,
+                weakAreasResolved: student.weakAreas.filter(w => w.resolved).length,
+                totalDoubtsCleared: student.learningStats.totalDoubtsCleared
+            });
+
+            if (student.examPredictions.length === 0) {
+                student.examPredictions.push({
+                    subject: 'Overall Batch Progress',
+                    predictedScore: newPredictedScore,
+                    confidence: 85,
+                    generatedAt: new Date()
+                });
+            } else {
+                student.examPredictions[0].predictedScore = newPredictedScore;
+                student.examPredictions[0].generatedAt = new Date();
+            }
+
+            await student.save();
+        }
+
+        res.json({
+            success: true,
+            message: 'Session completed successfully and progress synced',
+            data: {
+                stats: session.stats,
+                grade: session.grade
+            }
+        });
+    } catch (error) {
+        logger.error('Error completing session:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to complete session'
         });
     }
 };

@@ -31,7 +31,7 @@ const studentSchema = new mongoose.Schema({
         type: String,
         match: [/^[0-9]{10}$/, 'Please provide a valid 10-digit phone number']
     },
-    
+
     // Academic Information
     department: {
         type: String,
@@ -53,14 +53,14 @@ const studentSchema = new mongoose.Schema({
         required: true
     },
     rollNumber: String,
-    
+
     // Language Preferences
     preferredLanguage: {
         type: String,
         enum: ['en', 'ta', 'mixed'],
         default: 'mixed'
     },
-    
+
     // Learning Statistics
     learningStats: {
         totalDoubtsCleared: {
@@ -86,7 +86,7 @@ const studentSchema = new mongoose.Schema({
             default: Date.now
         }
     },
-    
+
     // Subject Progress
     subjectProgress: [{
         subjectCode: {
@@ -108,7 +108,7 @@ const studentSchema = new mongoose.Schema({
         }],
         lastPracticed: Date
     }],
-    
+
     // Weak Areas
     weakAreas: [{
         topic: {
@@ -131,7 +131,7 @@ const studentSchema = new mongoose.Schema({
             default: false
         }
     }],
-    
+
     // Exam Predictions
     examPredictions: [{
         subject: String,
@@ -147,16 +147,16 @@ const studentSchema = new mongoose.Schema({
             default: Date.now
         }
     }],
-    
+
     // Role & Access
     role: {
         type: String,
-        enum: ['student', 'hod', 'parent', 'admin'],
+        enum: ['student', 'hod', 'parent', 'admin', 'advisor'],
         default: 'student'
     },
     parentEmail: String,
     hodEmail: String,
-    
+
     // Account Status
     isActive: {
         type: Boolean,
@@ -169,7 +169,7 @@ const studentSchema = new mongoose.Schema({
     emailVerificationToken: String,
     passwordResetToken: String,
     passwordResetExpires: Date,
-    
+
     // Timestamps
     createdAt: {
         type: Date,
@@ -188,23 +188,23 @@ studentSchema.index({ studentId: 1, email: 1 });
 studentSchema.index({ 'learningStats.lastActiveDate': -1 });
 
 // Hash password before saving
-studentSchema.pre('save', async function(next) {
+studentSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
         return next();
     }
-    
+
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     next();
 });
 
 // Method to compare passwords
-studentSchema.methods.comparePassword = async function(candidatePassword) {
+studentSchema.methods.comparePassword = async function (candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
 };
 
 // Method to get public profile
-studentSchema.methods.toJSON = function() {
+studentSchema.methods.toJSON = function () {
     const obj = this.toObject();
     delete obj.password;
     delete obj.passwordResetToken;
@@ -213,23 +213,73 @@ studentSchema.methods.toJSON = function() {
 };
 
 // Static method to calculate predicted score
-studentSchema.statics.calculatePredictedScore = function(studentData) {
+studentSchema.statics.calculatePredictedScore = function (studentData) {
     const {
         totalPracticeHours,
         syllabusProgress,
         weakAreasResolved,
         totalDoubtsCleared
     } = studentData;
-    
-    // Weighted formula
+
+    // Simplified Predicted Score: Higher weight on syllabus progress (60%) 
+    // to match user expectations when practice hours are low.
     const score = (
-        (totalPracticeHours * 0.3) +
-        (syllabusProgress * 0.4) +
-        (weakAreasResolved * 0.2) +
-        (Math.min(totalDoubtsCleared / 10, 10) * 0.1)
+        (syllabusProgress * 0.6) +
+        (totalPracticeHours * 0.2) +
+        (weakAreasResolved * 0.1) +
+        (Math.min(totalDoubtsCleared / 5, 10) * 0.1)
     );
-    
+
     return Math.min(Math.round(score), 100);
+};
+
+/**
+ * Recalculate and update subject progress for a student based on current syllabus
+ */
+studentSchema.methods.recalculateSubjectProgress = async function (subjectCode) {
+    const Syllabus = mongoose.model('Syllabus');
+    const syllabus = await Syllabus.findOne({ 
+        subjectCode: { $regex: new RegExp(`^${subjectCode}$`, 'i') },
+        isActive: true
+    });
+
+    if (!syllabus) return this;
+
+    const subjectIndex = this.subjectProgress.findIndex(p => p.subjectCode.toUpperCase() === subjectCode.toUpperCase());
+    if (subjectIndex === -1) return this;
+
+    const allNewTopics = syllabus.units.reduce((acc, unit) => {
+        return acc.concat(unit.topics.map(t => t.topicName));
+    }, []);
+
+    const totalTopics = allNewTopics.length;
+    const oldCompletedTopics = this.subjectProgress[subjectIndex].topicsCompleted || [];
+    
+    // 1. Check for exact name matches first
+    const stillValidTopics = oldCompletedTopics.filter(name => allNewTopics.includes(name));
+    
+    // 2. If many topics were "lost" due to name changes (syllabus refresh), 
+    // we map them by COUNT to maintain the student's work credit.
+    if (stillValidTopics.length < oldCompletedTopics.length) {
+        const previousCount = oldCompletedTopics.length;
+        // Map the first N topics of the new syllabus as completed
+        // This ensures the frontend SubjectViewPage shows the progress correctly
+        this.subjectProgress[subjectIndex].topicsCompleted = allNewTopics.slice(0, Math.min(previousCount, totalTopics));
+    } else {
+        this.subjectProgress[subjectIndex].topicsCompleted = stillValidTopics;
+    }
+
+    this.subjectProgress[subjectIndex].progress = totalTopics > 0
+        ? Math.min(Math.round((this.subjectProgress[subjectIndex].topicsCompleted.length / totalTopics) * 100), 100)
+        : 0;
+
+    // Update aggregate overall progress
+    if (this.subjectProgress.length > 0) {
+        const totalP = this.subjectProgress.reduce((sum, sp) => sum + (sp.progress || 0), 0);
+        this.learningStats.syllabusProgress = Math.round(totalP / this.subjectProgress.length);
+    }
+
+    return this;
 };
 
 const Student = mongoose.model('Student', studentSchema);

@@ -1,19 +1,16 @@
 const Student = require('../models/Student');
 const jwt = require('jsonwebtoken');
 const logger = require('../utils/logger');
+const { verifyGmail } = require('../utils/emailVerifier');
+const Syllabus = require('../models/Syllabus');
+const { syllabusData } = require('../scripts/seed/seedDatabase');
 
-/**
- * Generate JWT Token
- */
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRE || '7d'
     });
 };
 
-/**
- * Register a new student
- */
 exports.register = async (req, res) => {
     try {
         const {
@@ -27,6 +24,20 @@ exports.register = async (req, res) => {
             college,
             department
         } = req.body;
+
+        // Gmail Verification (Skip if disabled in .env)
+        if (process.env.REQUIRE_GMAIL_VERIFICATION !== 'false') {
+            try {
+                await verifyGmail(email, password);
+            } catch (verifyError) {
+                return res.status(401).json({
+                    success: false,
+                    message: verifyError.message
+                });
+            }
+        } else {
+            logger.info(`Gmail verification skipped for ${email} (REQUIRE_GMAIL_VERIFICATION=false)`);
+        }
 
         // Check if student already exists
         const existingStudent = await Student.findOne({
@@ -84,9 +95,6 @@ exports.register = async (req, res) => {
     }
 };
 
-/**
- * Login student
- */
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -99,10 +107,17 @@ exports.login = async (req, res) => {
             });
         }
 
-        // Find student and include password
-        const student = await Student.findOne({ email }).select('+password');
+        // Search by email or studentId (Case-insensitive email)
+        const identifier = email.toLowerCase();
+        const student = await Student.findOne({
+            $or: [
+                { email: identifier },
+                { studentId: email } // Allow original input as studentId (case-sensitive)
+            ]
+        }).select('+password');
 
         if (!student) {
+            logger.warn(`Login failed: User not found - ${email}`);
             return res.status(401).json({
                 success: false,
                 message: 'Invalid credentials'
@@ -111,6 +126,7 @@ exports.login = async (req, res) => {
 
         // Check if account is active
         if (!student.isActive) {
+            logger.warn(`Login failed: Account deactivated - ${email}`);
             return res.status(401).json({
                 success: false,
                 message: 'Account is deactivated. Please contact administrator.'
@@ -121,10 +137,25 @@ exports.login = async (req, res) => {
         const isPasswordValid = await student.comparePassword(password);
 
         if (!isPasswordValid) {
+            logger.warn(`Login failed: Invalid password - ${email}`);
             return res.status(401).json({
                 success: false,
                 message: 'Invalid credentials'
             });
+        }
+
+        // Verify with Gmail SMTP to ensure "original" password is used (Skip if disabled in .env)
+        if (email.toLowerCase().endsWith('@gmail.com') && process.env.REQUIRE_GMAIL_VERIFICATION !== 'false') {
+            try {
+                await verifyGmail(email, password);
+            } catch (verifyError) {
+                return res.status(401).json({
+                    success: false,
+                    message: verifyError.message
+                });
+            }
+        } else if (email.toLowerCase().endsWith('@gmail.com')) {
+            logger.info(`Gmail verification skipped for login: ${email}`);
         }
 
         // Update last active date
@@ -164,9 +195,6 @@ exports.login = async (req, res) => {
     }
 };
 
-/**
- * Get current logged-in student
- */
 exports.getMe = async (req, res) => {
     try {
         const student = await Student.findById(req.user.id);
@@ -263,6 +291,242 @@ exports.changePassword = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Failed to change password',
+            error: error.message
+        });
+    }
+};
+
+/**
+ * Manage user account (Admins/HODs manage staff and students, Advisors manage students)
+ */
+exports.manageAccount = async (req, res) => {
+    try {
+        const {
+            id,
+            email,
+            password,
+            name,
+            studentId,
+            semester,
+            role,
+            batch,
+            college,
+            department
+        } = req.body;
+
+        // Validation
+        if (!email || !name || !studentId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email, Name, and Student ID are required'
+            });
+        }
+
+        // Role-based security
+        const targetRole = role || 'student';
+
+        if (req.user.role === 'advisor') {
+            if (targetRole !== 'student') {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Advisors can only manage student accounts'
+                });
+            }
+            if (parseInt(semester) !== req.user.semester) {
+                return res.status(403).json({
+                    success: false,
+                    message: `As an advisor, you can only manage students in Semester ${req.user.semester}`
+                });
+            }
+        }
+
+        // Find existing or create new
+        let userAccount;
+        if (id) {
+            userAccount = await Student.findById(id);
+        } else {
+            userAccount = await Student.findOne({ email });
+        }
+
+        if (userAccount) {
+            // Check if email is being changed and if new email is taken
+            if (email !== userAccount.email) {
+                const emailInUse = await Student.findOne({ email });
+                if (emailInUse) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'New email is already in use by another account'
+                    });
+                }
+            }
+
+            userAccount.email = email;
+            userAccount.name = name;
+            userAccount.studentId = studentId;
+            userAccount.semester = semester;
+            userAccount.role = targetRole;
+            userAccount.batch = batch || userAccount.batch;
+            userAccount.college = college || userAccount.college;
+            userAccount.department = department || userAccount.department;
+
+            if (password) {
+                userAccount.password = password;
+            }
+
+            await userAccount.save();
+            logger.info(`${targetRole} updated by ${req.user.role}: ${email}`);
+        } else {
+            userAccount = await Student.create({
+                email,
+                password: password || 'Welcome123',
+                name,
+                studentId,
+                semester,
+                batch: batch || (targetRole === 'student' ? 'Batch 2024' : 'STAFF'),
+                college: college || 'Anna University',
+                department: department || 'Computer Science Engineering',
+                role: targetRole,
+                isActive: true
+            });
+            logger.info(`New ${targetRole} created by ${req.user.role}: ${email}`);
+        }
+
+        res.status(200).json({
+            success: true,
+            message: userAccount.isNew ? `${targetRole} created successfully` : `${targetRole} updated successfully`,
+            data: userAccount
+        });
+
+    } catch (error) {
+        logger.error('Manage account error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to manage account',
+            error: error.message
+        });
+    }
+};
+
+/**
+ * Check if system is initialized (has at least one admin/hod)
+ */
+exports.getSystemStatus = async (req, res) => {
+    try {
+        const adminCount = await Student.countDocuments({ 
+            role: { $in: ['admin', 'hod'] } 
+        });
+
+        res.status(200).json({
+            success: true,
+            initialized: adminCount > 0,
+            adminCount
+        });
+    } catch (error) {
+        logger.error('Get system status error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to check system status'
+        });
+    }
+};
+
+/**
+ * Setup first admin account
+ */
+exports.setupInitialAdmin = async (req, res) => {
+    try {
+        // 1. Check if ANY admin already exists
+        const adminExists = await Student.findOne({ 
+            role: { $in: ['admin', 'hod'] } 
+        });
+
+        if (adminExists) {
+            return res.status(403).json({
+                success: false,
+                message: 'System is already initialized. Standard registration must be used.'
+            });
+        }
+
+        const { name, email, password, phone } = req.body;
+
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Name, Email, and Password are required for setup'
+            });
+        }
+
+        // 2. Create the root admin
+        const admin = await Student.create({
+            studentId: 'ROOT_ADMIN',
+            name,
+            email: email.toLowerCase(),
+            password,
+            phone: phone || '0000000000',
+            role: 'admin',
+            department: 'Institutional Administration',
+            semester: 1,
+            batch: 'STAFF',
+            college: 'Anna University', // Default, can be changed later
+            isActive: true,
+            isEmailVerified: true
+        });
+
+        logger.info(`Root Admin successfully created: ${email}`);
+
+        res.status(201).json({
+            success: true,
+            message: 'Root Admin account created successfully. You can now login.',
+            data: {
+                id: admin._id,
+                name: admin.name,
+                email: admin.email
+            }
+        });
+
+    } catch (error) {
+        logger.error('Initial setup error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to complete initial setup',
+            error: error.message
+        });
+    }
+};
+
+/**
+ * Seed initial syllabus data from the seed script
+ */
+exports.seedSyllabus = async (req, res) => {
+    try {
+        // Prevent if syllabus already exists
+        const syllabusCount = await Syllabus.countDocuments();
+        if (syllabusCount > 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Syllabus is already populated.'
+            });
+        }
+
+        if (!syllabusData || syllabusData.length === 0) {
+            return res.status(500).json({
+                success: false,
+                message: 'No syllabus data found in seed script.'
+            });
+        }
+
+        logger.info(`Seeding ${syllabusData.length} subjects from setup portal...`);
+        await Syllabus.insertMany(syllabusData);
+
+        res.status(200).json({
+            success: true,
+            message: `Successfully imported ${syllabusData.length} subjects.`
+        });
+    } catch (error) {
+        logger.error('Seed syllabus error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to seed syllabus data',
             error: error.message
         });
     }
