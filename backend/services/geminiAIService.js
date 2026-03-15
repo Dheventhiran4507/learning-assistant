@@ -315,92 +315,96 @@ class GeminiAIService {
 
         try {
             const prompt = `${systemPrompt}\n\n${userPrompt}`;
-            const cacheKey = `bulk_v2_${subjectCode || 'global'}_${topic}_${difficulty}_${count}`;
-            if (this.cache.has(cacheKey)) return this.cache.get(cacheKey);
+            const cacheKey = `bulk_v3_${subjectCode || 'global'}_${unitTitle || ''}_${topic.replace(/\s+/g, '_')}_${difficulty}_${count}`;
+            if (this.cache.has(cacheKey)) {
+                logger.info(`🎯 Cache hit for ${topic}`);
+                return this.cache.get(cacheKey);
+            }
 
             await this.ensureServiceAvailable();
             let questions = [];
 
             if (this.isServiceAvailable) {
+                logger.info(`🤖 Calling Gemini for ${count} questions on "${topic}"...`);
                 const result = await this.model.generateContent({
                     contents: [{ role: 'user', parts: [{ text: prompt }] }],
                     generationConfig: { temperature: 0.7 }
                 });
                 const response = await result.response;
                 const text = response.text();
+                logger.info(`📥 Received Gemini response length: ${text.length}`);
                 const parsed = this.cleanAndParseJSON(text);
                 questions = parsed.questions || parsed.data || (Array.isArray(parsed) ? parsed : []);
             } else {
+                logger.info(`🤖 Gemini offline, calling Groq fallback for "${topic}"...`);
                 questions = await this.getGroqFallbackQuestions(prompt);
             }
 
             // Randomize options and finalize
+            // Normalize and randomize options
             questions = (questions || []).map(q => {
-                const correct = q.correctAnswer;
-                q.options = this.shuffleArray(q.options || []);
-                q.correctAnswer = q.options.find(o => o === correct) || correct;
-                return q;
+                const correct = q.correctAnswer || q.answer;
+                const options = q.options || q.choices || [];
+                const shuffledOptions = this.shuffleArray(options);
+                return {
+                    question: q.question,
+                    options: shuffledOptions,
+                    correctAnswer: shuffledOptions.find(o => o === correct) || (typeof correct === 'number' ? shuffledOptions[correct] : correct),
+                    explanation: q.explanation || `Concept: ${topic}`
+                };
             });
 
             if (questions.length > 0) this.cache.set(cacheKey, questions);
             return questions;
         } catch (error) {
-            logger.error(`❌ Question Gen Error: ${error.message}`);
+            logger.error(`❌ Question Gen Critical Error for "${topic}": ${error.message}`);
+            if (error.stack) logger.error(error.stack);
             
             // Try Groq as secondary fallback if Gemini fails in-flight
             if (this.groq) {
                 try {
-                    logger.info('🔄 Attempting Groq secondary fallback for bulk questions...');
+                    logger.info(`🔄 Attempting Groq secondary fallback for "${topic}"...`);
                     const prompt = `${systemPrompt}\n\n${userPrompt}`;
                     const groqQuestions = await this.getGroqFallbackQuestions(prompt);
                     if (groqQuestions && groqQuestions.length > 0) {
                         return groqQuestions;
                     }
                 } catch (groqErr) {
-                    logger.error(`❌ Groq Fallback also failed: ${groqErr.message}`);
+                    logger.error(`❌ Groq Fallback also failed for "${topic}": ${groqErr.message}`);
                 }
             }
 
+            logger.warn(`⚠️ Both AI services failed. Using structural fallback for "${topic}"`);
             return this.getQuestionStructuralFallback(topic, subjectCode, subjectName, count);
         }
     }
 
     getQuestionStructuralFallback(topic, code = '', name = '', count = 5) {
-        const structuralQuestions = [
-            {
-                question: `Identify the primary technical challenge associated with ${topic}.`,
-                options: ["Scalability", "Security", "Consistency", "Interoperability"],
-                correctAnswer: "Scalability",
-                explanation: "Technical challenges often involve scalability in complex systems."
-            },
-            {
-                question: `Which of the following describes the core principle of ${topic}?`,
-                options: ["Efficiency", "Modularity", "Abstraction", "Encapsulation"],
-                correctAnswer: "Efficiency",
-                explanation: "Core principles usually prioritize system efficiency."
-            },
-            {
-                question: `In the context of ${topic}, what does a 403 error typically represent?`,
-                options: ["Forbidden/Access Denied", "Not Found", "Server Error", "Bad Request"],
-                correctAnswer: "Forbidden/Access Denied",
-                explanation: "A 403 Forbidden error indicates that the server understands the request but refuses to authorize it."
-            },
-            {
-                question: `What is the most common industry standard for implementing ${topic}?`,
-                options: ["ISO 27001", "Agile", "REST", "IEEE R2021"],
-                correctAnswer: "IEEE R2021",
-                explanation: "Standards provide a framework for consistent implementation."
-            },
-            {
-                question: `Which layer of the system architecture does ${topic} primarily reside in?`,
-                options: ["Data Layer", "Logic Layer", "UI Layer", "Network Layer"],
-                correctAnswer: "Logic Layer",
-                explanation: "Most technical topics are implemented within the business logic layer."
-            }
+        const pool = [
+            { q: `What is the primary objective of ${topic}?`, a: "Efficiency", o: ["Efficiency", "Complexity", "Stagnation", "Isolation"], e: `${topic} focuses on improving system efficiency.` },
+            { q: `Identify the core principle behind ${topic}.`, a: "Modularity", o: ["Modularity", "Monolithism", "Entropy", "Rigidity"], e: "Modularity is essential for managing complex topics." },
+            { q: `In an Anna University R2021 context, ${topic} is categorized as?`, a: "Core Concept", o: ["Core Concept", "Elective only", "Non-technical", "Deprecated"], e: "It is a vital part of the R2021 curriculum." },
+            { q: `Which technical challenge is most common in ${topic}?`, a: "Scalability", o: ["Scalability", "Syntax", "Naming", "Coloring"], e: "Scalability is a universal challenge in engineering." },
+            { q: `The most frequent industry application for ${topic} is?`, a: "Automation", o: ["Automation", "Manual labor", "History", "Legality"], e: "Automation leverages these core concepts." },
+            { q: `Which layer usually handles ${topic}?`, a: "Logic Layer", o: ["Logic Layer", "Physical Layer", "User Layer", "None"], e: "Business logic implement the core rules." },
+            { q: `What defines a successful implementation of ${topic}?`, a: "Reliability", o: ["Reliability", "Length", "Cost", "Popularity"], e: "Reliability is the hallmark of good engineering." },
+            { q: `Which tool is often used for ${topic}?`, a: "Standard API", o: ["Standard API", "Calculator", "Pen and Paper", "None"], e: "Modern tools provide APIs for implementation." },
+            { q: `What is the first step in learning ${topic}?`, a: "Foundations", o: ["Foundations", "Advanced math", "Deployment", "Marketing"], e: "Foundations are key to mastering any topic." },
+            { q: `How does ${topic} impact system performance?`, a: "Optimizes latency", o: ["Optimizes latency", "Increases cost", "No impact", "Reduces security"], e: "Good implementation reduces latency." },
+            { q: `What is a common misconception about ${topic}?`, a: "It's too simple", o: ["It's too simple", "It's magic", "It's irrelevant", "It's illegal"], e: "Complexity often hides under simple concepts." },
+            { q: `Identify the main benefit of ${topic}.`, a: "Consistency", o: ["Consistency", "Speed", "Brevity", "Novelty"], e: "Consistency ensures predictable system behavior." },
+            { q: `Which regulation affects ${topic} the most?`, a: "IEEE R2021", o: ["IEEE R2021", "Traffic laws", "Sports rules", "None"], e: "Academic regulations define the study scope." },
+            { q: `The best approach for ${topic} is?`, a: "Systematic", o: ["Systematic", "Random", "Aggressive", "Passive"], e: "A systematic approach yields the best results." },
+            { q: `Where can you find official documentation for ${topic}?`, a: "Technical Manuals", o: ["Technical Manuals", "Newspapers", "Social Media", "Novels"], e: "Manuals are the source of truth." }
         ];
         
-        // Return a slice but ensure we return at least everything we have if count is large
-        return structuralQuestions.slice(0, count);
+        const shuffled = this.shuffleArray(pool);
+        return shuffled.slice(0, count).map(it => ({
+            question: it.q,
+            options: this.shuffleArray(it.o),
+            correctAnswer: it.a,
+            explanation: it.e
+        }));
     }
 
     cleanAndParseJSON(text) {
@@ -455,8 +459,8 @@ class GeminiAIService {
         if (!this.groq) return [];
         try {
             const response = await this.groq.chat.completions.create({
-                messages: [{ role: 'user', content: prompt }],
-                model: 'llama-3.1-8b-instant',
+                messages: [{ role: 'system', content: 'Generate high-quality MCQs in JSON format.' }, { role: 'user', content: prompt }],
+                model: 'llama-3.3-70b-versatile',
                 response_format: { type: "json_object" }
             });
             const parsed = this.cleanAndParseJSON(response.choices[0].message.content);
