@@ -21,7 +21,9 @@ const logger = require('./utils/logger');
 
 const app = express();
 app.set('trust proxy', 1); // Trust first proxy (Render load balancer)
-const PORT = process.env.PORT || 5000;
+
+// Port must be provided by Render, default to 10000 for free tier if not set
+const PORT = process.env.PORT || (process.env.NODE_ENV === 'production' ? 10000 : 5000);
 
 // Middleware
 app.use(helmet()); // Security headers
@@ -83,21 +85,25 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/vidal')
         logger.info('✅ MongoDB connected successfully');
 
         // Start server
-        app.listen(PORT, '0.0.0.0', () => {
+        const server = app.listen(PORT, '0.0.0.0', () => {
             logger.info(`🚀 Server running on port ${PORT}`);
             logger.info(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
             logger.info(`🌐 Local: http://localhost:${PORT}`);
             
-            // Get local IP for mobile testing
+            // Log reachable address for Render debugging
             const os = require('os');
             const interfaces = os.networkInterfaces();
             for (const name of Object.keys(interfaces)) {
                 for (const iface of interfaces[name]) {
                     if (iface.family === 'IPv4' && !iface.internal) {
-                        logger.info(`📱 Mobile Access: http://${iface.address}:${PORT}/api`);
+                        logger.info(`📱 Publicly reachable (on Render internal network): http://${iface.address}:${PORT}/api`);
                     }
                 }
             }
+        });
+        
+        server.on('error', (error) => {
+            logger.error('❌ Server startup error:', error.message);
         });
     })
     .catch((error) => {
