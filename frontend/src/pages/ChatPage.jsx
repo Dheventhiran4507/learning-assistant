@@ -160,7 +160,6 @@ export default function ChatPage() {
     };
 
     return (
-    return (
         <div className="flex h-[calc(100dvh-120px)] sm:h-[calc(100vh-100px)] overflow-hidden bg-slate-50/50">
             
             {/* Sidebar Overlay (Mobile) */}
