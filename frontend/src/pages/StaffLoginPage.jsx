@@ -74,7 +74,7 @@ const StaffLoginPage = () => {
                                 <UserIcon className="w-5 h-5" />
                             </div>
                             <input
-                                type="email"
+                                type="text"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
