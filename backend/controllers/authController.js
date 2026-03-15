@@ -25,6 +25,9 @@ exports.register = async (req, res) => {
             department
         } = req.body;
 
+        const cleanEmail = email ? email.trim().toLowerCase() : '';
+        const cleanStudentId = studentId ? studentId.trim() : '';
+
         // Gmail Verification (Skip if disabled in .env)
         if (process.env.REQUIRE_GMAIL_VERIFICATION !== 'false') {
             try {
@@ -41,7 +44,7 @@ exports.register = async (req, res) => {
 
         // Check if student already exists
         const existingStudent = await Student.findOne({
-            $or: [{ email }, { studentId }]
+            $or: [{ email: cleanEmail }, { studentId: cleanStudentId }]
         });
 
         if (existingStudent) {
@@ -108,11 +111,13 @@ exports.login = async (req, res) => {
         }
 
         // Search by email or studentId (Case-insensitive email)
-        const identifier = email.toLowerCase();
+        const identifier = email ? email.trim().toLowerCase() : '';
+        const rawIdentifier = email ? email.trim() : '';
+        
         const student = await Student.findOne({
             $or: [
                 { email: identifier },
-                { studentId: email } // Allow original input as studentId (case-sensitive)
+                { studentId: rawIdentifier } 
             ]
         }).select('+password');
 

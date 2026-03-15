@@ -26,7 +26,7 @@ const StaffLoginPage = () => {
         setLoading(true);
 
         try {
-            const response = await api.post('/auth/login', { email, password });
+            const response = await api.post('/auth/login', { email: email.trim(), password });
 
             if (response.data.success) {
                 const { student, token } = response.data.data;

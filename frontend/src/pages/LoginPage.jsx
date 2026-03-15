@@ -28,7 +28,7 @@ const LoginPage = () => {
         setLoading(true);
 
         try {
-            const data = await authService.login({ email, password });
+            const data = await authService.login({ email: email.trim(), password });
             if (data.success) {
                 const user = data.data.student;
                 
