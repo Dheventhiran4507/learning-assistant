@@ -129,6 +129,7 @@ const Navbar = () => {
             <AnimatePresence>
                 {isMenuOpen && (
                     <>
+                        {/* PWA Sync Version: 1.0.3 */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}

@@ -4,13 +4,178 @@
     "units": [
       {
         "unitNumber": 1,
-        "unitTitle": "Language and Communication",
+        "unitTitle": "Introduction to Professional English",
         "topics": [
           {
-            "topicName": "Reading Skills"
+            "topicName": "Importance of English in Professional Life",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17e4aa587c033672f7804"
+          },
+          {
+            "topicName": "Language Skills for Effective Communication",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17e4aa587c033672f7805"
+          },
+          {
+            "topicName": "Overview of Professional English Course",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17e4aa587c033672f7806"
           }
         ],
-        "hours": 9
+        "hours": 9,
+        "_id": "69b17e4aa587c033672f7803"
+      },
+      {
+        "unitNumber": 2,
+        "unitTitle": "Reading Comprehension",
+        "topics": [
+          {
+            "topicName": "Reading Strategies for Comprehension",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17e4aa587c033672f7808"
+          },
+          {
+            "topicName": "Identifying Main Ideas and Supporting Details",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17e4aa587c033672f7809"
+          },
+          {
+            "topicName": "Making Inferences and Drawing Conclusions",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17e4aa587c033672f780a"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17e4aa587c033672f7807"
+      },
+      {
+        "unitNumber": 3,
+        "unitTitle": "Writing for Professional Purposes",
+        "topics": [
+          {
+            "topicName": "Basic Writing Skills",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17e4aa587c033672f780c"
+          },
+          {
+            "topicName": "Writing Formal and Informal Emails",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17e4aa587c033672f780d"
+          },
+          {
+            "topicName": "Report Writing and Memorandum",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17e4aa587c033672f780e"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17e4aa587c033672f780b"
+      },
+      {
+        "unitNumber": 4,
+        "unitTitle": "Speaking and Listening",
+        "topics": [
+          {
+            "topicName": "Effective Speaking Techniques",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17e4aa587c033672f7810"
+          },
+          {
+            "topicName": "Participating in Meetings and Discussions",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17e4aa587c033672f7811"
+          },
+          {
+            "topicName": "Active Listening and Note-taking",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17e4aa587c033672f7812"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17e4aa587c033672f780f"
+      },
+      {
+        "unitNumber": 5,
+        "unitTitle": "Professional Presentation and Communication",
+        "topics": [
+          {
+            "topicName": "Preparing and Delivering Professional Presentations",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17e4aa587c033672f7814"
+          },
+          {
+            "topicName": "Using Visual Aids and Non-Verbal Communication",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17e4aa587c033672f7815"
+          },
+          {
+            "topicName": "Handling Questions and Answers",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17e4aa587c033672f7816"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17e4aa587c033672f7813"
       }
     ]
   },
@@ -270,13 +435,178 @@
     "units": [
       {
         "unitNumber": 1,
-        "unitTitle": "Water Technology",
+        "unitTitle": "WATER AND INSTRUMENTAL ANALYSIS",
         "topics": [
           {
-            "topicName": "Hardness"
+            "topicName": "Water quality",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdc1a4255e38020fa6d"
+          },
+          {
+            "topicName": "Hardness",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdc1a4255e38020fa6e"
+          },
+          {
+            "topicName": "Treatment",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdc1a4255e38020fa6f"
           }
         ],
-        "hours": 9
+        "hours": 9,
+        "_id": "69b17fdc1a4255e38020fa6c"
+      },
+      {
+        "unitNumber": 2,
+        "unitTitle": "NANOCHEMISTRY",
+        "topics": [
+          {
+            "topicName": "Nanomaterials",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdc1a4255e38020fa71"
+          },
+          {
+            "topicName": "Preparation",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdc1a4255e38020fa72"
+          },
+          {
+            "topicName": "Properties",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdc1a4255e38020fa73"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdc1a4255e38020fa70"
+      },
+      {
+        "unitNumber": 3,
+        "unitTitle": "PHASE RULE AND COMPOSITES",
+        "topics": [
+          {
+            "topicName": "Phase rule",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdc1a4255e38020fa75"
+          },
+          {
+            "topicName": "One component",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdc1a4255e38020fa76"
+          },
+          {
+            "topicName": "Composites",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdc1a4255e38020fa77"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdc1a4255e38020fa74"
+      },
+      {
+        "unitNumber": 4,
+        "unitTitle": "FUELS AND COMBUSTION",
+        "topics": [
+          {
+            "topicName": "Coal",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdc1a4255e38020fa79"
+          },
+          {
+            "topicName": "Petroleum",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdc1a4255e38020fa7a"
+          },
+          {
+            "topicName": "Gaseous fuels",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdc1a4255e38020fa7b"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdc1a4255e38020fa78"
+      },
+      {
+        "unitNumber": 5,
+        "unitTitle": "ENERGY STORAGE DEVICES",
+        "topics": [
+          {
+            "topicName": "Batteries",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdc1a4255e38020fa7d"
+          },
+          {
+            "topicName": "Fuel cells",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdc1a4255e38020fa7e"
+          },
+          {
+            "topicName": "Solar cells",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdc1a4255e38020fa7f"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdc1a4255e38020fa7c"
       }
     ]
   },
@@ -285,13 +615,133 @@
     "units": [
       {
         "unitNumber": 1,
-        "unitTitle": "Computational Thinking",
+        "unitTitle": "ALGORITHMIC PROBLEM SOLVING",
         "topics": [
           {
-            "topicName": "Algorithms"
+            "topicName": "Algorithms",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fa8b"
+          },
+          {
+            "topicName": "Pseudo code",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fa8c"
           }
         ],
-        "hours": 9
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020fa8a"
+      },
+      {
+        "unitNumber": 2,
+        "unitTitle": "DATA, EXPRESSIONS, STATEMENTS",
+        "topics": [
+          {
+            "topicName": "Variables",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fa8e"
+          },
+          {
+            "topicName": "Operators",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fa8f"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020fa8d"
+      },
+      {
+        "unitNumber": 3,
+        "unitTitle": "CONTROL FLOW, FUNCTIONS",
+        "topics": [
+          {
+            "topicName": "Conditionals",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fa91"
+          },
+          {
+            "topicName": "Functions",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fa92"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020fa90"
+      },
+      {
+        "unitNumber": 4,
+        "unitTitle": "LISTS, TUPLES, DICTIONARIES",
+        "topics": [
+          {
+            "topicName": "Lists",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fa94"
+          },
+          {
+            "topicName": "Dictionaries",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fa95"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020fa93"
+      },
+      {
+        "unitNumber": 5,
+        "unitTitle": "FILES, MODULES, PACKAGES",
+        "topics": [
+          {
+            "topicName": "File handling",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fa97"
+          },
+          {
+            "topicName": "Exceptions",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fa98"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020fa96"
       }
     ]
   },
@@ -14132,13 +14582,133 @@
     "units": [
       {
         "unitNumber": 1,
-        "unitTitle": "Automata Fundamentals",
+        "unitTitle": "AUTOMATA AND REGULAR EXPRESSIONS",
         "topics": [
           {
-            "topicName": "Finite Automata"
+            "topicName": "Introduction to Finite Automata",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b180939b397eb748200198"
+          },
+          {
+            "topicName": "DFA vs NFA",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b180939b397eb748200199"
           }
         ],
-        "hours": 9
+        "hours": 9,
+        "_id": "69b180939b397eb748200197"
+      },
+      {
+        "unitNumber": 2,
+        "unitTitle": "REGULAR EXPRESSIONS AND LANGUAGES",
+        "topics": [
+          {
+            "topicName": "Pumping Lemma",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b180939b397eb74820019b"
+          },
+          {
+            "topicName": "Regular Grammars",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b180939b397eb74820019c"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b180939b397eb74820019a"
+      },
+      {
+        "unitNumber": 3,
+        "unitTitle": "CONTEXT FREE GRAMMAR AND PUSH DOWN AUTOMATA",
+        "topics": [
+          {
+            "topicName": "CFG",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b180939b397eb74820019e"
+          },
+          {
+            "topicName": "Pushdown Automata",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b180939b397eb74820019f"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b180939b397eb74820019d"
+      },
+      {
+        "unitNumber": 4,
+        "unitTitle": "NORMAL FORMS AND TURING MACHINES",
+        "topics": [
+          {
+            "topicName": "CNF/GNF",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b180939b397eb7482001a1"
+          },
+          {
+            "topicName": "Turing Machines",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b180939b397eb7482001a2"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b180939b397eb7482001a0"
+      },
+      {
+        "unitNumber": 5,
+        "unitTitle": "UNDECIDABILITY",
+        "topics": [
+          {
+            "topicName": "Universal TM",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b180939b397eb7482001a4"
+          },
+          {
+            "topicName": "P vs NP",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b180939b397eb7482001a5"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b180939b397eb7482001a3"
       }
     ]
   },
@@ -14319,13 +14889,124 @@
     "units": [
       {
         "unitNumber": 1,
-        "unitTitle": "Problem Solving",
+        "unitTitle": "PROBLEM SOLVING",
         "topics": [
           {
-            "topicName": "Search Algorithms"
+            "topicName": "Informed Search",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fae8"
+          },
+          {
+            "topicName": "Uninformed Search",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fae9"
           }
         ],
-        "hours": 12
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020fae7"
+      },
+      {
+        "unitNumber": 2,
+        "unitTitle": "KNOWLEDGE REPRESENTATION",
+        "topics": [
+          {
+            "topicName": "First Order Logic",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020faeb"
+          },
+          {
+            "topicName": "Inference",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020faec"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020faea"
+      },
+      {
+        "unitNumber": 3,
+        "unitTitle": "LEARNING",
+        "topics": [
+          {
+            "topicName": "Supervised Learning",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020faee"
+          },
+          {
+            "topicName": "Unsupervised Learning",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020faef"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020faed"
+      },
+      {
+        "unitNumber": 4,
+        "unitTitle": "PROBABILISTIC REASONING",
+        "topics": [
+          {
+            "topicName": "Bayesian Networks",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020faf1"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020faf0"
+      },
+      {
+        "unitNumber": 5,
+        "unitTitle": "APPLICATIONS",
+        "topics": [
+          {
+            "topicName": "Robotics",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020faf3"
+          },
+          {
+            "topicName": "NLP",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020faf4"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020faf2"
       }
     ]
   },
@@ -14334,13 +15015,115 @@
     "units": [
       {
         "unitNumber": 1,
-        "unitTitle": "Lexical Analysis",
+        "unitTitle": "PHASES OF COMPILER AND LEXICAL ANALYSIS",
         "topics": [
           {
-            "topicName": "Tokens"
+            "topicName": "Compiler Phases",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fde1a4255e38020fb0d"
+          },
+          {
+            "topicName": "Regular Expressions",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fde1a4255e38020fb0e"
           }
         ],
-        "hours": 12
+        "hours": 9,
+        "_id": "69b17fde1a4255e38020fb0c"
+      },
+      {
+        "unitNumber": 2,
+        "unitTitle": "SYNTAX ANALYSIS",
+        "topics": [
+          {
+            "topicName": "Parsing",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fde1a4255e38020fb10"
+          },
+          {
+            "topicName": "CFG",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fde1a4255e38020fb11"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fde1a4255e38020fb0f"
+      },
+      {
+        "unitNumber": 3,
+        "unitTitle": "INTERMEDIATE CODE GENERATION",
+        "topics": [
+          {
+            "topicName": "DAG",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fde1a4255e38020fb13"
+          },
+          {
+            "topicName": "Three Address Code",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fde1a4255e38020fb14"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fde1a4255e38020fb12"
+      },
+      {
+        "unitNumber": 4,
+        "unitTitle": "RUNTIME ENVIRONMENT AND CODE GENERATION",
+        "topics": [
+          {
+            "topicName": "Stack Allocation",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fde1a4255e38020fb16"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fde1a4255e38020fb15"
+      },
+      {
+        "unitNumber": 5,
+        "unitTitle": "CODE OPTIMIZATION",
+        "topics": [
+          {
+            "topicName": "Data Flow Analysis",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fde1a4255e38020fb18"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fde1a4255e38020fb17"
       }
     ]
   },
@@ -14512,13 +15295,133 @@
     "units": [
       {
         "unitNumber": 1,
-        "unitTitle": "Fundamentals",
+        "unitTitle": "INTRODUCTION AND PHYSICAL LAYER",
         "topics": [
           {
-            "topicName": "OSI Reference Model"
+            "topicName": "OSI Model",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fde1a4255e38020fafa"
+          },
+          {
+            "topicName": "TCP/IP",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fde1a4255e38020fafb"
           }
         ],
-        "hours": 12
+        "hours": 9,
+        "_id": "69b17fde1a4255e38020faf9"
+      },
+      {
+        "unitNumber": 2,
+        "unitTitle": "DATA-LINK LAYER & MEDIA ACCESS",
+        "topics": [
+          {
+            "topicName": "Framing",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fde1a4255e38020fafd"
+          },
+          {
+            "topicName": "Error Detection",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fde1a4255e38020fafe"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fde1a4255e38020fafc"
+      },
+      {
+        "unitNumber": 3,
+        "unitTitle": "NETWORK LAYER",
+        "topics": [
+          {
+            "topicName": "IP Addressing",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fde1a4255e38020fb00"
+          },
+          {
+            "topicName": "Routing",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fde1a4255e38020fb01"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fde1a4255e38020faff"
+      },
+      {
+        "unitNumber": 4,
+        "unitTitle": "TRANSPORT LAYER",
+        "topics": [
+          {
+            "topicName": "UDP",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fde1a4255e38020fb03"
+          },
+          {
+            "topicName": "TCP",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fde1a4255e38020fb04"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fde1a4255e38020fb02"
+      },
+      {
+        "unitNumber": 5,
+        "unitTitle": "APPLICATION LAYER",
+        "topics": [
+          {
+            "topicName": "HTTP",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fde1a4255e38020fb06"
+          },
+          {
+            "topicName": "DNS",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fde1a4255e38020fb07"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fde1a4255e38020fb05"
       }
     ]
   },
@@ -15391,13 +16294,115 @@
     "units": [
       {
         "unitNumber": 1,
-        "unitTitle": "Environment and Ecosystem",
+        "unitTitle": "ENVIRONMENT, ECOSYSTEMS AND BIODIVERSITY",
         "topics": [
           {
-            "topicName": "Biodiversity"
+            "topicName": "Ecosystems",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fad7"
+          },
+          {
+            "topicName": "Biodiversity",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fad8"
           }
         ],
-        "hours": 6
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020fad6"
+      },
+      {
+        "unitNumber": 2,
+        "unitTitle": "ENVIRONMENTAL POLLUTION",
+        "topics": [
+          {
+            "topicName": "Air pollution",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fada"
+          },
+          {
+            "topicName": "Water pollution",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fadb"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020fad9"
+      },
+      {
+        "unitNumber": 3,
+        "unitTitle": "NATURAL RESOURCES",
+        "topics": [
+          {
+            "topicName": "Forest resources",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fadd"
+          },
+          {
+            "topicName": "Water resources",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fade"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020fadc"
+      },
+      {
+        "unitNumber": 4,
+        "unitTitle": "SOCIAL ISSUES AND THE ENVIRONMENT",
+        "topics": [
+          {
+            "topicName": "Sustainable development",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fae0"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020fadf"
+      },
+      {
+        "unitNumber": 5,
+        "unitTitle": "HUMAN POPULATION AND THE ENVIRONMENT",
+        "topics": [
+          {
+            "topicName": "Population growth",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fae2"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020fae1"
       }
     ]
   },
@@ -15718,13 +16723,133 @@
     "units": [
       {
         "unitNumber": 1,
-        "unitTitle": "Testing of Hypothesis",
+        "unitTitle": "TESTING OF HYPOTHESIS",
         "topics": [
           {
-            "topicName": "T-Test"
+            "topicName": "Large samples",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020faa1"
+          },
+          {
+            "topicName": "Small samples",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020faa2"
           }
         ],
-        "hours": 12
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020faa0"
+      },
+      {
+        "unitNumber": 2,
+        "unitTitle": "DESIGN OF EXPERIMENTS",
+        "topics": [
+          {
+            "topicName": "One way",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020faa4"
+          },
+          {
+            "topicName": "Two way",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020faa5"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020faa3"
+      },
+      {
+        "unitNumber": 3,
+        "unitTitle": "SOLUTION OF EQUATIONS",
+        "topics": [
+          {
+            "topicName": "Newton Raphson",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020faa7"
+          },
+          {
+            "topicName": "Gauss elimination",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020faa8"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020faa6"
+      },
+      {
+        "unitNumber": 4,
+        "unitTitle": "INTERPOLATION AND INTEGRATION",
+        "topics": [
+          {
+            "topicName": "Lagrange",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020faaa"
+          },
+          {
+            "topicName": "Simpson",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020faab"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020faa9"
+      },
+      {
+        "unitNumber": 5,
+        "unitTitle": "NUMERICAL SOLUTION OF ODE",
+        "topics": [
+          {
+            "topicName": "Taylor series",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020faad"
+          },
+          {
+            "topicName": "Runge Kutta",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020faae"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020faac"
       }
     ]
   },
@@ -26126,13 +27251,133 @@
     "units": [
       {
         "unitNumber": 1,
-        "unitTitle": "List",
+        "unitTitle": "LINEAR DATA STRUCTURES - LIST",
         "topics": [
           {
-            "topicName": "Abstract Data Types"
+            "topicName": "ADT",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fac4"
+          },
+          {
+            "topicName": "Linked Lists",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fac5"
           }
         ],
-        "hours": 9
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020fac3"
+      },
+      {
+        "unitNumber": 2,
+        "unitTitle": "LINEAR DATA STRUCTURES - STACKS, QUEUES",
+        "topics": [
+          {
+            "topicName": "Stacks",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fac7"
+          },
+          {
+            "topicName": "Queues",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fac8"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020fac6"
+      },
+      {
+        "unitNumber": 3,
+        "unitTitle": "NON LINEAR DATA STRUCTURES - TREES",
+        "topics": [
+          {
+            "topicName": "Traversals",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020faca"
+          },
+          {
+            "topicName": "BST",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020facb"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020fac9"
+      },
+      {
+        "unitNumber": 4,
+        "unitTitle": "NON LINEAR DATA STRUCTURES - GRAPHS",
+        "topics": [
+          {
+            "topicName": "Representations",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020facd"
+          },
+          {
+            "topicName": "BFS/DFS",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020face"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020facc"
+      },
+      {
+        "unitNumber": 5,
+        "unitTitle": "HASHING AND SORTING",
+        "topics": [
+          {
+            "topicName": "Sorting",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fad0"
+          },
+          {
+            "topicName": "Hashing",
+            "subtopics": [],
+            "difficulty": "medium",
+            "keyPoints": [],
+            "examples": [],
+            "references": [],
+            "_id": "69b17fdd1a4255e38020fad1"
+          }
+        ],
+        "hours": 9,
+        "_id": "69b17fdd1a4255e38020facf"
       }
     ]
   },

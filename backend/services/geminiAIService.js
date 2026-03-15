@@ -508,13 +508,36 @@ class GeminiAIService {
         this.initModel();
     }
 
-    getStructuralFallback(subjectCode, manualName = null) {
-        return {
-            subjectName: manualName || subjectCode,
-            units: [1,2,3,4,5].map(i => ({
-                unitNumber: i, unitTitle: `Unit ${i}`, topics: [{ topicName: "Core Topic", difficulty: "medium" }]
-            }))
-        };
+    async generateSyllabusStructure(subjectCode, officialName = null) {
+        const prompt = `Generate a comprehensive syllabus for the subject "${subjectCode} - ${officialName || ''}" under Anna University R2021 Regulation. 
+        It MUST have exactly 5 units.
+        Return a JSON object with the following structure:
+        {
+          "subjectName": "Full Subject Name",
+          "units": [
+            {
+              "unitNumber": 1,
+              "unitTitle": "Unit 1 Title",
+              "topics": [
+                { "topicName": "Topic 1", "difficulty": "medium" }
+              ],
+              "hours": 9
+            }
+          ]
+        }`;
+        
+        try {
+            logger.info(`Generating syllabus structure for ${subjectCode}...`);
+            const data = await this.universalGenerateSyllabus(prompt);
+            if (data && data.units && data.units.length >= 5) {
+                return data;
+            }
+            logger.warn(`AI returned incomplete syllabus for ${subjectCode}, using structural fallback.`);
+            return this.getStructuralFallback(subjectCode, officialName);
+        } catch (error) {
+            logger.error(`Failed to generate syllabus structure for ${subjectCode}:`, error.message);
+            return this.getStructuralFallback(subjectCode, officialName);
+        }
     }
 }
 
