@@ -96,7 +96,10 @@ const LoginPage = () => {
                             <h1 className="text-3xl font-black text-slate-900 uppercase tracking-widest">
                                 Student Portal
                             </h1>
-                            <p className="mt-2 text-slate-500 font-medium">Authentication required for secure access</p>
+                            <div className="flex items-center justify-center gap-2 mt-1">
+                                <p className="text-slate-500 font-medium">Authentication required for secure access</p>
+                                <span className="text-[10px] font-bold text-slate-400 opacity-60">v1.0.5</span>
+                            </div>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">

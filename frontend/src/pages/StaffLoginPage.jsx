@@ -63,7 +63,10 @@ const StaffLoginPage = () => {
                         <ShieldCheckIcon className="w-10 h-10 text-white" />
                     </div>
                     <h1 className="text-4xl font-black text-white mb-3 tracking-tighter uppercase">Staff <span className="text-indigo-400">Terminal</span></h1>
-                    <p className="text-slate-500 font-bold text-sm tracking-widest uppercase">Institutional Management Control</p>
+                    <div className="flex items-center justify-center gap-3">
+                        <p className="text-slate-500 font-bold text-sm tracking-widest uppercase">Institutional Management Control</p>
+                        <span className="text-[10px] font-bold text-slate-600 opacity-80">v1.0.5</span>
+                    </div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
