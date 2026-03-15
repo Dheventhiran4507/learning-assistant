@@ -53,9 +53,10 @@ export default function PracticePage() {
     const [visibleTimer, setVisibleTimer] = useState(0);
 
     // Anti-Cheat Focus Lock State
-    const MAX_VIOLATIONS = 3;
+    const MAX_VIOLATIONS = 1;
     const [tabSwitchCount, setTabSwitchCount] = useState(0);
     const [showWarning, setShowWarning] = useState(false);
+    const [isPrivacyShieldActive, setIsPrivacyShieldActive] = useState(false);
 
     const { user } = useAuthStore();
 
@@ -129,6 +130,7 @@ export default function PracticePage() {
     useEffect(() => {
         setTabSwitchCount(0);
         setShowWarning(false);
+        setIsPrivacyShieldActive(false);
     }, [currentIdx]);
 
     // Anti-Cheat: Focus Lock Effect
@@ -143,6 +145,7 @@ export default function PracticePage() {
         const triggerViolation = () => {
             violationCount += 1;
             setTabSwitchCount(violationCount);
+            setIsPrivacyShieldActive(true);
             if (violationCount >= MAX_VIOLATIONS) {
                 setShowWarning(false);
                 // Auto-submit a wrong answer to penalize cheating
@@ -150,7 +153,7 @@ export default function PracticePage() {
                 toast.error('❌ Session integrity violated! Question marked wrong.', { duration: 4000 });
             } else {
                 setShowWarning(true);
-                toast.error(`⚠️ Warning ${violationCount}/${MAX_VIOLATIONS}: Stay on this page!`, { duration: 3000 });
+                toast.error(`⚠️ Warning: Stay on this page!`, { duration: 3000 });
             }
         };
 
@@ -161,6 +164,12 @@ export default function PracticePage() {
         const handleBlur = () => {
             triggerViolation();
         };
+
+        const handleFocus = () => {
+            // Content remains hidden/blurred until they dismiss the warning or if they already failed
+        };
+
+        window.addEventListener('focus', handleFocus);
 
         const blockKeys = (e) => {
             // Block copy, select-all, paste, view-source, devtools
@@ -183,6 +192,7 @@ export default function PracticePage() {
         return () => {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
             window.removeEventListener('blur', handleBlur);
+            window.removeEventListener('focus', handleFocus);
             document.removeEventListener('keydown', blockKeys, true);
             document.removeEventListener('contextmenu', blockContextMenu);
         };
@@ -197,6 +207,7 @@ export default function PracticePage() {
         const handlePopState = () => {
             // Re-push so Back button never actually leaves
             window.history.pushState(null, '', window.location.href);
+            setIsPrivacyShieldActive(true);
             setShowWarning(true);
             setTabSwitchCount(prev => {
                 const next = prev + 1;
@@ -204,7 +215,7 @@ export default function PracticePage() {
                     submitAnswer('__FOCUS_VIOLATION__');
                     toast.error('❌ Session integrity violated! Question marked wrong.', { duration: 4000 });
                 } else {
-                    toast.error(`⚠️ Warning ${next}/${MAX_VIOLATIONS}: Back button is blocked!`, { duration: 3000 });
+                    toast.error(`⚠️ Warning: Back button is blocked!`, { duration: 3000 });
                 }
                 return next;
             });
@@ -515,17 +526,16 @@ export default function PracticePage() {
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
-            {/* ===== ANTI-CHEAT WARNING OVERLAY ===== */}
+            {/* ===== ANTI-CHEAT / PRIVACY SHIELD OVERLAY ===== */}
             <AnimatePresence>
-                {showWarning && (
+                {(showWarning || isPrivacyShieldActive) && (
                     <motion.div
                         key="cheat-warning"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[200] flex items-center justify-center"
-                        style={{ backdropFilter: 'blur(8px)', backgroundColor: 'rgba(185,28,28,0.55)' }}
-                        onClick={() => setShowWarning(false)}
+                        className="fixed inset-0 z-[200] flex items-center justify-center backdrop-blur-[30px] bg-slate-900/90"
+                        onClick={() => !isAnswered && setShowWarning(false)}
                     >
                         <motion.div
                             initial={{ scale: 0.7, opacity: 0 }}
@@ -545,35 +555,39 @@ export default function PracticePage() {
 
                             <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 text-xs font-black uppercase tracking-widest px-4 py-2 rounded-full mb-4">
                                 <ExclamationTriangleIcon className="w-4 h-4" />
-                                Warning {tabSwitchCount} / {MAX_VIOLATIONS}
+                                Focus Violation
                             </div>
 
-                            <h2 className="text-2xl font-black text-gray-900 mb-3">Focus Violation Detected!</h2>
-                            <p className="text-gray-500 text-base leading-relaxed mb-2">
-                                Practice session-ல் இருக்கும்போது வேற tab/window-க்கு போகக்கூடாது.
-                            </p>
-                            <p className="text-gray-400 text-sm mb-8">
-                                {MAX_VIOLATIONS - tabSwitchCount} more violation{MAX_VIOLATIONS - tabSwitchCount !== 1 ? 's' : ''} will auto-fail this question.
+                            <h2 className="text-2xl font-black text-gray-900 mb-3 uppercase tracking-tight">Security Alert!</h2>
+                            <p className="text-gray-500 text-base leading-relaxed mb-6">
+                                Practice session-ல் இருக்கும்போது வேற tab-க்கோ அல்லது window-க்கோ போகக்கூடாது. Integrity-க்காக screen hide செய்யப்பட்டுள்ளது.
                             </p>
 
-                            <div className="flex justify-center gap-3 mb-2">
-                                {Array.from({ length: MAX_VIOLATIONS }).map((_, i) => (
-                                    <div
-                                        key={i}
-                                        className={`w-4 h-4 rounded-full transition-all ${i < tabSwitchCount
-                                            ? 'bg-red-500 scale-110'
-                                            : 'bg-gray-200'
-                                            }`}
-                                    />
-                                ))}
+                            <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl mb-8 flex items-center gap-4 text-left">
+                                <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400">
+                                    <ClockIcon className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Time Penalty</p>
+                                    <p className="text-sm font-bold text-slate-700 uppercase">Violation Recorded</p>
+                                </div>
                             </div>
 
-                            <button
-                                onClick={() => setShowWarning(false)}
-                                className="mt-6 w-full py-4 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-black text-lg transition-all"
-                            >
-                                I Understand — Back to Practice
-                            </button>
+                            {tabSwitchCount < MAX_VIOLATIONS ? (
+                                <button
+                                    onClick={() => {
+                                        setShowWarning(false);
+                                        setIsPrivacyShieldActive(false);
+                                    }}
+                                    className="w-full py-5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black text-lg transition-all shadow-xl shadow-slate-900/20 active:scale-95"
+                                >
+                                    BACK TO TEST
+                                </button>
+                            ) : (
+                                <div className="text-red-600 font-black text-sm uppercase tracking-widest">
+                                    Question marked as failed.
+                                </div>
+                            )}
                         </motion.div>
                     </motion.div>
                 )}

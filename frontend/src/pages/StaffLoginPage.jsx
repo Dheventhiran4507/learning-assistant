@@ -8,12 +8,15 @@ import {
     UserIcon,
     LockClosedIcon,
     ShieldCheckIcon,
-    ArrowRightIcon
+    ArrowRightIcon,
+    EyeIcon,
+    EyeSlashIcon
 } from '@heroicons/react/24/outline';
 
 const StaffLoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const { login } = useAuthStore();
     const navigate = useNavigate();
@@ -88,13 +91,24 @@ const StaffLoginPage = () => {
                                 <LockClosedIcon className="w-5 h-5" />
                             </div>
                             <input
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
-                                className="w-full bg-white/5 border border-white/10 rounded-2xl pl-16 pr-6 py-5 text-white placeholder-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500/40 transition-all font-bold"
+                                className="w-full bg-white/5 border border-white/10 rounded-2xl pl-16 pr-12 py-5 text-white placeholder-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500/40 transition-all font-bold"
                                 placeholder="••••••••"
                             />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                            >
+                                {showPassword ? (
+                                    <EyeSlashIcon className="w-5 h-5" />
+                                ) : (
+                                    <EyeIcon className="w-5 h-5" />
+                                )}
+                            </button>
                         </div>
                     </div>
 

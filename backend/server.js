@@ -25,7 +25,7 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(helmet()); // Security headers
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: process.env.NODE_ENV === 'development' ? '*' : (process.env.FRONTEND_URL || 'http://localhost:3000'),
     credentials: true
 }));
 app.use(compression()); // Compress responses
@@ -82,10 +82,21 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/vidal')
         logger.info('✅ MongoDB connected successfully');
 
         // Start server
-        app.listen(PORT, () => {
+        app.listen(PORT, '0.0.0.0', () => {
             logger.info(`🚀 Server running on port ${PORT}`);
             logger.info(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-            logger.info(`🌐 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+            logger.info(`🌐 Local: http://localhost:${PORT}`);
+            
+            // Get local IP for mobile testing
+            const os = require('os');
+            const interfaces = os.networkInterfaces();
+            for (const name of Object.keys(interfaces)) {
+                for (const iface of interfaces[name]) {
+                    if (iface.family === 'IPv4' && !iface.internal) {
+                        logger.info(`📱 Mobile Access: http://${iface.address}:${PORT}/api`);
+                    }
+                }
+            }
         });
     })
     .catch((error) => {

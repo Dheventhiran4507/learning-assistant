@@ -9,7 +9,9 @@ import {
     EnvelopeIcon,
     LockClosedIcon,
     KeyIcon,
-    ShieldCheckIcon
+    ShieldCheckIcon,
+    EyeIcon,
+    EyeSlashIcon
 } from '@heroicons/react/24/outline';
 
 const InitialSetupPage = () => {
@@ -19,6 +21,8 @@ const InitialSetupPage = () => {
         password: '',
         confirmPassword: ''
     });
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [shouldSeed, setShouldSeed] = useState(true);
     const [loading, setLoading] = useState(false);
 
@@ -154,13 +158,24 @@ const InitialSetupPage = () => {
                                 <div className="relative">
                                     <LockClosedIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                                     <input
-                                        type="password"
+                                        type={showPassword ? "text" : "password"}
                                         required
                                         value={formData.password}
                                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                        className="w-full pl-12 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary-500/5 focus:border-primary-500 text-slate-900 outline-none transition-all font-bold placeholder:text-slate-300"
+                                        className="w-full pl-12 pr-12 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary-500/5 focus:border-primary-500 text-slate-900 outline-none transition-all font-bold placeholder:text-slate-300"
                                         placeholder="••••••••"
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                                    >
+                                        {showPassword ? (
+                                            <EyeSlashIcon className="w-5 h-5" />
+                                        ) : (
+                                            <EyeIcon className="w-5 h-5" />
+                                        )}
+                                    </button>
                                 </div>
                             </div>
 
@@ -169,13 +184,24 @@ const InitialSetupPage = () => {
                                 <div className="relative">
                                     <LockClosedIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                                     <input
-                                        type="password"
+                                        type={showConfirmPassword ? "text" : "password"}
                                         required
                                         value={formData.confirmPassword}
                                         onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                                        className="w-full pl-12 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary-500/5 focus:border-primary-500 text-slate-900 outline-none transition-all font-bold placeholder:text-slate-300"
+                                        className="w-full pl-12 pr-12 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary-500/5 focus:border-primary-500 text-slate-900 outline-none transition-all font-bold placeholder:text-slate-300"
                                         placeholder="••••••••"
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                                    >
+                                        {showConfirmPassword ? (
+                                            <EyeSlashIcon className="w-5 h-5" />
+                                        ) : (
+                                            <EyeIcon className="w-5 h-5" />
+                                        )}
+                                    </button>
                                 </div>
                             </div>
 
