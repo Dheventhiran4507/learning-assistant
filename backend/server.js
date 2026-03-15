@@ -53,6 +53,16 @@ app.get('/health', (req, res) => {
     });
 });
 
+app.get('/api/debug-info', (req, res) => {
+    res.status(200).json({
+        project: 'Vidal - Lumina Portal',
+        version: '1.0.5',
+        auth: 'Dheventhiran4507',
+        timestamp: new Date().toISOString(),
+        port: PORT
+    });
+});
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
