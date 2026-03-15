@@ -21,7 +21,6 @@
     "react-router-dom": "^6.21.0",
     "recharts": "^2.10.3",
     "remark-gfm": "^4.0.1",
-    "tamiledu-ai-fullstack": "file:..",
     "zustand": "^4.4.7"
   },
   "devDependencies": {
