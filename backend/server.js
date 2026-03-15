@@ -22,8 +22,8 @@ const logger = require('./utils/logger');
 const app = express();
 app.set('trust proxy', 1); // Trust first proxy (Render load balancer)
 
-// Port must be provided by Render, default to 10000 for free tier if not set
-const PORT = process.env.PORT || (process.env.NODE_ENV === 'production' ? 10000 : 5000);
+// Render requires listening on the port provided in process.env.PORT
+const PORT = process.env.PORT || 10000; 
 
 // Middleware
 app.use(helmet()); // Security headers
