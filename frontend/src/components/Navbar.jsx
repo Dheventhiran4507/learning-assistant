@@ -66,7 +66,10 @@ const Navbar = () => {
                                 </div>
                                 <div className="hidden sm:block">
                                     <span className="text-lg sm:text-xl font-black text-gray-900 block leading-none tracking-tighter uppercase">LUMINA</span>
-                                    <span className="text-[8px] sm:text-[10px] font-black text-primary-600 tracking-[0.3em] uppercase">PORTAL</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-[8px] sm:text-[10px] font-black text-primary-600 tracking-[0.3em] uppercase">PORTAL</span>
+                                        <span className="text-[7px] font-bold text-slate-400 opacity-50">v1.0.5</span>
+                                    </div>
                                 </div>
                             </Link>
                         </div>
