@@ -113,6 +113,13 @@ exports.login = async (req, res) => {
         // Search by email or studentId (Case-insensitive email)
         const identifier = email ? email.trim().toLowerCase() : '';
         const rawIdentifier = email ? email.trim() : '';
+
+        // DEBUG LOG: Show exact bytes to catch hidden characters
+        if (email) {
+            const hex = Buffer.from(email).toString('hex');
+            logger.info(`Login attempt identifier: "${email}" (Length: ${email.length}, Hex: ${hex})`);
+            logger.info(`Normalized identifier: "${identifier}" (Length: ${identifier.length})`);
+        }
         
         const student = await Student.findOne({
             $or: [
