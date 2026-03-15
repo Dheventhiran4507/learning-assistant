@@ -346,17 +346,61 @@ class GeminiAIService {
             return questions;
         } catch (error) {
             logger.error(`❌ Question Gen Error: ${error.message}`);
+            
+            // Try Groq as secondary fallback if Gemini fails in-flight
+            if (this.groq) {
+                try {
+                    logger.info('🔄 Attempting Groq secondary fallback for bulk questions...');
+                    const prompt = `${systemPrompt}\n\n${userPrompt}`;
+                    const groqQuestions = await this.getGroqFallbackQuestions(prompt);
+                    if (groqQuestions && groqQuestions.length > 0) {
+                        return groqQuestions;
+                    }
+                } catch (groqErr) {
+                    logger.error(`❌ Groq Fallback also failed: ${groqErr.message}`);
+                }
+            }
+
             return this.getQuestionStructuralFallback(topic, subjectCode, subjectName, count);
         }
     }
 
     getQuestionStructuralFallback(topic, code = '', name = '', count = 5) {
-        return [{
-            question: `Identify the primary technical challenge associated with ${topic}.`,
-            options: ["Scalability", "Security", "Consistency", "Interoperability"],
-            correctAnswer: "Scalability",
-            explanation: "Technical challenges often involve scalability in complex systems."
-        }].slice(0, count);
+        const structuralQuestions = [
+            {
+                question: `Identify the primary technical challenge associated with ${topic}.`,
+                options: ["Scalability", "Security", "Consistency", "Interoperability"],
+                correctAnswer: "Scalability",
+                explanation: "Technical challenges often involve scalability in complex systems."
+            },
+            {
+                question: `Which of the following describes the core principle of ${topic}?`,
+                options: ["Efficiency", "Modularity", "Abstraction", "Encapsulation"],
+                correctAnswer: "Efficiency",
+                explanation: "Core principles usually prioritize system efficiency."
+            },
+            {
+                question: `In the context of ${topic}, what does a 403 error typically represent?`,
+                options: ["Forbidden/Access Denied", "Not Found", "Server Error", "Bad Request"],
+                correctAnswer: "Forbidden/Access Denied",
+                explanation: "A 403 Forbidden error indicates that the server understands the request but refuses to authorize it."
+            },
+            {
+                question: `What is the most common industry standard for implementing ${topic}?`,
+                options: ["ISO 27001", "Agile", "REST", "IEEE R2021"],
+                correctAnswer: "IEEE R2021",
+                explanation: "Standards provide a framework for consistent implementation."
+            },
+            {
+                question: `Which layer of the system architecture does ${topic} primarily reside in?`,
+                options: ["Data Layer", "Logic Layer", "UI Layer", "Network Layer"],
+                correctAnswer: "Logic Layer",
+                explanation: "Most technical topics are implemented within the business logic layer."
+            }
+        ];
+        
+        // Return a slice but ensure we return at least everything we have if count is large
+        return structuralQuestions.slice(0, count);
     }
 
     cleanAndParseJSON(text) {

@@ -39,7 +39,8 @@ exports.startSession = async (req, res) => {
                 'subject.subjectCode': { $regex: new RegExp(`^${subjectCode}$`, 'i') },
                 practiceType: 'topic_based',
                 status: 'completed',
-                'questions.topic': topic
+                'questions.topic': topic,
+                'questions.4': { $exists: true } // Ensure at least 5 questions
             }).sort({ completedAt: -1 });
 
             if (completedSession) {
@@ -137,9 +138,12 @@ exports.startSession = async (req, res) => {
 
                 // 2. If we have enough from DB, add them and move to next topic
                 if (processedDbQuestions.length >= questionsPerTopic) {
+                    logger.info(`Found ${processedDbQuestions.length} questions in DB for topic: ${t.topicName}`);
                     generatedQuestions.push(...processedDbQuestions);
                     continue;
                 }
+
+                logger.info(`DB had only ${processedDbQuestions.length} questions for ${t.topicName}. Calling AI...`);
 
                 // 3. For sparse topics, use AI (Serial execution to stay under quota)
                 const remainingCount = questionsPerTopic - processedDbQuestions.length;
@@ -159,6 +163,7 @@ exports.startSession = async (req, res) => {
 
                 if (aiQuestions && aiQuestions.length > 0) {
                     const qualityQuestions = aiQuestions.filter(q => !q.isMock);
+                    logger.info(`AI generated ${aiQuestions.length} questions (${qualityQuestions.length} quality) for ${t.topicName}`);
                     
                     // Cache quality questions
                     await Promise.all(qualityQuestions.map(async (q) => {
