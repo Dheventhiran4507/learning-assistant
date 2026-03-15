@@ -370,7 +370,8 @@ export default function PracticePage() {
 
     if (!session) {
         return (
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        return (
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
                 <AnimatePresence>
                     {starting && (
                         <motion.div
@@ -393,10 +394,10 @@ export default function PracticePage() {
                 >
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                         <div>
-                            <h1 className="text-6xl font-black text-slate-900 mb-4">
+                            <h1 className="text-3xl sm:text-6xl font-black text-slate-900 mb-2 sm:mb-4">
                                 Practice <span className="text-gradient">Hub</span>
                             </h1>
-                            <p className="text-slate-600 text-xl font-medium">Refine your understanding through targeted exercises.</p>
+                            <p className="text-slate-500 text-sm sm:text-xl font-medium">Refine your understanding through targeted exercises.</p>
                         </div>
 
                         <div className="flex bg-white p-1 rounded-2xl border border-gray-200 shadow-sm opacity-0 pointer-events-none hidden">
@@ -411,18 +412,18 @@ export default function PracticePage() {
                                 <span className="w-10 h-10 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 border border-indigo-500/20 text-sm font-bold">1</span>
                                 Select Course
                             </h2>
-                            <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-4 custom-scrollbar">
+                            <div className="space-y-4 max-h-[40vh] sm:max-h-[60vh] overflow-y-auto pr-2 sm:pr-4 custom-scrollbar">
                                 {subjects.map(s => (
                                     <button
                                         key={s.subjectCode}
                                         onClick={() => handleSubjectSelect(s.subjectCode, s)}
-                                        className={`w-full text-left p-6 rounded-3xl transition-all border ${selectedSubject === s.subjectCode
+                                        className={`w-full text-left p-4 sm:p-6 rounded-2xl sm:rounded-3xl transition-all border ${selectedSubject === s.subjectCode
                                             ? 'bg-primary border-transparent text-white shadow-lg'
                                             : 'bg-white border-slate-100 text-slate-500 hover:bg-slate-50 hover:border-slate-200'
                                             }`}
                                     >
-                                        <div className={`font-bold text-lg ${selectedSubject === s.subjectCode ? 'text-white' : 'text-slate-900'}`}>{s.subjectName}</div>
-                                        <div className={`text-xs mt-1 ${selectedSubject === s.subjectCode ? 'text-white/80' : 'text-slate-500'}`}>{s.subjectCode} • Regulation {s.regulation}</div>
+                                        <div className={`font-bold text-base sm:text-lg ${selectedSubject === s.subjectCode ? 'text-white' : 'text-slate-900'}`}>{s.subjectName}</div>
+                                        <div className={`text-[10px] sm:text-xs mt-1 ${selectedSubject === s.subjectCode ? 'text-white/80' : 'text-slate-500'}`}>{s.subjectCode} • Regulation {s.regulation}</div>
                                     </button>
                                 ))}
                             </div>
@@ -438,28 +439,28 @@ export default function PracticePage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <button
                                     onClick={() => handleCoverageSelection('all')}
-                                    className={`p-8 rounded-3xl border transition-all text-left relative overflow-hidden group ${selectedUnit === 'all'
+                                    className={`p-6 sm:p-8 rounded-2xl sm:rounded-3xl border transition-all text-left relative overflow-hidden group ${selectedUnit === 'all'
                                         ? 'bg-gradient-to-br from-indigo-600 to-indigo-800 border-transparent text-white shadow-xl scale-[1.01]'
                                         : 'bg-white border-slate-100 text-slate-500 hover:bg-slate-50 hover:border-slate-200'
                                         }`}
                                 >
-                                    <GlobeAltIcon className="w-10 h-10 mb-4 opacity-20 group-hover:opacity-100 transition-opacity" />
-                                    <div className="text-2xl font-bold mb-1">Comprehensive Study</div>
-                                    <div className="text-sm opacity-60">Assess knowledge across all units</div>
+                                    <GlobeAltIcon className="w-8 h-8 sm:w-10 sm:h-10 mb-3 sm:mb-4 opacity-20 group-hover:opacity-100 transition-opacity" />
+                                    <div className="text-xl sm:text-2xl font-bold mb-1">Comprehensive Study</div>
+                                    <div className="text-[11px] sm:text-sm opacity-60">Assess knowledge across all units</div>
                                 </button>
 
                                 {units.map((u) => (
                                     <button
                                         key={u.unitNumber}
                                         onClick={() => setSelectedUnit(u.unitNumber)}
-                                        className={`p-8 rounded-3xl border transition-all text-left group ${selectedUnit === u.unitNumber
+                                        className={`p-6 sm:p-8 rounded-2xl sm:rounded-3xl border transition-all text-left group ${selectedUnit === u.unitNumber
                                             ? 'bg-slate-800 border-transparent text-white shadow-xl scale-[1.01]'
                                             : 'bg-white border-slate-100 text-slate-500 hover:bg-slate-50 hover:border-slate-200'
                                             }`}
                                     >
-                                        <div className={`text-3xl font-black mb-4 transition-opacity ${selectedUnit === u.unitNumber ? 'text-white/20' : 'text-slate-200 group-hover:text-slate-300'}`}>0{u.unitNumber}</div>
-                                        <div className={`text-2xl font-bold mb-1 truncate ${selectedUnit === u.unitNumber ? 'text-white' : 'text-slate-900'}`}>{u.unitTitle}</div>
-                                        <div className={`text-sm opacity-60 ${selectedUnit === u.unitNumber ? 'text-white/60' : 'text-slate-50'}`}>{u.topics?.length || 0} Topics</div>
+                                        <div className={`text-2xl sm:text-3xl font-black mb-3 sm:mb-4 transition-opacity ${selectedUnit === u.unitNumber ? 'text-white/20' : 'text-slate-200 group-hover:text-slate-300'}`}>0{u.unitNumber}</div>
+                                        <div className={`text-lg sm:text-2xl font-bold mb-1 truncate ${selectedUnit === u.unitNumber ? 'text-white' : 'text-slate-900'}`}>{u.unitTitle}</div>
+                                        <div className={`text-[11px] sm:text-sm opacity-60 ${selectedUnit === u.unitNumber ? 'text-white/60' : 'text-slate-50'}`}>{u.topics?.length || 0} Topics</div>
                                     </button>
                                 ))}
                             </div>
@@ -507,10 +508,10 @@ export default function PracticePage() {
                         <button
                             onClick={startPractice}
                             disabled={!selectedUnit || starting}
-                            className="btn-premium px-16 py-5 rounded-[2rem] text-xl font-black shadow-xl flex items-center gap-4"
+                            className="btn-premium px-8 sm:px-16 py-4 sm:py-5 rounded-2xl sm:rounded-[2rem] text-lg sm:text-xl font-black shadow-xl flex items-center gap-4 w-full sm:w-auto justify-center"
                         >
                             {starting ? <ArrowPathIcon className="w-6 h-6 animate-spin" /> : <BeakerIcon className="w-6 h-6" />}
-                            {starting ? 'Preparing Session...' : 'Start Learning Session'}
+                            {starting ? 'Preparing...' : 'Start Session'}
                         </button>
                     </div>
                 </motion.div>
@@ -524,7 +525,7 @@ export default function PracticePage() {
     const isAnswered = currentQuestion.isCorrect !== null;
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-12">
 
             {/* ===== ANTI-CHEAT / PRIVACY SHIELD OVERLAY ===== */}
             <AnimatePresence>
@@ -618,17 +619,17 @@ export default function PracticePage() {
                                 </div>
                             </div>
 
-                            <h2 className="text-2xl font-black text-gray-900 mb-3">Session இன்னும் நடக்குது!</h2>
-                            <p className="text-gray-500 text-base leading-relaxed mb-8">
+                            <h2 className="text-xl sm:text-2xl font-black text-gray-900 mb-3">Session Still Active!</h2>
+                            <p className="text-gray-500 text-sm sm:text-base leading-relaxed mb-8">
                                 Practice session முடியாம வேற page-க்கு போனா இந்த question <strong>incomplete</strong>-ஆ mark ஆகும்.
                             </p>
 
                             <div className="flex flex-col gap-3">
                                 <button
                                     onClick={() => { setShowBlockedNav(false); pendingNavRef.current = null; }}
-                                    className="w-full py-4 rounded-2xl bg-primary-500 hover:bg-primary-600 text-white font-black text-lg transition-all"
+                                    className="w-full py-4 rounded-xl sm:rounded-2xl bg-primary-500 hover:bg-primary-600 text-white font-black text-base sm:text-lg transition-all"
                                 >
-                                    Session-ல் தொடரு 💪
+                                    Continue Session 💪
                                 </button>
                                 <button
                                     onClick={() => {
@@ -638,9 +639,9 @@ export default function PracticePage() {
                                         pendingNavRef.current = null;
                                         if (dest) navigate(dest);
                                     }}
-                                    className="w-full py-3 rounded-2xl border border-gray-200 text-gray-500 hover:bg-gray-50 font-bold transition-all"
+                                    className="w-full py-3 rounded-xl sm:rounded-2xl border border-gray-200 text-gray-500 hover:bg-gray-50 font-bold transition-all text-sm"
                                 >
-                                    Exit anyway (session ends)
+                                    Exit anyway
                                 </button>
                             </div>
                         </motion.div>
@@ -649,45 +650,45 @@ export default function PracticePage() {
             </AnimatePresence>
 
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12 bg-white p-8 rounded-[2.5rem] border border-gray-100 relative overflow-hidden shadow-lg">
-                <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-primary-500 to-secondary-500"></div>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-12 bg-white p-4 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border border-gray-100 relative overflow-hidden shadow-lg">
+                <div className="absolute top-0 left-0 w-1.5 sm:w-2 h-full bg-gradient-to-b from-primary-500 to-secondary-500"></div>
                 <div>
-                    <div className="flex items-center gap-3 text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
-                        <span>Course {session.subject.subjectCode}</span>
+                    <div className="flex items-center gap-2 sm:gap-3 text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 sm:mb-2">
+                        <span className="truncate max-w-[80px] sm:max-w-none">{session.subject.subjectCode}</span>
                         <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
                         <span>Unit {currentQuestion.unit}</span>
                         {isReviewMode && (
                             <>
                                 <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-                                <span className="text-secondary-500 font-bold bg-secondary-50 px-2 py-0.5 rounded-md border border-secondary-200">Review Mode</span>
+                                <span className="text-secondary-500 font-bold bg-secondary-50 px-2 py-0.5 rounded-md border border-secondary-200 text-[8px] sm:text-[10px]">Review</span>
                             </>
                         )}
                     </div>
-                    <h2 className="text-3xl font-black text-slate-900">
-                        Concept: <span className="text-primary">{currentQuestion.topic}</span>
+                    <h2 className="text-lg sm:text-3xl font-black text-slate-900 truncate max-w-[250px] sm:max-w-none">
+                        <span className="text-primary">{currentQuestion.topic}</span>
                     </h2>
                 </div>
-                <div className="flex items-center gap-8">
-                    <div className="text-right flex items-center gap-6">
-                        <div className="bg-slate-50 px-4 py-2 rounded-2xl border border-slate-200 flex items-center gap-2">
-                            <ClockIcon className="w-5 h-5 text-slate-500" />
-                            <span className="text-xl font-black text-slate-700 tracking-mono">
+                <div className="flex items-center justify-between w-full sm:w-auto gap-3 sm:gap-8 border-t sm:border-t-0 pt-3 sm:pt-0 mt-3 sm:mt-0">
+                    <div className="flex items-center gap-4 sm:gap-6">
+                        <div className="bg-slate-50 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl border border-slate-200 flex items-center gap-2">
+                            <ClockIcon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
+                            <span className="text-base sm:text-xl font-black text-slate-700 tracking-mono">
                                 {isReviewMode 
                                     ? `${Math.floor((currentQuestion.timeTaken || 0) / 60)}:${((currentQuestion.timeTaken || 0) % 60).toString().padStart(2, '0')}`
                                     : `${Math.floor(visibleTimer / 60)}:${(visibleTimer % 60).toString().padStart(2, '0')}`
                                 }
                             </span>
                         </div>
-                        <div>
-                            <div className="text-gray-500 text-[10px] font-black uppercase tracking-tighter mb-1">Question Progress</div>
-                            <div className="text-2xl font-black text-gray-900">{currentIdx + 1} <span className="text-gray-400">/ {session.questions.length}</span></div>
+                        <div className="flex flex-col items-end">
+                            <div className="text-gray-500 text-[8px] sm:text-[10px] font-black uppercase tracking-tighter sm:mb-1">Progress</div>
+                            <div className="text-base sm:text-2xl font-black text-gray-900">{currentIdx + 1}<span className="text-gray-400 text-xs sm:text-lg">/{session.questions.length}</span></div>
                         </div>
                     </div>
                     <button
                         onClick={() => setSession(null)}
-                        className="w-12 h-12 glass rounded-2xl flex items-center justify-center text-xl hover:bg-red-50 text-gray-500 hover:text-red-500 transition-colors border border-gray-200 hover:border-red-200"
+                        className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors border border-gray-200"
                     >
-                        <XMarkIcon className="w-6 h-6" />
+                        <XMarkIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                     </button>
                 </div>
             </div>
@@ -695,19 +696,19 @@ export default function PracticePage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
                 {/* Question Area */}
                 <div className="lg:col-span-8 space-y-8">
-                    <motion.div
-                        key={currentQuestion.questionId}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="glass-card p-12 rounded-[3.5rem] min-h-[500px] flex flex-col border border-gray-100 relative overflow-hidden"
-                    >
-                        <div className="absolute top-0 right-12 w-32 h-32 bg-primary-500/5 rounded-full blur-3xl"></div>
+                        <motion.div
+                            key={currentQuestion.questionId}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-white p-6 sm:p-12 rounded-3xl sm:rounded-[3.5rem] min-h-[400px] sm:min-h-[500px] flex flex-col border border-gray-100 relative overflow-hidden shadow-sm"
+                        >
+                            <div className="absolute top-0 right-12 w-32 h-32 bg-primary-500/5 rounded-full blur-3xl"></div>
 
-                        <div className="mb-12">
-                            <h3 className="text-3xl font-bold text-gray-900 leading-[1.4]">
-                                <MathRenderer content={currentQuestion.question} />
-                            </h3>
-                        </div>
+                            <div className="mb-8 sm:mb-12">
+                                <h3 className="text-xl sm:text-3xl font-bold text-gray-900 leading-[1.4]">
+                                    <MathRenderer content={currentQuestion.question} />
+                                </h3>
+                            </div>
 
                         <div className="flex-1 space-y-4">
                             {currentQuestion.options.map((opt, i) => (
@@ -726,14 +727,14 @@ export default function PracticePage() {
                                         : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-primary-500/50 hover:scale-[1.01]'
                                         }`}
                                 >
-                                    <div className="flex items-center gap-6 relative z-10">
-                                        <div className={`w-10 h-10 rounded-2xl border flex items-center justify-center text-sm font-black transition-colors ${isAnswered && opt === currentQuestion.userAnswer
+                                    <div className="flex items-center gap-4 sm:gap-6 relative z-10">
+                                        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl border flex items-center justify-center text-xs sm:text-sm font-black transition-colors ${isAnswered && opt === currentQuestion.userAnswer
                                             ? 'border-transparent bg-white/30'
                                             : 'border-slate-100 bg-slate-50 text-slate-500'
                                             }`}>
                                             {String.fromCharCode(65 + i)}
                                         </div>
-                                        <span className={`text-lg font-medium ${isAnswered && opt === currentQuestion.userAnswer ? 'text-white' : 'text-slate-700'}`}>
+                                        <span className={`text-[15px] sm:text-lg font-medium ${isAnswered && opt === currentQuestion.userAnswer ? 'text-white' : 'text-slate-700'}`}>
                                             <MathRenderer content={opt} />
                                         </span>
                                     </div>
@@ -750,20 +751,20 @@ export default function PracticePage() {
                                 <motion.div
                                     initial={{ opacity: 0, y: 30 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="mt-12 p-10 rounded-[2.5rem] bg-gray-50 border border-gray-100 relative overflow-hidden"
+                                    className="mt-8 sm:mt-12 p-6 sm:p-10 rounded-2xl sm:rounded-[2.5rem] bg-gray-50 border border-gray-100 relative overflow-hidden"
                                 >
-                                    <div className="absolute top-0 left-0 w-2 h-full bg-primary"></div>
-                                    <h4 className={`text-2xl font-black mb-4 ${currentQuestion.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+                                    <div className="absolute top-0 left-0 w-1.5 sm:w-2 h-full bg-primary"></div>
+                                    <h4 className={`text-xl sm:text-2xl font-black mb-3 sm:mb-4 ${currentQuestion.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
                                         {currentQuestion.isCorrect ? 'CORRECT' : 'REVIEW NEEDED'}
                                     </h4>
-                                    <p className="text-gray-600 text-lg leading-relaxed mb-10">
+                                    <div className="text-gray-600 text-[15px] sm:text-lg leading-relaxed mb-6 sm:mb-10">
                                         <MathRenderer content={currentQuestion.aiFeedback.explanation} />
-                                    </p>
+                                    </div>
 
                                     <div className="flex justify-end">
                                         <button
                                             onClick={nextQuestion}
-                                            className="btn-premium px-10 py-3 rounded-2xl flex items-center gap-3 text-lg"
+                                            className="btn-premium px-6 sm:px-10 py-3 rounded-xl sm:rounded-2xl flex items-center gap-3 text-base sm:text-lg w-full sm:w-auto justify-center"
                                         >
                                             {currentIdx < session.questions.length - 1 ? 'Next Question' : 'Complete Session'}
                                             <ArrowRightIcon className="w-5 h-5" />
@@ -777,14 +778,14 @@ export default function PracticePage() {
 
                 {/* Sidebar */}
                 <div className="lg:col-span-4 space-y-8">
-                    <div className="glass-card p-10 rounded-[3rem] border border-gray-100">
-                        <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest mb-6">Mastery Level</h3>
+                    <div className="bg-white p-6 sm:p-10 rounded-3xl sm:rounded-[3rem] border border-gray-100 shadow-sm">
+                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 sm:mb-6">Mastery Level</h3>
                         <div className="space-y-4">
                             <div className="flex justify-between items-end">
-                                <div className="text-4xl font-black text-gray-900">{Math.round(((currentIdx + (isAnswered ? 1 : 0)) / session.questions.length) * 100)}%</div>
-                                <div className="text-gray-500 font-bold mb-2">COMPLETE</div>
+                                <div className="text-3xl sm:text-4xl font-black text-gray-900 leading-none">{Math.round(((currentIdx + (isAnswered ? 1 : 0)) / session.questions.length) * 100)}%</div>
+                                <div className="text-[10px] font-bold text-gray-400 uppercase">PROGRESS</div>
                             </div>
-                            <div className="h-4 bg-gray-200 rounded-full overflow-hidden p-1 border border-gray-200">
+                            <div className="h-3 sm:h-4 bg-gray-100 rounded-full overflow-hidden p-0.5 sm:p-1 border border-gray-100">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${((currentIdx + (isAnswered ? 1 : 0)) / session.questions.length) * 100}%` }}

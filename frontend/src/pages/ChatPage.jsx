@@ -160,7 +160,8 @@ export default function ChatPage() {
     };
 
     return (
-        <div className="flex h-[calc(100vh-80px)] overflow-hidden bg-slate-50/50">
+    return (
+        <div className="flex h-[calc(100dvh-120px)] sm:h-[calc(100vh-100px)] overflow-hidden bg-slate-50/50">
             
             {/* Sidebar Overlay (Mobile) */}
             {isSidebarOpen && (
@@ -219,8 +220,8 @@ export default function ChatPage() {
             {/* Main Chat Area */}
             <main className="flex-1 flex flex-col relative w-full lg:w-auto h-full overflow-hidden">
                 {/* Header */}
-                <div className="flex-shrink-0 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 sm:px-8 py-4 flex items-center justify-between z-10">
-                    <div className="flex items-center gap-4">
+                <div className="flex-shrink-0 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 sm:px-8 py-3 sm:py-4 flex items-center justify-between z-10">
+                    <div className="flex items-center gap-3 sm:gap-4">
                         <button 
                             onClick={() => setIsSidebarOpen(true)}
                             className="lg:hidden p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
@@ -228,10 +229,10 @@ export default function ChatPage() {
                             <Bars3Icon className="w-6 h-6" />
                         </button>
                         <div>
-                            <h1 className="text-xl sm:text-2xl font-black text-slate-900 leading-none">
-                                Academic <span className="text-gradient">Chat</span>
+                            <h1 className="text-lg sm:text-2xl font-black text-slate-900 leading-none">
+                                Academic <span className="text-gradient">Assistant</span>
                             </h1>
-                            <p className="text-slate-500 text-xs sm:text-sm font-medium mt-1">Expert guidance for AU R2021 Regulation.</p>
+                            <p className="text-slate-500 text-[10px] sm:text-sm font-medium mt-1 uppercase tracking-tighter sm:normal-case">Anna University R2021 Guide</p>
                         </div>
                     </div>
                 </div>
@@ -284,7 +285,7 @@ export default function ChatPage() {
                                         key={msg.id}
                                         initial={{ opacity: 0, y: 15 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        className={`flex gap-4 sm:gap-6 ${msg.sender === 'user' ? 'justify-end' : 'justify-start w-full'}`}
+                                        className={`flex gap-3 sm:gap-6 ${msg.sender === 'user' ? 'justify-end' : 'justify-start w-full'}`}
                                     >
                                         {msg.sender === 'ai' && (
                                             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-600 flex items-center justify-center flex-shrink-0 shadow-sm mt-1">
@@ -298,7 +299,7 @@ export default function ChatPage() {
                                                 }`}
                                         >
                                             <div className={`prose max-w-none ${msg.sender === 'user' ? 'text-white prose-headings:text-white prose-strong:text-white' : 'text-slate-800 prose-headings:text-slate-900 prose-headings:font-bold prose-strong:text-slate-900'} 
-                                                prose-p:leading-relaxed prose-p:mb-5 prose-li:mb-2 prose-ul:my-4 prose-ul:list-disc prose-ul:ml-4 prose-ol:list-decimal prose-ol:ml-4 prose-ol:my-4 prose-headings:mt-8 prose-headings:mb-4 prose-code:text-indigo-600 prose-code:bg-indigo-50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:font-medium prose-pre:bg-slate-900 prose-pre:text-slate-100 text-[15.5px] prose-a:text-indigo-600`}>
+                                                prose-p:leading-relaxed prose-p:mb-4 prose-li:mb-1 prose-ul:my-3 prose-ul:list-disc prose-ul:ml-4 prose-ol:list-decimal prose-ol:ml-4 prose-ol:my-3 prose-headings:mt-6 prose-headings:mb-3 prose-code:text-indigo-600 prose-code:bg-indigo-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded-md prose-code:font-bold prose-pre:bg-slate-900 prose-pre:text-slate-100 text-[14px] sm:text-[15.5px] prose-a:text-indigo-600`}>
                                                 {msg.sender === 'ai' ? (
                                                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                                         {msg.text}
@@ -352,7 +353,7 @@ export default function ChatPage() {
                             animate={{ opacity: 1, y: 0 }}
                             className="relative"
                         >
-                            <div className="bg-white border-2 border-slate-200 rounded-3xl p-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] focus-within:border-indigo-500 focus-within:shadow-[0_8px_30px_rgba(99,102,241,0.1)] transition-all flex flex-col sm:flex-row items-end gap-2 group">
+                            <div className="bg-white border sm:border-2 border-slate-200 rounded-2xl sm:rounded-3xl p-1.5 sm:p-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] focus-within:border-indigo-500 focus-within:shadow-[0_8px_30px_rgba(99,102,241,0.1)] transition-all flex flex-row items-end gap-2 group">
                                 <textarea
                                     ref={textareaRef}
                                     rows="1"
@@ -360,21 +361,23 @@ export default function ChatPage() {
                                     onChange={(e) => setInput(e.target.value)}
                                     onKeyDown={handleKeyDown}
                                     disabled={loading}
-                                    className="flex-1 w-full bg-transparent border-none px-5 py-4 text-slate-900 placeholder-slate-400 focus:ring-0 resize-none disabled:opacity-50 transition-all font-medium text-[16px] leading-[1.6]"
-                                    placeholder="Ask anything about your R2021 curriculum... (Shift+Enter for new line)"
+                                    className="flex-1 bg-transparent border-none px-4 sm:px-5 py-3 sm:py-4 text-slate-900 placeholder-slate-400 focus:ring-0 resize-none disabled:opacity-50 transition-all font-medium text-[14px] sm:text-[16px] leading-[1.6]"
+                                    placeholder="Message Assistant..."
                                 />
                                 <button
                                     onClick={handleSendMessage}
                                     disabled={loading || !input.trim()}
-                                    className={`h-14 w-full sm:w-auto px-8 rounded-2xl font-black uppercase tracking-wider flex items-center justify-center gap-3 transition-all ${loading || !input.trim()
+                                    className={`h-11 w-11 sm:h-14 sm:w-auto sm:px-8 rounded-xl sm:rounded-2xl font-black uppercase tracking-wider flex items-center justify-center gap-3 transition-all flex-shrink-0 mb-1 mr-1 sm:mb-0 sm:mr-0 ${loading || !input.trim()
                                         ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
                                         : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-500/25 active:scale-95'
                                         }`}
                                 >
-                                    {loading ? 'Wait' : (
+                                    {loading ? (
+                                        <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                                    ) : (
                                         <>
                                             <span className="hidden sm:inline">Send</span>
-                                            <PaperAirplaneIcon className="w-5 h-5 -rotate-45 mt-[-2px]" />
+                                            <PaperAirplaneIcon className="w-5 h-5 -rotate-45" />
                                         </>
                                     )}
                                 </button>
