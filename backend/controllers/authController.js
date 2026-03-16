@@ -198,11 +198,17 @@ exports.login = async (req, res) => {
         });
 
     } catch (error) {
-        logger.error('Login error:', error);
+        logger.error('Login error details:', error);
+        
+        // Provide specific error info even in production for debugging the current live issue
+        const errorMessage = error.name === 'ValidationError' 
+            ? `Validation failed: ${Object.values(error.errors).map(e => e.message).join(', ')}`
+            : error.message;
+
         res.status(500).json({
             success: false,
-            message: 'Login failed',
-            error: error.message
+            message: 'Login failed due to a server error',
+            error: errorMessage
         });
     }
 };

@@ -28,7 +28,19 @@ const PORT = process.env.PORT || 10000;
 // Middleware
 app.use(helmet()); // Security headers
 app.use(cors({
-    origin: process.env.NODE_ENV === 'development' ? '*' : (process.env.FRONTEND_URL || 'http://localhost:3000'),
+    origin: (origin, callback) => {
+        // Allow same-origin (no origin) or developer matches
+        if (!origin || process.env.NODE_ENV === 'development') {
+            return callback(null, true);
+        }
+        
+        // Allow Render domains
+        if (origin.includes('onrender.com') || origin === process.env.FRONTEND_URL) {
+            return callback(null, true);
+        }
+        
+        callback(new Error('Not allowed by CORS'));
+    },
     credentials: true
 }));
 app.use(compression()); // Compress responses
