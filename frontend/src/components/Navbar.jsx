@@ -8,7 +8,11 @@ import {
     UserCircleIcon,
     Bars3CenterLeftIcon,
     XMarkIcon,
-    ChevronLeftIcon
+    ChevronLeftIcon,
+    ChartBarIcon,
+    ChatBubbleLeftRightIcon,
+    CursorArrowRaysIcon,
+    PresentationChartLineIcon
 } from '@heroicons/react/24/outline';
 
 const Navbar = () => {
