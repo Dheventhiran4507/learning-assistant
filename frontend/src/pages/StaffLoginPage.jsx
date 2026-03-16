@@ -41,7 +41,9 @@ const StaffLoginPage = () => {
                 }
             }
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Login failed');
+            const serverMsg = error.response?.data?.message;
+            const detailMsg = error.response?.data?.error;
+            toast.error(detailMsg || serverMsg || 'Login failed');
         } finally {
             setLoading(false);
         }

@@ -47,7 +47,9 @@ const LoginPage = () => {
                 toast.error(data.message || 'Login failed');
             }
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Server error');
+            const serverMsg = error.response?.data?.message;
+            const detailMsg = error.response?.data?.error;
+            toast.error(detailMsg || serverMsg || 'Login failed');
         } finally {
             setLoading(false);
         }
