@@ -176,8 +176,24 @@ const LoginPage = () => {
                                     <ShieldCheckIcon className="w-5 h-5" /> Staff / Admin Login
                                 </Link>
                             </div>
-                            
 
+                            {/* App cache reset button for PWA issues */}
+                            <button
+                                type="button"
+                                onClick={async () => {
+                                    if (window.confirm('App-ai reset panna thuraiya? Idhu blank page issue-ai fix pannum.')) {
+                                        if ('serviceWorker' in navigator) {
+                                            const regs = await navigator.serviceWorker.getRegistrations();
+                                            for (let r of regs) await r.unregister();
+                                        }
+                                        localStorage.clear();
+                                        window.location.reload(true);
+                                    }
+                                }}
+                                className="mt-4 text-[10px] text-slate-400 hover:text-indigo-500 transition-colors underline underline-offset-2"
+                            >
+                                App work aagala? Reset pannunga →
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -365,12 +365,6 @@ body {
     pointer-events: none;
 }
 
-/* Smooth Transitions */
-* {
-    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
 /* Focus Styles */
 *:focus-visible {
     @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-gray-900;

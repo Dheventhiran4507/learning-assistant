@@ -9,6 +9,7 @@ export const useAuthStore = create(
       isAuthenticated: false,
 
       login: (userData, token) => {
+        console.log('AuthStore: Logging in user:', userData?.email || userData?.id);
         set({
           user: userData,
           token,
@@ -17,6 +18,7 @@ export const useAuthStore = create(
       },
 
       logout: () => {
+        console.log('AuthStore: Logging out');
         set({
           user: null,
           token: null,

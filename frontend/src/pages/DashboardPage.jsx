@@ -30,13 +30,14 @@ const DashboardPage = () => {
                 if (response.data.success) {
                     setStats(response.data.data);
                     updateUser({
-                        learningStats: response.data.data.learningStats,
-                        subjectProgress: response.data.data.subjectProgress,
-                        weakAreas: response.data.data.weakAreas
+                        learningStats: response.data.data.learningStats || {},
+                        subjectProgress: response.data.data.subjectProgress || [],
+                        weakAreas: response.data.data.weakAreas || []
                     });
                 }
             } catch (error) {
-                // toast.error('Failed to load dashboard data');
+                toast.error('Dashboard data sync error');
+                console.error('Stats fetch error:', error);
             } finally {
                 setLoading(false);
             }
@@ -49,7 +50,7 @@ const DashboardPage = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     // Filter semesters based on user's current semester
-    const userCurrentSemester = user?.semester || 8; // Default to 8 if not set
+    const userCurrentSemester = Math.min(Math.max(Number(user?.semester) || 1, 1), 8); 
     const availableSemesters = Array.from({ length: userCurrentSemester }, (_, i) => i + 1);
 
     // Close dropdown when clicking outside
@@ -65,9 +66,9 @@ const DashboardPage = () => {
     }, [isDropdownOpen]);
 
     const syllabusProgress = stats?.learningStats?.syllabusProgress || 0;
-    const topicsMastered = stats?.subjectProgress?.reduce((total, subject) => {
+    const topicsMastered = (Array.isArray(stats?.subjectProgress) ? stats.subjectProgress : []).reduce((total, subject) => {
         return total + (subject.topicsCompleted?.length || 0);
-    }, 0) || 0;
+    }, 0);
 
     const stats_cards = [
         { label: 'Syllabus Coverage', value: `${syllabusProgress}%`, icon: <BookOpenIcon className="w-8 h-8 text-indigo-600" />, color: 'from-indigo-600 to-slate-900' },

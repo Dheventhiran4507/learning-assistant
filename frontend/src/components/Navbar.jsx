@@ -12,7 +12,8 @@ import {
     ChartBarIcon,
     ChatBubbleLeftRightIcon,
     CursorArrowRaysIcon,
-    PresentationChartLineIcon
+    PresentationChartLineIcon,
+    ArrowPathIcon
 } from '@heroicons/react/24/outline';
 
 const Navbar = () => {
@@ -21,9 +22,16 @@ const Navbar = () => {
     const location = useLocation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
+    const handleSync = async () => {
+        if (window.confirm('Update-ai force panni synchronize panna thuraiya? App oru vaatti refresh aahum.')) {
+            if ('serviceWorker' in navigator) {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (let registration of registrations) {
+                    await registration.unregister();
+                }
+            }
+            window.location.reload(true);
+        }
     };
 
     const handleBack = () => {
@@ -121,6 +129,15 @@ const Navbar = () => {
                             <Bars3CenterLeftIcon className="w-6 h-6" />
                         </button>
 
+                        {/* Desktop Sync Button */}
+                        <button
+                            onClick={handleSync}
+                            className="hidden lg:flex w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 items-center justify-center hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-all group mr-2"
+                            title="Force Sync App"
+                        >
+                            <ArrowPathIcon className="w-5 h-5 group-hover:rotate-180 transition-transform duration-700" />
+                        </button>
+
                         <button
                             onClick={handleLogout}
                             className="hidden sm:flex w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 items-center justify-center hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all group"
@@ -161,12 +178,21 @@ const Navbar = () => {
                                         <p className="text-[10px] font-bold text-primary-600 uppercase tracking-widest mt-1">Semester {user?.semester}</p>
                                     </div>
                                 </div>
-                                <button
-                                    onClick={() => setIsMenuOpen(false)}
-                                    className="p-2 hover:bg-slate-100 rounded-xl transition-colors"
-                                >
-                                    <XMarkIcon className="w-6 h-6 text-slate-900" />
-                                </button>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={handleSync}
+                                        className="p-2 hover:bg-indigo-50 text-indigo-600 rounded-xl transition-colors border border-indigo-100"
+                                        title="Force Sync"
+                                    >
+                                        <ArrowPathIcon className="w-5 h-5" />
+                                    </button>
+                                    <button
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="p-2 hover:bg-slate-100 rounded-xl transition-colors"
+                                    >
+                                        <XMarkIcon className="w-6 h-6 text-slate-900" />
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="flex-1 overflow-y-auto p-6 space-y-2">

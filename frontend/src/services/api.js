@@ -10,12 +10,17 @@ const api = axios.create({
 // Add a request interceptor to include auth token
 api.interceptors.request.use(
     (config) => {
-        const authStorage = localStorage.getItem('auth-storage');
-        if (authStorage) {
-            const { state } = JSON.parse(authStorage);
-            if (state.token) {
-                config.headers.Authorization = `Bearer ${state.token}`;
+        try {
+            const authStorage = localStorage.getItem('auth-storage');
+            if (authStorage) {
+                const parsed = JSON.parse(authStorage);
+                if (parsed && parsed.state && parsed.state.token) {
+                    config.headers.Authorization = `Bearer ${parsed.state.token}`;
+                }
             }
+        } catch (err) {
+            console.error('Auth storage parse error:', err);
+            // If storage is corrupted, we might want to clear it, but let's just log for now
         }
         return config;
     },
