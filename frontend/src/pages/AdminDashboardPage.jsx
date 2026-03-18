@@ -48,6 +48,7 @@ const AdminDashboardPage = () => {
     const [addingElective, setAddingElective] = useState(false);
     const [regeneratingSubjects, setRegeneratingSubjects] = useState({});
     const [selectedSubject, setSelectedSubject] = useState(null);
+    const [savingStudent, setSavingStudent] = useState(false);
 
     // Fetch fresh user data to ensure role and semester are up to date
     useEffect(() => {
@@ -124,8 +125,8 @@ const AdminDashboardPage = () => {
 
     const handleManageStudent = async (e) => {
         e.preventDefault();
+        setSavingStudent(true);
         try {
-            // Rename to manageAccount
             const response = await api.post('/auth/manage-account', {
                 ...studentFormData,
                 id: editingStudent?._id || '',
@@ -135,10 +136,12 @@ const AdminDashboardPage = () => {
             if (response.data.success) {
                 toast.success(response.data.message);
                 setShowStudentModal(false);
-                fetchData(); // Refresh list
+                fetchData();
             }
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to manage account');
+        } finally {
+            setSavingStudent(false);
         }
     };
 
@@ -640,9 +643,13 @@ const AdminDashboardPage = () => {
                                     </div>
                                 </div>
                                 <div className="pt-4 flex gap-4">
-                                    <button type="button" onClick={() => setShowStudentModal(false)} className="flex-1 px-6 py-3 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-all uppercase tracking-widest text-xs">Cancel</button>
-                                    <button type="submit" className="flex-1 bg-gray-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-black transition-all shadow-lg shadow-gray-900/20 uppercase tracking-widest text-xs">
-                                        {editingStudent ? 'Save Changes' : `Create ${studentFormData.role}`}
+                                    <button type="button" onClick={() => setShowStudentModal(false)} disabled={savingStudent} className="flex-1 px-6 py-3 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-all uppercase tracking-widest text-xs disabled:opacity-50">Cancel</button>
+                                    <button type="submit" disabled={savingStudent} className="flex-1 bg-gray-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-black transition-all shadow-lg shadow-gray-900/20 uppercase tracking-widest text-xs disabled:opacity-70 flex items-center justify-center gap-2">
+                                        {savingStudent ? (
+                                            <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div><span>Sending Email...</span></>
+                                        ) : (
+                                            editingStudent ? 'Save Changes' : `Create ${studentFormData.role}`
+                                        )}
                                     </button>
                                 </div>
                             </form>
