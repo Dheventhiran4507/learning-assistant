@@ -146,6 +146,15 @@ exports.login = async (req, res) => {
             });
         }
 
+        // Block login for students whose email is not verified (dummy email accounts)
+        if (student.role === 'student' && !student.isEmailVerified) {
+            logger.warn(`Login blocked: Unverified email account - ${email}`);
+            return res.status(401).json({
+                success: false,
+                message: 'Your account email is not verified. Please contact your institution staff to update your account with a valid email ID.'
+            });
+        }
+
         // Verify password
         const isPasswordValid = await student.comparePassword(password);
 
@@ -432,7 +441,8 @@ exports.manageAccount = async (req, res) => {
                 college: college || 'Anna University',
                 department: department || 'Computer Science Engineering',
                 role: targetRole,
-                isActive: true
+                isActive: true,
+                isEmailVerified: targetRole === 'student' ? true : false
             });
             logger.info(`New ${targetRole} created by ${req.user.role}: ${email} (email verified via delivery)`);
         }
