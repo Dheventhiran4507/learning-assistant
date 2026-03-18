@@ -1,28 +1,51 @@
 /**
- * Email Service using Resend REST API (direct fetch - no SDK timeout issues)
+ * Email Service using Brevo (formerly Sendinblue) v3 API
+ * This bypasses SMTP blocks and works reliably on cloud platforms like Render.
  */
 
 const APP_URL = process.env.FRONTEND_URL || 'https://learning-assistant-7760.onrender.com';
-const FROM_ADDRESS = 'Vidal Portal <onboarding@resend.dev>';
+const FROM_EMAIL = 'sivadevandren@gmail.com';
+const FROM_NAME = 'Vidal Portal';
 
+/**
+ * Core send function using Brevo REST API
+ */
 async function sendEmail(to, subject, html) {
-    const response = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ from: FROM_ADDRESS, to: [to], subject, html }),
-        signal: AbortSignal.timeout(15000) // 15 second timeout
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(data.message || `Resend API error: ${response.status}`);
+    const apiKey = process.env.BREVO_API_KEY;
+    
+    if (!apiKey) {
+        console.error('❌ BREVO_API_KEY is missing in environment variables');
+        return false;
     }
 
-    return data;
+    try {
+        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+            method: 'POST',
+            headers: {
+                'accept': 'application/json',
+                'api-key': apiKey,
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                sender: { name: FROM_NAME, email: FROM_EMAIL },
+                to: [{ email: to }],
+                subject: subject,
+                htmlContent: html
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error(`❌ Brevo API Error (${response.status}):`, data);
+            throw new Error(data.message || 'Failed to send email via Brevo');
+        }
+
+        return data;
+    } catch (error) {
+        console.error(`❌ Email transport error:`, error.message);
+        throw error;
+    }
 }
 
 /**
