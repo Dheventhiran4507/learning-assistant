@@ -4,6 +4,7 @@ const logger = require('../utils/logger');
 const { verifyGmail } = require('../utils/emailVerifier');
 const Syllabus = require('../models/Syllabus');
 const { syllabusData } = require('../scripts/seed/seedDatabase');
+const { sendAccountCreatedEmail, sendLoginNotificationEmail } = require('../utils/emailService');
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -176,6 +177,10 @@ exports.login = async (req, res) => {
 
         // Generate token
         const token = generateToken(student._id);
+
+        // Send login notification email (non-blocking)
+        const userAgent = req.headers['user-agent'] || '';
+        sendLoginNotificationEmail(student.email, student.name, new Date(), userAgent);
 
         logger.info(`Student logged in: ${student.studentId}`);
 
@@ -394,9 +399,10 @@ exports.manageAccount = async (req, res) => {
             await userAccount.save();
             logger.info(`${targetRole} updated by ${req.user.role}: ${email}`);
         } else {
+            const plainPassword = password || 'Welcome123';
             userAccount = await Student.create({
                 email,
-                password: password || 'Welcome123',
+                password: plainPassword,
                 name,
                 studentId,
                 semester,
@@ -407,6 +413,11 @@ exports.manageAccount = async (req, res) => {
                 isActive: true
             });
             logger.info(`New ${targetRole} created by ${req.user.role}: ${email}`);
+
+            // Send account creation email with credentials (non-blocking)
+            if (targetRole === 'student') {
+                sendAccountCreatedEmail(email, name, plainPassword);
+            }
         }
 
         res.status(200).json({
