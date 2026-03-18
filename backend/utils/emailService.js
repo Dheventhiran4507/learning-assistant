@@ -86,7 +86,8 @@ const sendAccountCreatedEmail = async (toEmail, name, password) => {
         return true;
     } catch (error) {
         console.error(`❌ Failed to send account creation email to ${toEmail}:`, error.message);
-        return false;
+        // Throw the error so the caller can block account creation
+        throw new Error(`Invalid or unreachable email address: ${toEmail}. Please use the student's real Gmail ID.`);
     }
 };
 
