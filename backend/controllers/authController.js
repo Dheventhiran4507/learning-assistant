@@ -408,28 +408,15 @@ exports.manageAccount = async (req, res) => {
             await userAccount.save();
             logger.info(`${targetRole} updated by ${req.user.role}: ${email}`);
         } else {
-            // --- VALIDATION: Only real Gmail addresses allowed for students ---
+            // Only @gmail.com allowed for students
             if (targetRole === 'student' && !email.toLowerCase().endsWith('@gmail.com')) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Only @gmail.com addresses are allowed for student accounts. Please use the student\'s real Gmail ID.'
+                    message: 'Only @gmail.com addresses are allowed for student accounts.'
                 });
             }
 
             const plainPassword = password || 'Welcome123';
-
-            // --- VALIDATION: Try sending email FIRST — if it fails, block account creation ---
-            if (targetRole === 'student') {
-                try {
-                    await sendAccountCreatedEmail(email, name, plainPassword);
-                } catch (emailError) {
-                    logger.warn(`Account creation blocked - email delivery failed: ${email}`);
-                    return res.status(400).json({
-                        success: false,
-                        message: `Cannot create account: Email delivery failed to "${email}". Please use the student's real, active Gmail ID.`
-                    });
-                }
-            }
 
             userAccount = await Student.create({
                 email,
@@ -442,9 +429,16 @@ exports.manageAccount = async (req, res) => {
                 department: department || 'Computer Science Engineering',
                 role: targetRole,
                 isActive: true,
-                isEmailVerified: targetRole === 'student' ? true : false
+                isEmailVerified: true  // Staff vouches for the email
             });
-            logger.info(`New ${targetRole} created by ${req.user.role}: ${email} (email verified via delivery)`);
+            logger.info(`New ${targetRole} created by ${req.user.role}: ${email}`);
+
+            // Send credentials email (non-blocking — don't fail account creation if email fails)
+            if (targetRole === 'student') {
+                sendAccountCreatedEmail(email, name, plainPassword).catch(err => {
+                    logger.warn(`Credentials email failed for ${email}: ${err.message}`);
+                });
+            }
         }
 
         res.status(200).json({
