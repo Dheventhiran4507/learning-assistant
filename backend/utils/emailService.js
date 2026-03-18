@@ -1,20 +1,36 @@
-const { Resend } = require('resend');
+/**
+ * Email Service using Resend REST API (direct fetch - no SDK timeout issues)
+ */
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// Sender address – using Resend's shared domain (no custom domain needed)
+const APP_URL = process.env.FRONTEND_URL || 'https://learning-assistant-7760.onrender.com';
 const FROM_ADDRESS = 'Vidal Portal <onboarding@resend.dev>';
-const APP_URL = process.env.FRONTEND_URL || 'https://your-app.onrender.com';
+
+async function sendEmail(to, subject, html) {
+    const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ from: FROM_ADDRESS, to: [to], subject, html }),
+        signal: AbortSignal.timeout(15000) // 15 second timeout
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || `Resend API error: ${response.status}`);
+    }
+
+    return data;
+}
 
 /**
- * Send account creation email to the student with their credentials.
+ * Send account creation email to the student with credentials.
  */
 const sendAccountCreatedEmail = async (toEmail, name, password) => {
-    const { error } = await resend.emails.send({
-        from: FROM_ADDRESS,
-        to: toEmail,
-        subject: 'Your Vidal Account Has Been Created',
-        html: `
+    try {
+        await sendEmail(toEmail, 'Your Vidal Account Has Been Created', `
 <!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
@@ -35,7 +51,7 @@ const sendAccountCreatedEmail = async (toEmail, name, password) => {
         <p style="margin:0;"><span style="color:#64748b;font-size:12px;font-weight:600;display:block;">Password</span><span style="color:#6366f1;font-size:22px;font-weight:900;letter-spacing:3px;">${password}</span></p>
       </div>
       <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:16px;margin-bottom:28px;">
-        <p style="color:#92400e;font-size:13px;font-weight:600;margin:0;">⚠️ Do not share your credentials with anyone. Change your password after first login.</p>
+        <p style="color:#92400e;font-size:13px;font-weight:600;margin:0;">⚠️ Do not share your credentials. Change your password after first login.</p>
       </div>
       <a href="${APP_URL}/login" style="display:block;background:#0f172a;color:#fff;text-align:center;padding:18px;border-radius:14px;font-weight:800;font-size:13px;letter-spacing:2px;text-decoration:none;text-transform:uppercase;">Login to Portal &rarr;</a>
     </div>
@@ -44,16 +60,14 @@ const sendAccountCreatedEmail = async (toEmail, name, password) => {
     </div>
   </div>
 </body>
-</html>`
-    });
+</html>`);
 
-    if (error) {
-        console.error(`❌ Resend error for ${toEmail}:`, error);
-        throw new Error(error.message);
+        console.log(`✅ Account creation email sent to ${toEmail}`);
+        return true;
+    } catch (error) {
+        console.error(`❌ Account creation email failed for ${toEmail}:`, error.message);
+        return false;
     }
-
-    console.log(`✅ Account creation email sent to ${toEmail}`);
-    return true;
 };
 
 /**
@@ -63,22 +77,14 @@ const sendLoginNotificationEmail = async (toEmail, name, loginTime, userAgent) =
     try {
         const istTime = new Date(loginTime).toLocaleString('en-IN', {
             timeZone: 'Asia/Kolkata',
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+            hour: '2-digit', minute: '2-digit'
         });
 
         const isMobile = /Mobile|Android|iPhone|iPad/i.test(userAgent || '');
         const deviceType = isMobile ? 'Mobile Device' : 'Desktop / Laptop';
 
-        const { error } = await resend.emails.send({
-            from: FROM_ADDRESS,
-            to: toEmail,
-            subject: 'New Login Detected — Vidal Portal',
-            html: `
+        await sendEmail(toEmail, 'New Login Detected — Vidal Portal', `
 <!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
@@ -106,18 +112,12 @@ const sendLoginNotificationEmail = async (toEmail, name, loginTime, userAgent) =
     </div>
   </div>
 </body>
-</html>`
-        });
-
-        if (error) {
-            console.error(`❌ Login notification failed for ${toEmail}:`, error);
-            return false;
-        }
+</html>`);
 
         console.log(`✅ Login notification email sent to ${toEmail}`);
         return true;
-    } catch (err) {
-        console.error(`❌ Login notification error for ${toEmail}:`, err.message);
+    } catch (error) {
+        console.error(`❌ Login notification failed for ${toEmail}:`, error.message);
         return false;
     }
 };
