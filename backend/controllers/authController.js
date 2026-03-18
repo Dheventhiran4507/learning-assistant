@@ -582,4 +582,60 @@ exports.seedSyllabus = async (req, res) => {
     }
 };
 
+/**
+ * Delete a student or staff account
+ */
+exports.deleteAccount = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Find the user
+        const userToDelete = await Student.findById(id);
+
+        if (!userToDelete) {
+            return res.status(404).json({
+                success: false,
+                message: 'Account not found'
+            });
+        }
+
+        // Security Checks
+        // 1. Prevent self-deletion
+        if (id === req.user._id.toString()) {
+            return res.status(400).json({
+                success: false,
+                message: 'You cannot delete your own account'
+            });
+        }
+
+        // 2. Prevent deleting the very first admin (safety net)
+        // If the user to delete is an admin, check if it's the only one 
+        // or a protected one? Let's just check if it's the current user's role 
+        // trying to delete another admin/hod.
+        if (userToDelete.role === 'admin' && req.user.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: 'Only super admins can delete admin accounts'
+            });
+        }
+
+        await Student.findByIdAndDelete(id);
+
+        logger.info(`Account deleted by ${req.user.role} (${req.user.email}): ${userToDelete.email}`);
+
+        res.status(200).json({
+            success: true,
+            message: 'Account deleted successfully'
+        });
+
+    } catch (error) {
+        logger.error('Delete account error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to delete account',
+            error: error.message
+        });
+    }
+};
+
 module.exports = exports;

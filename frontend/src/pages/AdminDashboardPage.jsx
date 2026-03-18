@@ -124,6 +124,7 @@ const AdminDashboardPage = () => {
     }, [selectedSemester]);
 
     const handleManageStudent = async (e) => {
+        // ... (existing code omitted for brevity in instruction, will keep it in ReplacementContent)
         e.preventDefault();
         setSavingStudent(true);
         try {
@@ -142,6 +143,20 @@ const AdminDashboardPage = () => {
             toast.error(error.response?.data?.message || 'Failed to manage account');
         } finally {
             setSavingStudent(false);
+        }
+    };
+
+    const handleDeleteAccount = async (id, name) => {
+        if (!window.confirm(`Are you sure you want to delete ${name}'s account? This cannot be undone.`)) return;
+        
+        try {
+            const response = await api.delete(`/auth/account/${id}`);
+            if (response.data.success) {
+                toast.success('Account deleted successfully');
+                fetchData();
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to delete account');
         }
     };
 
@@ -422,6 +437,7 @@ const AdminDashboardPage = () => {
                                         </th>
                                         <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-center">Doubts</th>
                                         <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-right">Predicted Score</th>
+                                        <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest"></th>
                                     </tr>
                                 ) : (
                                     <tr>
@@ -429,6 +445,7 @@ const AdminDashboardPage = () => {
                                         <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-center">Assigned Semester</th>
                                         <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-center">Role</th>
                                         <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-right">Status</th>
+                                        <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest"></th>
                                     </tr>
                                 )}
                             </thead>
@@ -489,12 +506,21 @@ const AdminDashboardPage = () => {
                                                 {student.doubts}
                                             </td>
                                             <td className="px-8 py-6 text-right">
-                                                <span className={`px-4 py-1.5 rounded-full font-black text-xs ${student.predictedScore > 80 ? 'bg-green-100 text-green-600' :
-                                                    student.predictedScore > 60 ? 'bg-orange-100 text-orange-600' :
-                                                        'bg-red-100 text-red-600'
-                                                    }`}>
-                                                    {student.predictedScore} / 100
-                                                </span>
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <span className={`px-4 py-1.5 rounded-full font-black text-xs ${student.predictedScore > 80 ? 'bg-green-100 text-green-600' :
+                                                        student.predictedScore > 60 ? 'bg-orange-100 text-orange-600' :
+                                                            'bg-red-100 text-red-600'
+                                                        }`}>
+                                                        {student.predictedScore} / 100
+                                                    </span>
+                                                    <button
+                                                        onClick={() => handleDeleteAccount(student._id, student.name)}
+                                                        className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
+                                                        title="Delete Account"
+                                                    >
+                                                        <TrashIcon className="w-4 h-4" />
+                                                    </button>
+                                                </div>
                                             </td>
                                         </motion.tr>
                                     ))
@@ -530,9 +556,18 @@ const AdminDashboardPage = () => {
                                                 {member.role}
                                             </td>
                                             <td className="px-8 py-6 text-right">
-                                                <span className={`px-4 py-1.5 rounded-full font-black text-xs ${member.isActive ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                                                    {member.isActive ? 'Active' : 'Inactive'}
-                                                </span>
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <span className={`px-4 py-1.5 rounded-full font-black text-xs ${member.isActive ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                                                        {member.isActive ? 'Active' : 'Inactive'}
+                                                    </span>
+                                                    <button
+                                                        onClick={() => handleDeleteAccount(member._id, member.name)}
+                                                        className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
+                                                        title="Delete Account"
+                                                    >
+                                                        <TrashIcon className="w-4 h-4" />
+                                                    </button>
+                                                </div>
                                             </td>
                                         </motion.tr>
                                     ))
