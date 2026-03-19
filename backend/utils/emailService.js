@@ -53,7 +53,7 @@ const sendAccountCreatedEmail = async (toEmail, name, password) => {
     <div style="padding:40px;">
       <h2 style="color:#0f172a;font-size:20px;font-weight:800;margin:0 0 8px;">Hello, ${name}</h2>
       <p style="color:#64748b;font-size:15px;line-height:1.7;margin:0 0 28px;">
-        Your student account on the <strong>Vidal Lumina Portal</strong> has been successfully created by your institution. Use the credentials below to access your account.
+        Your account on the <strong>Vidal Lumina Portal</strong> has been successfully created. Use the credentials below to access your account.
       </p>
       <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:28px;margin-bottom:24px;">
         <p style="color:#94a3b8;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin:0 0 16px;">Account Credentials</p>

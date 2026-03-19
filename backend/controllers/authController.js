@@ -433,8 +433,8 @@ exports.manageAccount = async (req, res) => {
             });
             logger.info(`New ${targetRole} created by ${req.user.role}: ${email}`);
 
-            // Send credentials email (non-blocking — don't fail account creation if email fails)
-            if (targetRole === 'student') {
+            // Send credentials email (non-blocking)
+            if (['student', 'advisor', 'hod'].includes(targetRole)) {
                 sendAccountCreatedEmail(email, name, plainPassword).catch(err => {
                     logger.warn(`Credentials email failed for ${email}: ${err.message}`);
                 });
