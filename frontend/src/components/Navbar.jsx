@@ -85,7 +85,7 @@ const Navbar = () => {
                                     <span className="text-lg sm:text-xl font-black text-gray-900 block leading-none tracking-tighter uppercase">LUMINA</span>
                                     <div className="flex items-center gap-2">
                                         <span className="text-[8px] sm:text-[10px] font-black text-primary-600 tracking-[0.3em] uppercase">PORTAL</span>
-                                        <span className="text-[7px] font-bold text-slate-400 opacity-50">v1.0.5</span>
+                                        <span className="text-[7px] font-bold text-slate-400 opacity-50">v1.1.0</span>
                                     </div>
                                 </div>
                             </Link>
@@ -120,7 +120,9 @@ const Navbar = () => {
                     <div className="flex items-center gap-3 sm:gap-6 relative z-10">
                         {/* Desktop User Info */}
                         <div className="hidden md:flex flex-col items-end">
-                            <span className="text-gray-900 text-sm font-black">{user?.name}</span>
+                            <span className="text-gray-900 text-sm font-black">
+                                {typeof user?.name === 'string' ? user.name : (user?.name?.message || 'User')}
+                            </span>
                             <span className="text-primary-600 text-[10px] font-black uppercase tracking-tighter">Semester {user?.semester || '1'}</span>
                         </div>
 

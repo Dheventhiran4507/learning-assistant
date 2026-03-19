@@ -33,9 +33,11 @@ function App() {
     const checkStatus = async () => {
       try {
         const data = await authService.getSystemStatus();
-        setIsInitialized(data.initialized);
+        if (data && typeof data.initialized === 'boolean') {
+            setIsInitialized(data.initialized);
+        }
       } catch (error) {
-        console.error('Failed to check system status', error);
+        console.warn('System status check failed, assuming initialized');
       } finally {
         setCheckingStatus(false);
       }

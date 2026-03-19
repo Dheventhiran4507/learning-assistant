@@ -44,12 +44,19 @@ const LoginPage = () => {
                 toast.success(`Welcome back, ${user.name}!`);
                 navigate('/dashboard');
             } else {
-                toast.error(data.message || 'Login failed');
+                const msg = typeof data.message === 'string' ? data.message : (data.message?.message || 'Login failed');
+                toast.error(msg);
             }
         } catch (error) {
             const serverMsg = error.response?.data?.message;
             const detailMsg = error.response?.data?.error;
-            toast.error(detailMsg || serverMsg || 'Login failed');
+            
+            // Handle cases where serverMsg might be an object {code, message}
+            const finalMsg = typeof detailMsg === 'string' ? detailMsg : 
+                           (typeof serverMsg === 'string' ? serverMsg : 
+                           (serverMsg?.message || 'Login failed'));
+            
+            toast.error(finalMsg);
         } finally {
             setLoading(false);
         }
@@ -100,7 +107,7 @@ const LoginPage = () => {
                             </h1>
                             <div className="flex items-center justify-center gap-2 mt-1">
                                 <p className="text-slate-500 font-medium">Authentication required for secure access</p>
-                                <span className="text-[10px] font-bold text-slate-400 opacity-60">v1.0.5</span>
+                                <span className="text-[10px] font-bold text-slate-400 opacity-60">v1.1.1</span>
                             </div>
                         </div>
 

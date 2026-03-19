@@ -43,7 +43,13 @@ const StaffLoginPage = () => {
         } catch (error) {
             const serverMsg = error.response?.data?.message;
             const detailMsg = error.response?.data?.error;
-            toast.error(detailMsg || serverMsg || 'Login failed');
+            
+            // Safety check for objects
+            const finalMsg = typeof detailMsg === 'string' ? detailMsg : 
+                           (typeof serverMsg === 'string' ? serverMsg : 
+                           (serverMsg?.message || 'Login failed'));
+            
+            toast.error(finalMsg);
         } finally {
             setLoading(false);
         }

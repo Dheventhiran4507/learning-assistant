@@ -58,10 +58,13 @@ const InitialSetupPage = () => {
                 toast.success('Root Admin created successfully!');
                 navigate('/staff-login');
             } else {
-                toast.error(data.message || 'Setup failed');
+                const msg = typeof data.message === 'string' ? data.message : (data.message?.message || 'Setup failed');
+                toast.error(msg);
             }
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Server error during setup');
+            const serverMsg = error.response?.data?.message;
+            const finalMsg = typeof serverMsg === 'string' ? serverMsg : (serverMsg?.message || 'Server error during setup');
+            toast.error(finalMsg);
         } finally {
             setLoading(false);
         }
