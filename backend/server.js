@@ -85,17 +85,25 @@ app.use('/api/practice', practiceRoutes);
 app.use('/api/questions', require('./routes/questionRoutes'));
 
 // Serve Static Files (Frontend)
-const frontendPath = path.join(__dirname, '../frontend/dist');
+const frontendPath = path.resolve(__dirname, '../frontend/dist');
 app.use(express.static(frontendPath));
 
 // Catch-all route for React Router (must be after API routes)
 app.get('*', (req, res) => {
     // If it's an API request that wasn't handled, return 404
     if (req.url.startsWith('/api')) {
+        logger.warn(`API route not found: ${req.url}`);
         return res.status(404).json({ message: 'API route not found' });
     }
+    
     // Otherwise serve the frontend index.html
-    res.sendFile(path.join(frontendPath, 'index.html'));
+    const indexPath = path.join(frontendPath, 'index.html');
+    res.sendFile(indexPath, (err) => {
+        if (err) {
+            logger.error(`Error sending index.html: ${err.message}`);
+            res.status(500).send('Frontend build not found or server error. Please rebuild the frontend.');
+        }
+    });
 });
 
 // Error handling middleware (must be last)
