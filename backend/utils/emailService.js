@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const APP_URL = process.env.FRONTEND_URL || 'https://learning-assistant-7760.onrender.com';
+const APP_URL = process.env.FRONTEND_URL || 'https://learning-assistant-beryl.vercel.app';
 const FROM_EMAIL = 'sivadevandren@gmail.com';
 const FROM_NAME = 'Vidal Portal';
 
