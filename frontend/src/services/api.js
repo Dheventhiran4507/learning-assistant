@@ -1,7 +1,18 @@
 import axios from 'axios';
 
+const getBaseURL = () => {
+    const envUrl = import.meta.env.VITE_API_URL;
+    const isPublicDomain = window.location.hostname.includes('vercel.app') || window.location.hostname.includes('onrender.com');
+    const isLocalUrl = envUrl && (envUrl.includes('localhost') || envUrl.includes('10.163') || envUrl.includes('192.168'));
+
+    if (isPublicDomain && isLocalUrl) {
+        return '/api';
+    }
+    return envUrl || '/api';
+};
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || '/api',
+    baseURL: getBaseURL(),
     headers: {
         'Content-Type': 'application/json',
     },

@@ -34,9 +34,10 @@ const LoginPage = () => {
                 
                 // Block staff from logging in via student portal
                 if (user.role === 'admin' || user.role === 'hod' || user.role === 'advisor') {
-                    // Sign them out immediately since login() wasn't called yet
-                    toast.error('Access Denied. Staff must use the Staff Portal.');
+                    toast.error('This is the Student Portal. Please use the Staff Portal to login.');
                     setLoading(false);
+                    // Automatically redirect staff to their portal after a short delay
+                    setTimeout(() => navigate('/staff-login'), 2000);
                     return;
                 }
 
@@ -107,7 +108,7 @@ const LoginPage = () => {
                             </h1>
                             <div className="flex items-center justify-center gap-2 mt-1">
                                 <p className="text-slate-500 font-medium">Authentication required for secure access</p>
-                                <span className="text-[10px] font-bold text-slate-400 opacity-60">v1.1.1</span>
+                                <span className="text-[10px] font-bold text-slate-400 opacity-60">v1.1.2 [FINAL_FIX]</span>
                             </div>
                         </div>
 

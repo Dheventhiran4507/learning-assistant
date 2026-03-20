@@ -31,13 +31,15 @@ const StaffLoginPage = () => {
             if (response.data.success) {
                 const { student, token } = response.data.data;
 
-                // Only allow staff roles to login via this portal
+                // Suggest Staff Portal if Admin/Staff tries to login here (though they shouldn't)
                 if (['admin', 'hod', 'advisor'].includes(student.role)) {
                     login(student, token);
-                    toast.success('Welcome to the Staff Portal');
+                    toast.success('System Initialized - Welcome Admin');
                     navigate('/admin/dashboard');
                 } else {
-                    toast.error('Access Denied: This portal is for Staff and Advisors only.');
+                    login(student, token);
+                    toast.success('Welcome to Vidal Portal');
+                    navigate('/dashboard');
                 }
             }
         } catch (error) {
@@ -73,7 +75,7 @@ const StaffLoginPage = () => {
                     <h1 className="text-4xl font-black text-white mb-3 tracking-tighter uppercase">Staff <span className="text-indigo-400">Terminal</span></h1>
                     <div className="flex items-center justify-center gap-3">
                         <p className="text-slate-500 font-bold text-sm tracking-widest uppercase">Institutional Management Control</p>
-                        <span className="text-[10px] font-bold text-slate-600 opacity-80">v1.0.5</span>
+                        <span className="text-[10px] font-bold text-slate-600 opacity-80" id="staff-version-marker">v1.1.2 [FINAL_FIX]</span>
                     </div>
                 </div>
 
