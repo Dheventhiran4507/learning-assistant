@@ -13,7 +13,8 @@ import {
     ChatBubbleLeftRightIcon,
     CursorArrowRaysIcon,
     PresentationChartLineIcon,
-    ArrowPathIcon
+    ArrowPathIcon,
+    CreditCardIcon
 } from '@heroicons/react/24/outline';
 
 const Navbar = () => {
@@ -48,7 +49,10 @@ const Navbar = () => {
     const isAdmin = user?.role === 'admin' || user?.role === 'hod' || user?.role === 'advisor';
 
     const navLinks = isAdmin
-        ? [{ name: 'Academic Admin', path: '/admin/dashboard', icon: <UserCircleIcon className="w-5 h-5" /> }]
+        ? [
+            { name: 'Academic Admin', path: '/admin/dashboard', icon: <UserCircleIcon className="w-5 h-5" /> },
+            { name: 'Subscription', path: '/admin/subscription', icon: <CreditCardIcon className="w-5 h-5" /> }
+          ]
         : [
             { name: 'Dashboard', path: '/dashboard', icon: <ChartBarIcon className="w-5 h-5" /> },
             { name: 'AI Assistant', path: '/chat', icon: <ChatBubbleLeftRightIcon className="w-5 h-5" /> },
@@ -85,7 +89,7 @@ const Navbar = () => {
                                     <span className="text-lg sm:text-xl font-black text-gray-900 block leading-none tracking-tighter uppercase">LUMINA</span>
                                     <div className="flex items-center gap-2">
                                         <span className="text-[8px] sm:text-[10px] font-black text-primary-600 tracking-[0.3em] uppercase">PORTAL</span>
-                                        <span className="text-[7px] font-bold text-slate-400 opacity-50">v1.1.0</span>
+                                        <span className="text-[7px] font-bold text-slate-400 opacity-50">v1.1.2</span>
                                     </div>
                                 </div>
                             </Link>
