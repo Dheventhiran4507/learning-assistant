@@ -15,6 +15,7 @@ import PracticePage from './pages/PracticePage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import AdminSyllabusPage from './pages/AdminSyllabusPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import SubscriptionPage from './pages/SubscriptionPage';
 import InitialSetupPage from './pages/InitialSetupPage';
 import authService from './services/authService';
 import { useEffect, useState } from 'react';
@@ -145,6 +146,14 @@ function App() {
             element={
               <PrivateRoute>
                 <AdminDashboardPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/subscription"
+            element={
+              <PrivateRoute>
+                <SubscriptionPage />
               </PrivateRoute>
             }
           />
