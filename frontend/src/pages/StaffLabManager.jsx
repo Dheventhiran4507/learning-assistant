@@ -30,7 +30,8 @@ const StaffLabManager = () => {
                 setAssessments(response.data.data);
             }
         } catch (error) {
-            toast.error('Failed to fetch assessments');
+            console.error('Fetch Assessments Manager Error:', error);
+            toast.error(`Fetch Error: ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }

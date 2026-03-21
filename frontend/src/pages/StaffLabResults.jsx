@@ -28,7 +28,12 @@ const StaffLabResults = () => {
                 setAssessments(response.data.data);
             }
         } catch (error) {
-            toast.error('Failed to fetch assessments');
+            console.error('Fetch Assessments Error Details:', {
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message
+            });
+            toast.error(`Failed to fetch: ${error.response?.data?.message || error.message}`);
         } finally {
             setLoading(false);
         }
