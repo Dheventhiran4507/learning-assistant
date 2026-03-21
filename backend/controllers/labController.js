@@ -10,7 +10,8 @@ const labController = {
     // Staff: Upload document and assign lab
     assignLab: async (req, res) => {
         try {
-            const { title, description, type, semester, subjectCode, questionCount } = req.body;
+            const { title, description, type, subjectCode, questionCount } = req.body;
+            const semester = req.user.semester;
             const file = req.file;
 
             if (!file) {

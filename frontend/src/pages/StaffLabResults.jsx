@@ -158,7 +158,13 @@ const StaffLabResults = () => {
                                                     <td className="px-8 py-6">
                                                         <div className="flex flex-col">
                                                             <span className="text-sm font-black text-slate-900 uppercase tracking-tight">{sub.student?.name}</span>
-                                                            <span className="text-[10px] font-bold text-slate-400">{sub.student?.studentId}</span>
+                                                            <div className="flex items-center gap-2 mt-1">
+                                                                <span className="text-[8px] font-bold text-slate-400 uppercase bg-slate-100 px-1.5 py-0.5 rounded">ID: {sub.student?.studentId}</span>
+                                                                <span className="text-[8px] font-bold text-primary-600 uppercase bg-primary/5 px-1.5 py-0.5 rounded">Batch: {sub.student?.batch}</span>
+                                                            </div>
+                                                            {sub.student?.rollNumber && (
+                                                                <span className="text-[8px] font-bold text-slate-400 uppercase mt-1">Roll: {sub.student.rollNumber}</span>
+                                                            )}
                                                         </div>
                                                     </td>
                                                     <td className="px-8 py-6 text-center font-bold text-slate-600">

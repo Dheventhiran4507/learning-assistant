@@ -17,7 +17,6 @@ const StaffLabManager = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [type, setType] = useState('pre-lab');
-    const [semester, setSemester] = useState(1);
     const [subjectCode, setSubjectCode] = useState('');
     const [questionCount, setQuestionCount] = useState(5);
     const [isUploading, setIsUploading] = useState(false);
@@ -66,7 +65,6 @@ const StaffLabManager = () => {
         formData.append('title', title);
         formData.append('description', description);
         formData.append('type', type);
-        formData.append('semester', semester);
         formData.append('subjectCode', subjectCode.toUpperCase());
         formData.append('questionCount', questionCount);
 
@@ -142,17 +140,7 @@ const StaffLabManager = () => {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Semester</label>
-                                    <select
-                                        value={semester}
-                                        onChange={(e) => setSemester(e.target.value)}
-                                        className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 ring-primary/20"
-                                    >
-                                        {[1,2,3,4,5,6,7,8].map(s => <option key={s} value={s}>Sem {s}</option>)}
-                                    </select>
-                                </div>
+                            <div className="grid grid-cols-1 gap-6">
                                 <div>
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Subject Code</label>
                                     <input
