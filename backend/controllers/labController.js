@@ -2,7 +2,7 @@ const LabAssessment = require('../models/LabAssessment');
 const LabSubmission = require('../models/LabSubmission');
 const Student = require('../models/Student');
 const aiService = require('../services/geminiAIService');
-const pdf = require('pdf-parse');
+const pdf = require('pdf-parse-fork');
 const fs = require('fs');
 const logger = require('../utils/logger');
 
