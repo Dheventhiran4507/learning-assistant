@@ -25,15 +25,12 @@ const StaffLabManager = () => {
 
     const fetchAssessments = async () => {
         try {
-            // We use the same 'active' endpoint but we might need a staff-specific one 
-            // to see ALL (not just for a semester). For now, let's use the staff-only result endpoint
-            // or we'll assume staff can see active ones too.
-            const response = await api.get('/lab/active?type=' + type);
+            const response = await api.get('/lab/staff-assessments');
             if (response.data.success) {
                 setAssessments(response.data.data);
             }
         } catch (error) {
-            console.error('Failed to fetch assessments:', error);
+            toast.error('Failed to fetch assessments');
         } finally {
             setLoading(false);
         }

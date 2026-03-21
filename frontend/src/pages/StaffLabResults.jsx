@@ -23,12 +23,9 @@ const StaffLabResults = () => {
 
     const fetchAssessments = async () => {
         try {
-            // For now, staff sees all active labs. 
-            // In a real scenario, we might want a staff-only 'all-labs' endpoint.
-            const response = await api.get('/lab/active?type=pre-lab');
-            const response2 = await api.get('/lab/active?type=post-lab');
-            if (response.data.success && response2.data.success) {
-                setAssessments([...response.data.data, ...response2.data.data]);
+            const response = await api.get('/lab/staff-assessments');
+            if (response.data.success) {
+                setAssessments(response.data.data);
             }
         } catch (error) {
             toast.error('Failed to fetch assessments');

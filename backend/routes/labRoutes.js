@@ -37,7 +37,8 @@ const upload = multer({
 // Staff Routes
 router.post('/assign', protect, authorize('admin', 'hod', 'advisor'), upload.single('document'), labController.assignLab);
 router.get('/results/:assessmentId', protect, authorize('admin', 'hod', 'advisor'), labController.getLabResults);
-router.delete('/:id', protect, authorize('admin', 'hod', 'advisor'), labController.deleteLab);
+router.get('/staff-assessments', protect, authorize('admin', 'hod', 'advisor'), labController.getStaffAssessments);
+router.delete('/:id', protect, authorize('admin', 'hod', 'advisor'), labController.deleteAssessment);
 
 // Student Routes
 router.get('/active', protect, labController.getLabs);
