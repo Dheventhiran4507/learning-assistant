@@ -157,10 +157,11 @@ const Navbar = () => {
 
                         <button
                             onClick={handleLogout}
-                            className="hidden sm:flex w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 items-center justify-center hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all group"
+                            className="flex items-center gap-2 px-3 sm:px-4 h-10 sm:h-12 rounded-xl sm:rounded-2xl bg-red-50 border border-red-100 text-red-600 hover:bg-red-100 hover:border-red-200 transition-all group"
                             title="Sign Out"
                         >
-                            <ArrowRightOnRectangleIcon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                            <ArrowRightOnRectangleIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            <span className="hidden xl:block text-[10px] font-black uppercase tracking-widest">Logout</span>
                         </button>
                     </div>
                 </div>
