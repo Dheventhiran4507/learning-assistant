@@ -15,6 +15,10 @@ import PracticePage from './pages/PracticePage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import AdminSyllabusPage from './pages/AdminSyllabusPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import StaffLabManager from './pages/StaffLabManager';
+import StaffLabResults from './pages/StaffLabResults';
+import StudentPreLabPage from './pages/StudentPreLabPage';
+import StudentPostLabPage from './pages/StudentPostLabPage';
 import InitialSetupPage from './pages/InitialSetupPage';
 import authService from './services/authService';
 import { useEffect, useState } from 'react';
@@ -109,6 +113,22 @@ function App() {
             }
           />
           <Route
+            path="/pre-lab"
+            element={
+              <PrivateRoute>
+                <StudentPreLabPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/post-lab"
+            element={
+              <PrivateRoute>
+                <StudentPostLabPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
             path="/chat"
             element={
               <StudentRoute>
@@ -145,6 +165,22 @@ function App() {
             element={
               <PrivateRoute>
                 <AdminDashboardPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/lab-manager"
+            element={
+              <PrivateRoute>
+                <StaffLabManager />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/lab-results"
+            element={
+              <PrivateRoute>
+                <StaffLabResults />
               </PrivateRoute>
             }
           />

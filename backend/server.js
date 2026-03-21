@@ -15,6 +15,7 @@ const chatRoutes = require('./routes/chatRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const syllabusRoutes = require('./routes/syllabusRoutes');
 const practiceRoutes = require('./routes/practiceRoutes');
+const labRoutes = require('./routes/labRoutes');
 
 const errorHandler = require('./middleware/errorHandler');
 const logger = require('./utils/logger');
@@ -83,6 +84,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/syllabus', syllabusRoutes);
 app.use('/api/practice', practiceRoutes);
 app.use('/api/questions', require('./routes/questionRoutes'));
+app.use('/api/lab', labRoutes);
 
 // Serve Static Files (Frontend)
 const frontendPath = path.resolve(__dirname, '../frontend/dist');

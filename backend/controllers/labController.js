@@ -1,0 +1,201 @@
+const LabAssessment = require('../models/LabAssessment');
+const LabSubmission = require('../models/LabSubmission');
+const Student = require('../models/Student');
+const aiService = require('../services/geminiAIService');
+const pdf = require('pdf-parse');
+const fs = require('fs');
+const logger = require('../utils/logger');
+
+const labController = {
+    // Staff: Upload document and assign lab
+    assignLab: async (req, res) => {
+        try {
+            const { title, description, type, semester, subjectCode } = req.body;
+            const file = req.file;
+
+            if (!file) {
+                return res.status(400).json({ success: false, message: 'Please upload a document.' });
+            }
+
+            let textContent = '';
+            if (file.mimetype === 'application/pdf') {
+                const dataBuffer = fs.readFileSync(file.path);
+                const data = await pdf(dataBuffer);
+                textContent = data.text;
+            } else {
+                textContent = fs.readFileSync(file.path, 'utf8');
+            }
+
+            // Clean up temporary file
+            fs.unlinkSync(file.path);
+
+            if (!textContent || textContent.trim().length < 50) {
+                return res.status(400).json({ success: false, message: 'Document content too short or unreadable.' });
+            }
+
+            // Generate AI Questions
+            const prompt = `Based on the following lab document content, generate 5 highly relevant technical MCQs for a ${type} quiz. 
+            The questions should test understanding of the concepts mentioned in the text.
+            
+            Document Content:
+            ${textContent.substring(0, 4000)} // Truncate to avoid token limits
+            
+            Return JSON format: { "questions": [{ "question": "...", "options": ["...", "..."], "correctAnswer": "...", "explanation": "..." }] }`;
+
+            const aiResponse = await aiService.universalGenerateSyllabus(prompt);
+            const questions = aiResponse.questions || aiResponse.data || [];
+
+            if (!questions || questions.length === 0) {
+                throw new Error('AI failed to generate questions for this document.');
+            }
+
+            const newAssessment = new LabAssessment({
+                title,
+                description,
+                type,
+                semester: parseInt(semester),
+                subjectCode,
+                questions,
+                documentContent: textContent.substring(0, 10000), // Store first 10k chars
+                createdBy: req.user.id
+            });
+
+            await newAssessment.save();
+
+            res.status(201).json({
+                success: true,
+                message: `${type === 'pre-lab' ? 'Pre-lab' : 'Post-lab'} assigned successfully.`,
+                data: newAssessment
+            });
+
+        } catch (error) {
+            logger.error('Lab Assignment Error:', error);
+            res.status(500).json({ success: false, message: error.message });
+        }
+    },
+
+    // Student: Get active labs for their semester
+    getLabs: async (req, res) => {
+        try {
+            const { type } = req.query; // 'pre-lab' or 'post-lab'
+            const semester = req.user.semester;
+
+            const labs = await LabAssessment.find({ 
+                semester, 
+                type, 
+                isActive: true 
+            }).select('-documentContent').sort({ createdAt: -1 });
+
+            // Also check which ones student has already submitted
+            const submissions = await LabSubmission.find({ 
+                student: req.user.id 
+            }).select('assessment score percentage');
+
+            const labsWithStatus = labs.map(lab => {
+                const submission = submissions.find(s => s.assessment.toString() === lab._id.toString());
+                return {
+                    ...lab.toObject(),
+                    isCompleted: !!submission,
+                    submission: submission || null
+                };
+            });
+
+            res.json({ success: true, data: labsWithStatus });
+        } catch (error) {
+            res.status(500).json({ success: false, message: error.message });
+        }
+    },
+
+    // Student: Submit answers
+    submitLab: async (req, res) => {
+        try {
+            const { assessmentId, answers } = req.body;
+            const studentId = req.user.id;
+
+            const assessment = await LabAssessment.findById(assessmentId);
+            if (!assessment) {
+                return res.status(404).json({ success: false, message: 'Assessment not found.' });
+            }
+
+            // Calculate Score
+            let correctCount = 0;
+            const evaluatedAnswers = answers.map(answer => {
+                const question = assessment.questions[answer.questionIndex];
+                const isCorrect = question.correctAnswer === answer.selectedAnswer;
+                if (isCorrect) correctCount++;
+                return { ...answer, isCorrect };
+            });
+
+            const maxScore = assessment.questions.length;
+            const percentage = (correctCount / maxScore) * 100;
+
+            const submission = new LabSubmission({
+                assessment: assessmentId,
+                student: studentId,
+                answers: evaluatedAnswers,
+                score: correctCount,
+                maxScore,
+                percentage,
+                completedAt: new Date()
+            });
+
+            await submission.save();
+
+            res.status(201).json({
+                success: true,
+                message: 'Assessment submitted successfully.',
+                data: {
+                    score: correctCount,
+                    total: maxScore,
+                    percentage
+                }
+            });
+
+        } catch (error) {
+            if (error.code === 11000) {
+                return res.status(400).json({ success: false, message: 'You have already submitted this assessment.' });
+            }
+            res.status(500).json({ success: false, message: error.message });
+        }
+    },
+
+    // Staff: Get results for an assessment
+    getLabResults: async (req, res) => {
+        try {
+            const { assessmentId } = req.params;
+
+            const assessment = await LabAssessment.findById(assessmentId);
+            if (!assessment) {
+                return res.status(404).json({ success: false, message: 'Assessment not found.' });
+            }
+
+            const submissions = await LabSubmission.find({ assessment: assessmentId })
+                .populate('student', 'name studentId email semester')
+                .sort({ percentage: -1 });
+
+            res.json({
+                success: true,
+                data: {
+                    assessment,
+                    submissions
+                }
+            });
+        } catch (error) {
+            res.status(500).json({ success: false, message: error.message });
+        }
+    },
+
+    // Staff: Delete assessment
+    deleteLab: async (req, res) => {
+        try {
+            const { id } = req.params;
+            await LabAssessment.findByIdAndDelete(id);
+            await LabSubmission.deleteMany({ assessment: id });
+            res.json({ success: true, message: 'Assessment deleted successfully.' });
+        } catch (error) {
+            res.status(500).json({ success: false, message: error.message });
+        }
+    }
+};
+
+module.exports = labController;

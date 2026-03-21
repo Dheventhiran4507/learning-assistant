@@ -6,14 +6,18 @@ import {
     ArrowRightOnRectangleIcon,
     AcademicCapIcon,
     UserCircleIcon,
+    ChatBubbleLeftRightIcon,
     Bars3CenterLeftIcon,
     XMarkIcon,
     ChevronLeftIcon,
     ChartBarIcon,
-    ChatBubbleLeftRightIcon,
     CursorArrowRaysIcon,
     PresentationChartLineIcon,
-    ArrowPathIcon
+    ArrowPathIcon,
+    BeakerIcon,
+    CpuChipIcon,
+    ChartPieIcon,
+    DocumentTextIcon
 } from '@heroicons/react/24/outline';
 
 const Navbar = () => {
@@ -48,9 +52,15 @@ const Navbar = () => {
     const isAdmin = user?.role === 'admin' || user?.role === 'hod' || user?.role === 'advisor';
 
     const navLinks = isAdmin
-        ? [{ name: 'Academic Admin', path: '/admin/dashboard', icon: <UserCircleIcon className="w-5 h-5" /> }]
+        ? [
+            { name: 'Academic Admin', path: '/admin/dashboard', icon: <UserCircleIcon className="w-5 h-5" /> },
+            { name: 'Lab Manager', path: '/admin/lab-manager', icon: <BeakerIcon className="w-5 h-5" /> },
+            { name: 'Lab Results', path: '/admin/lab-results', icon: <ChartPieIcon className="w-5 h-5" /> }
+          ]
         : [
             { name: 'Dashboard', path: '/dashboard', icon: <ChartBarIcon className="w-5 h-5" /> },
+            { name: 'Pre-Lab', path: '/pre-lab', icon: <BeakerIcon className="w-5 h-5" /> },
+            { name: 'Post-Lab', path: '/post-lab', icon: <CpuChipIcon className="w-5 h-5" /> },
             { name: 'AI Assistant', path: '/chat', icon: <ChatBubbleLeftRightIcon className="w-5 h-5" /> },
             { name: 'Practice Hub', path: '/practice', icon: <CursorArrowRaysIcon className="w-5 h-5" /> },
             { name: 'Analytics', path: '/analytics', icon: <PresentationChartLineIcon className="w-5 h-5" /> },
