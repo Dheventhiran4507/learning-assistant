@@ -19,6 +19,7 @@ const StaffLabManager = () => {
     const [type, setType] = useState('pre-lab');
     const [semester, setSemester] = useState(1);
     const [subjectCode, setSubjectCode] = useState('');
+    const [questionCount, setQuestionCount] = useState(5);
     const [isUploading, setIsUploading] = useState(false);
     const [assessments, setAssessments] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -67,6 +68,7 @@ const StaffLabManager = () => {
         formData.append('type', type);
         formData.append('semester', semester);
         formData.append('subjectCode', subjectCode.toUpperCase());
+        formData.append('questionCount', questionCount);
 
         try {
             const response = await api.post('/lab/assign', formData, {
@@ -161,6 +163,19 @@ const StaffLabManager = () => {
                                         className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 ring-primary/20"
                                     />
                                 </div>
+                            </div>
+
+                            <div>
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Number of Questions (AI)</label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="15"
+                                    value={questionCount}
+                                    onChange={(e) => setQuestionCount(e.target.value)}
+                                    className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 ring-primary/20"
+                                />
+                                <p className="text-[9px] text-slate-400 mt-1 italic font-medium">Recommended: 5-10 questions</p>
                             </div>
 
                             <div>

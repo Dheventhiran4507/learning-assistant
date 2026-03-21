@@ -10,7 +10,7 @@ const labController = {
     // Staff: Upload document and assign lab
     assignLab: async (req, res) => {
         try {
-            const { title, description, type, semester, subjectCode } = req.body;
+            const { title, description, type, semester, subjectCode, questionCount } = req.body;
             const file = req.file;
 
             if (!file) {
@@ -34,7 +34,8 @@ const labController = {
             }
 
             // Generate AI Questions
-            const prompt = `Based on the following lab document content, generate 5 highly relevant technical MCQs for a ${type} quiz. 
+            const qCount = parseInt(questionCount) || 5;
+            const prompt = `Based on the following lab document content, generate ${qCount} highly relevant technical MCQs for a ${type} quiz. 
             The questions should test understanding of the concepts mentioned in the text.
             
             Document Content:
