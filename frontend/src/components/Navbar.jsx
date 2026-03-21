@@ -13,8 +13,7 @@ import {
     ChatBubbleLeftRightIcon,
     CursorArrowRaysIcon,
     PresentationChartLineIcon,
-    ArrowPathIcon,
-    CreditCardIcon
+    ArrowPathIcon
 } from '@heroicons/react/24/outline';
 
 const Navbar = () => {
@@ -49,10 +48,7 @@ const Navbar = () => {
     const isAdmin = user?.role === 'admin' || user?.role === 'hod' || user?.role === 'advisor';
 
     const navLinks = isAdmin
-        ? [
-            { name: 'Academic Admin', path: '/admin/dashboard', icon: <UserCircleIcon className="w-5 h-5" /> },
-            { name: 'Subscription', path: '/admin/subscription', icon: <CreditCardIcon className="w-5 h-5" /> }
-          ]
+        ? [{ name: 'Academic Admin', path: '/admin/dashboard', icon: <UserCircleIcon className="w-5 h-5" /> }]
         : [
             { name: 'Dashboard', path: '/dashboard', icon: <ChartBarIcon className="w-5 h-5" /> },
             { name: 'AI Assistant', path: '/chat', icon: <ChatBubbleLeftRightIcon className="w-5 h-5" /> },

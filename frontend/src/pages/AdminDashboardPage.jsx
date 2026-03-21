@@ -16,8 +16,7 @@ import {
     LightBulbIcon,
     XMarkIcon,
     ArrowPathIcon,
-    TrashIcon,
-    CreditCardIcon
+    TrashIcon
 } from '@heroicons/react/24/outline';
 
 const AdminDashboardPage = () => {
@@ -276,13 +275,6 @@ const AdminDashboardPage = () => {
                     </p>
                 </div>
                 <div className="flex gap-4">
-                    <Link 
-                        to="/admin/subscription"
-                        className="bg-white border border-gray-200 px-6 py-3 rounded-2xl flex items-center shadow-sm hover:shadow-md hover:border-primary/30 transition-all group"
-                    >
-                        <CreditCardIcon className="w-5 h-5 text-primary mr-2 group-hover:scale-110 transition-transform" />
-                        <span className="text-xs font-black text-slate-600 uppercase tracking-widest">Subscription</span>
-                    </Link>
                     <div className="glass-card px-6 py-3 rounded-2xl">
                         <span className="text-xs font-black text-gray-400 uppercase tracking-widest block">Total Students</span>
                         <span className="text-2xl font-black text-gray-900">{metrics?.totalStudents || 0}</span>
