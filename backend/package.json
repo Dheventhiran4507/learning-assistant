@@ -1,6 +1,9 @@
 {
   "name": "vidal-backend",
   "version": "1.0.0",
+  "engines": {
+    "node": "20.x"
+  },
   "description": "Backend API for Vidal - Lumina Portal",
   "main": "server.js",
   "scripts": {
