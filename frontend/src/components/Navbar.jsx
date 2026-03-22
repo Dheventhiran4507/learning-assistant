@@ -49,15 +49,22 @@ const Navbar = () => {
 
     const isSubPage = location.pathname !== '/dashboard' && location.pathname !== '/admin/dashboard';
 
-    const isAdmin = user?.role === 'admin' || user?.role === 'hod' || user?.role === 'advisor';
+    const isAdmin = user?.role === 'admin' || user?.role === 'hod';
+    const isAdvisor = user?.role === 'advisor';
 
-    const navLinks = isAdmin
-        ? [
+    let navLinks = [];
+    if (isAdmin) {
+        navLinks = [
             { name: 'Academic Admin', path: '/admin/dashboard', icon: <UserCircleIcon className="w-5 h-5" /> },
             { name: 'Lab Manager', path: '/admin/lab-manager', icon: <BeakerIcon className="w-5 h-5" /> },
             { name: 'Lab Results', path: '/admin/lab-results', icon: <ChartPieIcon className="w-5 h-5" /> }
-          ]
-        : [
+        ];
+    } else if (isAdvisor) {
+        navLinks = [
+            { name: 'Academic Admin', path: '/admin/dashboard', icon: <UserCircleIcon className="w-5 h-5" /> }
+        ];
+    } else {
+        navLinks = [
             { name: 'Dashboard', path: '/dashboard', icon: <ChartBarIcon className="w-5 h-5" /> },
             { name: 'Pre-Lab', path: '/pre-lab', icon: <BeakerIcon className="w-5 h-5" /> },
             { name: 'Post-Lab', path: '/post-lab', icon: <CpuChipIcon className="w-5 h-5" /> },
@@ -65,6 +72,7 @@ const Navbar = () => {
             { name: 'Practice Hub', path: '/practice', icon: <CursorArrowRaysIcon className="w-5 h-5" /> },
             { name: 'Analytics', path: '/analytics', icon: <PresentationChartLineIcon className="w-5 h-5" /> },
         ];
+    }
 
     return (
         <motion.nav

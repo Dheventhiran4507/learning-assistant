@@ -20,6 +20,7 @@ const StaffLabManager = () => {
     const [type, setType] = useState('pre-lab');
     const [subjectCode, setSubjectCode] = useState('');
     const [questionCount, setQuestionCount] = useState(5);
+    const [duration, setDuration] = useState(30);
     const [isUploading, setIsUploading] = useState(false);
     const [assessments, setAssessments] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -72,6 +73,7 @@ const StaffLabManager = () => {
         formData.append('type', type);
         formData.append('subjectCode', subjectCode.toUpperCase());
         formData.append('questionCount', questionCount);
+        formData.append('duration', duration);
 
         try {
             const response = await api.post('/lab/assign', formData, {
@@ -168,16 +170,35 @@ const StaffLabManager = () => {
                                 </div>
 
                             <div>
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Number of Questions (AI)</label>
-                                <input
-                                    type="number"
-                                    min="1"
-                                    max="15"
-                                    value={questionCount}
-                                    onChange={(e) => setQuestionCount(e.target.value)}
-                                    className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 ring-primary/20"
-                                />
-                                <p className="text-[9px] text-slate-400 mt-1 italic font-medium">Recommended: 5-10 questions</p>
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Assessment Config (Qty & Duration)</label>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="relative">
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            max="15"
+                                            value={questionCount}
+                                            onChange={(e) => setQuestionCount(e.target.value)}
+                                            className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 ring-primary/20"
+                                        />
+                                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400 uppercase">Qty</span>
+                                    </div>
+                                    <div className="relative">
+                                        <input
+                                            type="number"
+                                            min="5"
+                                            max="180"
+                                            value={duration}
+                                            onChange={(e) => setDuration(e.target.value)}
+                                            className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 ring-primary/20"
+                                        />
+                                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400 uppercase underline decoration-primary/40">Min</span>
+                                    </div>
+                                </div>
+                                <div className="flex justify-between mt-1">
+                                    <p className="text-[9px] text-slate-400 italic font-medium">Qty: 1-15</p>
+                                    <p className="text-[9px] text-slate-400 italic font-medium">Duration: 5-180m</p>
+                                </div>
                             </div>
 
                             <div>

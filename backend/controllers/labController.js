@@ -6,12 +6,14 @@ const pdf = require('pdf-parse-fork');
 const fs = require('fs');
 const logger = require('../utils/logger');
 
+const { sendLabAssignedEmail } = require('../utils/emailService');
+
 const labController = {
     // Staff: Upload document and assign lab
     assignLab: async (req, res) => {
         try {
-            const { title, description, type, subjectCode, questionCount } = req.body;
-            const semester = req.user.semester;
+            const { title, description, type, subjectCode, questionCount, duration } = req.body;
+            const semester = parseInt(req.user.semester);
             const role = req.user.role;
             const file = req.file;
 
@@ -69,18 +71,39 @@ const labController = {
                 title,
                 description,
                 type,
-                semester: parseInt(semester),
+                semester,
                 subjectCode,
                 questions,
                 documentContent: textContent.substring(0, 10000), // Store first 10k chars
-                createdBy: req.user.id
+                createdBy: req.user.id,
+                duration: parseInt(duration) || 30
             });
 
             await newAssessment.save();
 
+            // Notify students via email
+            try {
+                const students = await Student.find({ role: 'student', semester: semester });
+                const staffName = req.user.name;
+                
+                // Fetch subject name for the email
+                const subject = await Syllabus.findOne({ subjectCode: subjectCode.toUpperCase() });
+                const subjectName = subject ? subject.subjectName : subjectCode;
+
+                // Send emails in background
+                students.forEach(student => {
+                    sendLabAssignedEmail(student.email, student.name, staffName, subjectName, title, type);
+                });
+                
+                logger.info(`📧 Lab notification emails triggered for ${students.length} students in Semester ${semester}`);
+            } catch (emailError) {
+                logger.error('Email notification error:', emailError);
+                // Don't fail the request if email fails
+            }
+
             res.status(201).json({
                 success: true,
-                message: `${type === 'pre-lab' ? 'Pre-lab' : 'Post-lab'} assigned successfully.`,
+                message: `${type === 'pre-lab' ? 'Pre-lab' : 'Post-lab'} assigned successfully. Emails triggered for Semester ${semester}.`,
                 data: newAssessment
             });
 

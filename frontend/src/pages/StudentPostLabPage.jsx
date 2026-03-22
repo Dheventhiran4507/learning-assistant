@@ -18,6 +18,7 @@ const StudentPostLabPage = () => {
     const [answers, setAnswers] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [result, setResult] = useState(null);
+    const [timeLeft, setTimeLeft] = useState(null);
 
     const fetchLabs = async () => {
         try {
@@ -41,6 +42,26 @@ const StudentPostLabPage = () => {
         setCurrentQuestion(0);
         setAnswers(new Array(lab.questions.length).fill(null));
         setResult(null);
+        setTimeLeft((lab.duration || 30) * 60);
+    };
+
+    useEffect(() => {
+        let timer;
+        if (selectedLab && !result && timeLeft !== null && timeLeft > 0) {
+            timer = setInterval(() => {
+                setTimeLeft(prev => prev - 1);
+            }, 1000);
+        } else if (timeLeft === 0 && !result && selectedLab) {
+            submitQuiz();
+        }
+        return () => clearInterval(timer);
+    }, [selectedLab, timeLeft, result]);
+
+    const formatTime = (seconds) => {
+        if (seconds === null) return '00:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
     const handleAnswerSelection = (option) => {
@@ -173,10 +194,16 @@ const StudentPostLabPage = () => {
                                                 {currentQuestion + 1}
                                             </div>
                                             <div>
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Question {currentQuestion + 1} of {selectedLab.questions.length}</p>
-                                                <div className="w-32 h-1 bg-slate-100 rounded-full mt-1 overflow-hidden">
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Question {currentQuestion + 1} of {selectedLab.questions.length}</p>
+                                                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg font-black text-[10px] uppercase shadow-sm ${timeLeft < 60 ? 'bg-red-50 text-red-600 animate-pulse' : 'bg-slate-50 text-slate-600'}`}>
+                                                        <ClockIcon className="w-3.5 h-3.5" />
+                                                        {formatTime(timeLeft)}
+                                                    </div>
+                                                </div>
+                                                <div className="w-48 h-1 bg-slate-100 rounded-full mt-1 overflow-hidden">
                                                     <motion.div 
-                                                        className="h-full bg-primary"
+                                                        className={`h-full ${timeLeft < 60 ? 'bg-red-500' : 'bg-primary'}`}
                                                         initial={{ width: 0 }}
                                                         animate={{ width: `${((currentQuestion + 1) / selectedLab.questions.length) * 100}%` }}
                                                     />

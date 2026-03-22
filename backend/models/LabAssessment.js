@@ -49,6 +49,10 @@ const labAssessmentSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true
+    },
+    duration: {
+        type: Number,
+        default: 30 // Default 30 minutes
     }
 }, {
     timestamps: true

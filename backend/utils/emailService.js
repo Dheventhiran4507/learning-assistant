@@ -132,4 +132,45 @@ const sendLoginNotificationEmail = async (toEmail, name, loginTime, userAgent) =
     }
 };
 
-module.exports = { sendAccountCreatedEmail, sendLoginNotificationEmail };
+/**
+ * Send lab assignment notification to all students in a semester.
+ */
+const sendLabAssignedEmail = async (toEmail, studentName, staffName, subjectName, testTitle, type) => {
+    try {
+        await sendEmail(toEmail, `New ${type.toUpperCase()} Assigned: ${testTitle}`, `
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
+  <div style="max-width:560px;margin:40px auto;background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+    <div style="background:#0f172a;padding:40px;text-align:center;">
+      <h1 style="color:#fff;font-size:28px;font-weight:900;margin:0;letter-spacing:-1px;">VIDAL</h1>
+      <p style="color:#64748b;font-size:11px;margin:8px 0 0;letter-spacing:4px;text-transform:uppercase;">New Assessment Notification</p>
+    </div>
+    <div style="padding:40px;">
+      <h2 style="color:#0f172a;font-size:20px;font-weight:800;margin:0 0 8px;">Hello, ${studentName}</h2>
+      <p style="color:#64748b;font-size:15px;line-height:1.7;margin:0 0 28px;">
+        A new <strong>${type.toUpperCase()}</strong> has been assigned to your class by <strong>${staffName}</strong>.
+      </p>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:28px;margin-bottom:24px;">
+        <p style="color:#94a3b8;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin:0 0 16px;">Assessment Details</p>
+        <p style="margin:0 0 12px;"><span style="color:#64748b;font-size:12px;font-weight:600;display:block;">Subject</span><span style="color:#0f172a;font-size:15px;font-weight:700;">${subjectName}</span></p>
+        <p style="margin:0 0 12px;"><span style="color:#64748b;font-size:12px;font-weight:600;display:block;">Topic / Title</span><span style="color:#0f172a;font-size:15px;font-weight:700;">${testTitle}</span></p>
+        <p style="margin:0;"><span style="color:#64748b;font-size:12px;font-weight:600;display:block;">Assigned By</span><span style="color:#6366f1;font-size:15px;font-weight:700;">${staffName}</span></p>
+      </div>
+      <a href="${APP_URL}/login" style="display:block;background:#0f172a;color:#fff;text-align:center;padding:18px;border-radius:14px;font-weight:800;font-size:13px;letter-spacing:2px;text-decoration:none;text-transform:uppercase;">Take Assessment Now &rarr;</a>
+    </div>
+    <div style="padding:24px 40px;border-top:1px solid #f1f5f9;text-align:center;">
+      <p style="color:#94a3b8;font-size:11px;margin:0;">Vidal Lumina Portal &bull; Anna University &mdash; R2021<br><span style="color:#cbd5e1;">This is an automated educational alert. Please do not reply.</span></p>
+    </div>
+  </div>
+</body>
+</html>`);
+        return true;
+    } catch (error) {
+        console.error(`❌ Lab notification failed for ${toEmail}:`, error.message);
+        return false;
+    }
+};
+
+module.exports = { sendAccountCreatedEmail, sendLoginNotificationEmail, sendLabAssignedEmail };
