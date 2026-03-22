@@ -82,8 +82,8 @@ const AdminDashboardPage = () => {
                 api.get(`/syllabus/semester/${selectedSemester}`)
             ];
 
-            // If HOD/Admin, also fetch staff list
-            if (isAdmin) {
+            // If HOD/Admin/Advisor, also fetch staff list
+            if (isAdmin || isAdvisor) {
                 requests.push(api.get('/analytics/staff'));
             }
 
