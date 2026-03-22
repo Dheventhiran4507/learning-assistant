@@ -181,10 +181,10 @@ const AdminDashboardPage = () => {
                 id: '',
                 name: '',
                 email: '',
-                studentId: '',
+                studentId: type === 'student' ? '' : `STAFF-${Date.now()}`,
                 password: '',
                 role: type,
-                semester: type === 'student' ? selectedSemester : 1,
+                semester: isAdvisor ? user.semester : (type === 'student' ? selectedSemester : 1),
                 subjectsHandled: []
             });
         }
@@ -607,7 +607,9 @@ const AdminDashboardPage = () => {
                             animate={{ opacity: 1, scale: 1 }}
                             className="bg-white rounded-[2rem] p-8 max-w-lg w-full relative z-10 shadow-2xl"
                         >
-                            <h2 className="text-3xl font-black mb-6">{editingStudent ? 'Update' : 'Register'} Student</h2>
+                            <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">
+                                {editingStudent ? 'Update' : 'Register'} {studentFormData.role === 'student' ? 'Student' : 'Subject Staff'}
+                            </h1>
                             <form onSubmit={handleManageStudent} className="space-y-4">
                                 <div>
                                     <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-1">Full Name</label>
@@ -661,17 +663,31 @@ const AdminDashboardPage = () => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-1">ID / Roll No</label>
-                                        <input
-                                            type="text"
-                                            required
-                                            value={studentFormData.studentId}
-                                            onChange={(e) => setStudentFormData({ ...studentFormData, studentId: e.target.value })}
-                                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 ring-primary-500/20"
-                                        />
+                                {studentFormData.role === 'student' && (
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-1">ID / Roll No</label>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={studentFormData.studentId}
+                                                onChange={(e) => setStudentFormData({ ...studentFormData, studentId: e.target.value })}
+                                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 ring-primary-500/20"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-1">Access Password</label>
+                                            <input
+                                                type="text"
+                                                placeholder={editingStudent ? "Keep empty to skip" : "Welcome123"}
+                                                value={studentFormData.password}
+                                                onChange={(e) => setStudentFormData({ ...studentFormData, password: e.target.value })}
+                                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 ring-primary-500/20"
+                                            />
+                                        </div>
                                     </div>
+                                )}
+                                {studentFormData.role !== 'student' && (
                                     <div>
                                         <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-1">Access Password</label>
                                         <input
@@ -682,7 +698,7 @@ const AdminDashboardPage = () => {
                                             className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 ring-primary-500/20"
                                         />
                                     </div>
-                                </div>
+                                )}
 
                                 {studentFormData.role === 'advisor' && (
                                     <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
@@ -722,9 +738,12 @@ const AdminDashboardPage = () => {
                                     <button type="button" onClick={() => setShowStudentModal(false)} disabled={savingStudent} className="flex-1 px-6 py-3 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-all uppercase tracking-widest text-xs disabled:opacity-50">Cancel</button>
                                     <button type="submit" disabled={savingStudent} className="flex-1 bg-gray-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-black transition-all shadow-lg shadow-gray-900/20 uppercase tracking-widest text-xs disabled:opacity-70 flex items-center justify-center gap-2">
                                         {savingStudent ? (
-                                            <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div><span>Sending Email...</span></>
+                                            <>
+                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                                Processing...
+                                            </>
                                         ) : (
-                                            editingStudent ? 'Save Changes' : `Create ${studentFormData.role}`
+                                            editingStudent ? 'Save Changes' : (studentFormData.role === 'student' ? 'Create Student' : 'Create Staff')
                                         )}
                                     </button>
                                 </div>
