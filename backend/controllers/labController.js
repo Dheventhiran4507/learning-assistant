@@ -12,7 +12,21 @@ const labController = {
         try {
             const { title, description, type, subjectCode, questionCount } = req.body;
             const semester = req.user.semester;
+            const role = req.user.role;
             const file = req.file;
+
+            // Authorization: Only assigned staff or Admins/HODs can assign labs for a subject
+            if (role === 'advisor') {
+                const isAssigned = req.user.subjectsHandled?.some(
+                    sh => sh.subjectCode.toUpperCase() === subjectCode.toUpperCase()
+                );
+                if (!isAssigned) {
+                    return res.status(403).json({ 
+                        success: false, 
+                        message: `You are not authorized to assign labs for subject ${subjectCode}.` 
+                    });
+                }
+            }
 
             if (!file) {
                 return res.status(400).json({ success: false, message: 'Please upload a document.' });
@@ -171,6 +185,19 @@ const labController = {
                 return res.status(404).json({ success: false, message: 'Assessment not found.' });
             }
 
+            // Authorization check
+            if (req.user.role === 'advisor') {
+                const isAssigned = req.user.subjectsHandled?.some(
+                    sh => sh.subjectCode.toUpperCase() === assessment.subjectCode.toUpperCase()
+                );
+                if (!isAssigned) {
+                    return res.status(403).json({ 
+                        success: false, 
+                        message: 'You are not authorized to view results for this subject.' 
+                    });
+                }
+            }
+
             const submissions = await LabSubmission.find({ assessment: assessmentId })
                 .populate('student', 'name studentId email semester')
                 .sort({ percentage: -1 });
@@ -191,7 +218,18 @@ const labController = {
     getStaffAssessments: async (req, res) => {
         try {
             const semester = req.user.semester;
-            const assessments = await LabAssessment.find({ semester })
+            const role = req.user.role;
+            const subjectsHandled = req.user.subjectsHandled || [];
+
+            const query = { semester };
+            
+            // If advisor, only show labs for their assigned subjects
+            if (role === 'advisor') {
+                const handledCodes = subjectsHandled.map(sh => sh.subjectCode.toUpperCase());
+                query.subjectCode = { $in: handledCodes };
+            }
+
+            const assessments = await LabAssessment.find(query)
                 .sort({ createdAt: -1 });
 
             res.json({

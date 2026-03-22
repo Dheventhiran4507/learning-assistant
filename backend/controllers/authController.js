@@ -343,7 +343,8 @@ exports.manageAccount = async (req, res) => {
             role,
             batch,
             college,
-            department
+            department,
+            subjectsHandled
         } = req.body;
 
         // Validation
@@ -400,6 +401,10 @@ exports.manageAccount = async (req, res) => {
             userAccount.batch = batch || userAccount.batch;
             userAccount.college = college || userAccount.college;
             userAccount.department = department || userAccount.department;
+            
+            if (subjectsHandled) {
+                userAccount.subjectsHandled = subjectsHandled;
+            }
 
             if (password) {
                 userAccount.password = password;
@@ -428,6 +433,7 @@ exports.manageAccount = async (req, res) => {
                 college: college || 'Anna University',
                 department: department || 'Computer Science Engineering',
                 role: targetRole,
+                subjectsHandled: subjectsHandled || [],
                 isActive: true,
                 isEmailVerified: true  // Staff vouches for the email
             });

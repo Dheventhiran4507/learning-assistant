@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../store/authStore';
 import { 
     CloudArrowUpIcon, 
     DocumentTextIcon, 
@@ -22,6 +23,8 @@ const StaffLabManager = () => {
     const [isUploading, setIsUploading] = useState(false);
     const [assessments, setAssessments] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { user } = useAuthStore();
+    const subjectsHandled = user?.subjectsHandled || [];
 
     const fetchAssessments = async () => {
         try {
@@ -39,6 +42,10 @@ const StaffLabManager = () => {
 
     useEffect(() => {
         fetchAssessments();
+        // Set first subject as default if available
+        if (subjectsHandled.length > 0 && !subjectCode) {
+            setSubjectCode(subjectsHandled[0].subjectCode);
+        }
     }, [type]);
 
     const handleFileChange = (e) => {
@@ -138,18 +145,27 @@ const StaffLabManager = () => {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 gap-6">
                                 <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Subject Code</label>
-                                    <input
-                                        type="text"
-                                        placeholder="CS3491"
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Subject Assigned</label>
+                                    <select
                                         value={subjectCode}
                                         onChange={(e) => setSubjectCode(e.target.value)}
-                                        className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 ring-primary/20"
-                                    />
+                                        className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 ring-primary/20 uppercase"
+                                    >
+                                        <option value="" disabled>Select Subject</option>
+                                        {subjectsHandled.map(sh => (
+                                            <option key={sh.subjectCode} value={sh.subjectCode}>
+                                                {sh.subjectCode} (Sem {sh.semester})
+                                            </option>
+                                        ))}
+                                        {subjectsHandled.length === 0 && (
+                                            <option value="" disabled>No subjects assigned</option>
+                                        )}
+                                    </select>
+                                    {subjectsHandled.length === 0 && (
+                                        <p className="text-[9px] text-red-400 mt-1 italic font-medium">Please contact Admin to assign subjects to you.</p>
+                                    )}
                                 </div>
-                            </div>
 
                             <div>
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Number of Questions (AI)</label>

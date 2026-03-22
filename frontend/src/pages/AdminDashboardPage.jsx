@@ -41,7 +41,8 @@ const AdminDashboardPage = () => {
         studentId: '',
         password: '',
         role: 'student',
-        semester: selectedSemester
+        semester: selectedSemester,
+        subjectsHandled: []
     });
     const [availableSubjects, setAvailableSubjects] = useState({});
     const [showElectiveModal, setShowElectiveModal] = useState(false);
@@ -171,7 +172,8 @@ const AdminDashboardPage = () => {
                 studentId: item.studentId,
                 password: '',
                 role: item.role || type,
-                semester: item.semester
+                semester: item.semester,
+                subjectsHandled: item.subjectsHandled || []
             });
         } else {
             setEditingStudent(null);
@@ -182,7 +184,8 @@ const AdminDashboardPage = () => {
                 studentId: '',
                 password: '',
                 role: type,
-                semester: type === 'student' ? selectedSemester : 1
+                semester: type === 'student' ? selectedSemester : 1,
+                subjectsHandled: []
             });
         }
         setShowStudentModal(true);
@@ -678,6 +681,41 @@ const AdminDashboardPage = () => {
                                         />
                                     </div>
                                 </div>
+
+                                {studentFormData.role === 'advisor' && (
+                                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-4">Assigned Subjects (Lab Authority)</label>
+                                        <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
+                                            {subjects.map(subject => (
+                                                <label key={subject.subjectCode} className="flex items-center gap-3 p-2 hover:bg-white rounded-xl transition-all cursor-pointer border border-transparent hover:border-slate-100">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={studentFormData.subjectsHandled.some(sh => sh.subjectCode === subject.subjectCode)}
+                                                        onChange={(e) => {
+                                                            const isChecked = e.target.checked;
+                                                            let newHandled = [...studentFormData.subjectsHandled];
+                                                            if (isChecked) {
+                                                                newHandled.push({ subjectCode: subject.subjectCode, semester: studentFormData.semester });
+                                                            } else {
+                                                                newHandled = newHandled.filter(sh => sh.subjectCode !== subject.subjectCode);
+                                                            }
+                                                            setStudentFormData({ ...studentFormData, subjectsHandled: newHandled });
+                                                        }}
+                                                        className="w-4 h-4 rounded text-primary focus:ring-primary/20"
+                                                    />
+                                                    <div>
+                                                        <p className="text-[11px] font-black text-slate-900 uppercase leading-none">{subject.subjectCode}</p>
+                                                        <p className="text-[9px] text-slate-400 font-bold uppercase truncate">{subject.subjectName}</p>
+                                                    </div>
+                                                </label>
+                                            ))}
+                                            {subjects.length === 0 && (
+                                                <p className="text-[10px] text-slate-400 italic">No subjects found for Semester {selectedSemester}.</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
                                 <div className="pt-4 flex gap-4">
                                     <button type="button" onClick={() => setShowStudentModal(false)} disabled={savingStudent} className="flex-1 px-6 py-3 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-all uppercase tracking-widest text-xs disabled:opacity-50">Cancel</button>
                                     <button type="submit" disabled={savingStudent} className="flex-1 bg-gray-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-black transition-all shadow-lg shadow-gray-900/20 uppercase tracking-widest text-xs disabled:opacity-70 flex items-center justify-center gap-2">

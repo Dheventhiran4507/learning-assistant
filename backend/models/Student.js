@@ -157,6 +157,18 @@ const studentSchema = new mongoose.Schema({
     parentEmail: String,
     hodEmail: String,
 
+    // Staff / Advisor Assignments
+    subjectsHandled: [{
+        subjectCode: {
+            type: String,
+            required: true
+        },
+        semester: {
+            type: Number,
+            required: true
+        }
+    }],
+
     // Account Status
     isActive: {
         type: Boolean,
