@@ -49,19 +49,19 @@ const Navbar = () => {
 
     const isSubPage = location.pathname !== '/dashboard' && location.pathname !== '/admin/dashboard';
 
-    const isAdmin = user?.role === 'admin';
-    const isAcademicAdmin = user?.role === 'hod' || user?.role === 'advisor';
+    const isAdminOrHOD = user?.role === 'admin' || user?.role === 'hod';
+    const isAdvisor = user?.role === 'advisor';
 
     let navLinks = [];
-    if (isAdmin) {
+    if (isAdminOrHOD) {
+        navLinks = [
+            { name: 'Academic Admin', path: '/admin/dashboard', icon: <UserCircleIcon className="w-5 h-5" /> }
+        ];
+    } else if (isAdvisor) {
         navLinks = [
             { name: 'Academic Admin', path: '/admin/dashboard', icon: <UserCircleIcon className="w-5 h-5" /> },
             { name: 'Lab Manager', path: '/admin/lab-manager', icon: <BeakerIcon className="w-5 h-5" /> },
             { name: 'Lab Results', path: '/admin/lab-results', icon: <ChartPieIcon className="w-5 h-5" /> }
-        ];
-    } else if (isAcademicAdmin) {
-        navLinks = [
-            { name: 'Academic Admin', path: '/admin/dashboard', icon: <UserCircleIcon className="w-5 h-5" /> }
         ];
     } else {
         navLinks = [
