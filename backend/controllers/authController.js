@@ -359,20 +359,20 @@ exports.manageAccount = async (req, res) => {
         const targetRole = role || 'student';
 
         if (req.user.role === 'advisor') {
-            if (targetRole !== 'student') {
+            // Advisors can manage students and other advisors (Subject Staff) in their semester
+            if (!['student', 'advisor'].includes(targetRole)) {
                 return res.status(403).json({
                     success: false,
-                    message: 'Advisors can only manage student accounts'
+                    message: 'Advisors can only manage student or staff accounts'
                 });
             }
             if (parseInt(semester) !== req.user.semester) {
                 return res.status(403).json({
                     success: false,
-                    message: `As an advisor, you can only manage students in Semester ${req.user.semester}`
+                    message: `As an advisor, you can only manage accounts in Semester ${req.user.semester}`
                 });
             }
         }
-
         // Find existing or create new
         let userAccount;
         if (id) {

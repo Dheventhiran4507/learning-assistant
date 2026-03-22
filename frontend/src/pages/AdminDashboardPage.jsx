@@ -388,8 +388,8 @@ const AdminDashboardPage = () => {
 
                 {/* Management Section (2/3) */}
                 <div className="lg:col-span-2 space-y-8">
-                    {/* Tabs for HOD */}
-                    {isAdmin && (
+                    {/* Tabs for HOD / Advisor */}
+                    {(isAdmin || isAdvisor) && (
                         <div className="flex gap-4 border-b border-slate-100 pb-4">
                             <button
                                 onClick={() => setActiveTab('students')}
@@ -642,6 +642,7 @@ const AdminDashboardPage = () => {
                                             <option value="student">Student</option>
                                             {isAdmin && <option value="advisor">Advisor</option>}
                                         </select>
+                                        {isAdvisor && <p className="text-[10px] text-slate-400 mt-1 italic font-bold uppercase">Role Locked</p>}
                                     </div>
                                     <div>
                                         <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-1">
@@ -649,13 +650,14 @@ const AdminDashboardPage = () => {
                                         </label>
                                         <select
                                             required
-                                            disabled={!isAdmin && studentFormData.role === 'student'}
+                                            disabled={(!isAdmin && studentFormData.role === 'student') || isAdvisor}
                                             value={studentFormData.semester}
                                             onChange={(e) => setStudentFormData({ ...studentFormData, semester: parseInt(e.target.value) })}
                                             className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 ring-primary-500/20 disabled:opacity-50 font-bold"
                                         >
                                             {[1, 2, 3, 4, 5, 6, 7, 8].map(s => <option key={s} value={s}>Semester {s}</option>)}
                                         </select>
+                                        {isAdvisor && <p className="text-[10px] text-slate-400 mt-1 italic font-bold uppercase">Semester Fixed</p>}
                                     </div>
                                 </div>
 

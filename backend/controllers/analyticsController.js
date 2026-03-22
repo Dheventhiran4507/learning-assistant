@@ -92,8 +92,15 @@ exports.getHODStats = async (req, res) => {
 // Get all staff (advisors) for HOD/Admin
 exports.getStaff = async (req, res) => {
     try {
-        const staff = await Student.find({ role: 'advisor' })
-            .select('name email semester isActive studentId');
+        const query = { role: 'advisor' };
+        
+        // Advisors only see staff in their assigned semester
+        if (req.user.role === 'advisor') {
+            query.semester = req.user.semester;
+        }
+
+        const staff = await Student.find(query)
+            .select('name email semester isActive studentId subjectsHandled');
 
         res.json({
             success: true,
