@@ -10,8 +10,8 @@ exports.getHODStats = async (req, res) => {
         let query = { role: 'student' };
 
         // Role-based filtering
-        if (req.user.role === 'advisor') {
-            // Advisors only see their assigned semester
+        if (req.user.role === 'advisor' || req.user.role === 'staff') {
+            // Advisors and Staff only see their assigned semester
             query.semester = req.user.semester;
         } else if (semester) {
             // HOD/Admin can filter by semester if provided
@@ -89,10 +89,10 @@ exports.getHODStats = async (req, res) => {
     }
 };
 
-// Get all staff (advisors) for HOD/Admin
+// Get all staff (advisors and subject staff) for HOD/Admin
 exports.getStaff = async (req, res) => {
     try {
-        const query = { role: 'advisor' };
+        const query = { role: { $in: ['advisor', 'staff'] } };
         
         // Advisors only see staff in their assigned semester
         if (req.user.role === 'advisor') {

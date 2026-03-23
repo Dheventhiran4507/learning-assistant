@@ -11,7 +11,7 @@ router.get('/dashboard', protect, (req, res) => {
 router.get('/student/stats', protect, analyticsController.getStudentAnalytics);
 
 // Admin/HOD stats
-router.get('/hod/stats', protect, authorize('admin', 'hod', 'advisor'), analyticsController.getHODStats);
+router.get('/hod/stats', protect, authorize('admin', 'hod', 'advisor', 'staff'), analyticsController.getHODStats);
 router.get('/staff', protect, authorize('admin', 'hod', 'advisor'), analyticsController.getStaff);
 
 module.exports = router;

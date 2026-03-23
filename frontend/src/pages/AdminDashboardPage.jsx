@@ -68,9 +68,9 @@ const AdminDashboardPage = () => {
         refreshUser();
     }, [updateUser]);
 
-    // Force semester to advisor's assigned semester
+    // Force semester to advisor/staff's assigned semester
     useEffect(() => {
-        if (user?.role === 'advisor' && user?.semester) {
+        if ((user?.role === 'advisor' || user?.role === 'staff') && user?.semester) {
             setSelectedSemester(user.semester);
         }
     }, [user?.role, user?.semester]);
