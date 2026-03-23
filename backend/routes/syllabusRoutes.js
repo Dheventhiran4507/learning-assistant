@@ -6,8 +6,8 @@ const { protect, authorize } = require('../middleware/auth');
 router.get('/semester/:semester', protect, syllabusController.getSyllabusBySemester);
 router.get('/available', protect, syllabusController.getAvailableSubjects);
 router.get('/subject/:subjectCode', protect, syllabusController.getSubjectDetails);
-router.post('/subject/:subjectCode/regenerate', protect, authorize('admin', 'hod', 'advisor'), syllabusController.regenerateSyllabus);
-router.delete('/subject/:subjectCode', protect, authorize('admin', 'hod', 'advisor'), syllabusController.deleteSyllabus);
+router.post('/subject/:subjectCode/regenerate', protect, authorize('admin', 'hod', 'advisor', 'staff'), syllabusController.regenerateSyllabus);
+router.delete('/subject/:subjectCode', protect, authorize('admin', 'hod', 'advisor', 'staff'), syllabusController.deleteSyllabus);
 router.get('/search', protect, syllabusController.searchSyllabus);
 
 module.exports = router;
