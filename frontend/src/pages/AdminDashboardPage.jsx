@@ -23,6 +23,7 @@ const AdminDashboardPage = () => {
     const { user, updateUser } = useAuthStore();
     const isAdmin = user?.role === 'admin' || user?.role === 'hod';
     const isAdvisor = user?.role === 'advisor';
+    const isStaff = user?.role === 'staff';
 
     const [students, setStudents] = useState([]);
     const [metrics, setMetrics] = useState(null);
@@ -422,7 +423,7 @@ const AdminDashboardPage = () => {
                                 />
                             </div>
                             <button
-                                onClick={() => openStudentModal(null, activeTab === 'students' ? 'student' : 'advisor')}
+                                onClick={() => openStudentModal(null, activeTab === 'students' ? 'student' : 'staff')}
                                 className="bg-slate-900 text-white p-3.5 rounded-2xl shadow-xl hover:bg-slate-800 transition-all shrink-0"
                             >
                                 <PlusIcon className="w-5 h-5" />
@@ -646,6 +647,7 @@ const AdminDashboardPage = () => {
                                             {(isAdmin || isAdvisor) && <option value="staff">Subject Staff</option>}
                                         </select>
                                         {isAdvisor && <p className="text-[10px] text-slate-400 mt-1 italic font-bold uppercase">Role Locked to Semester {user.semester}</p>}
+                                        {isStaff && <p className="text-[10px] text-slate-400 mt-1 italic font-bold uppercase">Subject Authority Only</p>}
                                     </div>
                                     <div>
                                         <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-1">
