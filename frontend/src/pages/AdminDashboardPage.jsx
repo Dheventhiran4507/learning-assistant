@@ -635,16 +635,16 @@ const AdminDashboardPage = () => {
                                     <div>
                                         <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-1">Role</label>
                                         <select
-                                            disabled={!isAdmin && studentFormData.role !== 'student'}
+                                            disabled={!isAdmin && !isAdvisor}
                                             required
                                             value={studentFormData.role}
                                             onChange={(e) => setStudentFormData({ ...studentFormData, role: e.target.value })}
                                             className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 ring-primary-500/20 disabled:opacity-50 font-bold"
                                         >
                                             <option value="student">Student</option>
-                                            {isAdmin && <option value="advisor">Advisor</option>}
+                                            {(isAdmin || isAdvisor) && <option value="advisor">{isAdvisor ? 'Subject Staff' : 'Advisor'}</option>}
                                         </select>
-                                        {isAdvisor && <p className="text-[10px] text-slate-400 mt-1 italic font-bold uppercase">Role Locked</p>}
+                                        {isAdvisor && <p className="text-[10px] text-slate-400 mt-1 italic font-bold uppercase">Role Locked to Semester {user.semester}</p>}
                                     </div>
                                     <div>
                                         <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-1">
