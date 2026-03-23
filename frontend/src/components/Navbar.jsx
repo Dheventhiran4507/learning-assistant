@@ -51,13 +51,14 @@ const Navbar = () => {
 
     const isAdminOrHOD = user?.role === 'admin' || user?.role === 'hod';
     const isAdvisor = user?.role === 'advisor';
+    const isStaff = user?.role === 'staff';
 
     let navLinks = [];
-    if (isAdminOrHOD) {
+    if (isAdminOrHOD || isAdvisor) {
         navLinks = [
             { name: 'Academic Admin', path: '/admin/dashboard', icon: <UserCircleIcon className="w-5 h-5" /> }
         ];
-    } else if (isAdvisor) {
+    } else if (isStaff) {
         navLinks = [
             { name: 'Academic Admin', path: '/admin/dashboard', icon: <UserCircleIcon className="w-5 h-5" /> },
             { name: 'Lab Manager', path: '/admin/lab-manager', icon: <BeakerIcon className="w-5 h-5" /> },

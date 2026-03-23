@@ -151,7 +151,7 @@ const studentSchema = new mongoose.Schema({
     // Role & Access
     role: {
         type: String,
-        enum: ['student', 'hod', 'parent', 'admin', 'advisor'],
+        enum: ['student', 'hod', 'parent', 'admin', 'advisor', 'staff'],
         default: 'student'
     },
     parentEmail: String,

@@ -32,7 +32,7 @@ const StaffLoginPage = () => {
                 const { student, token } = response.data.data;
 
                 // Suggest Staff Portal if Admin/Staff tries to login here (though they shouldn't)
-                if (['admin', 'hod', 'advisor'].includes(student.role)) {
+                if (['admin', 'hod', 'advisor', 'staff'].includes(student.role)) {
                     login(student, token);
                     toast.success('System Initialized - Welcome Admin');
                     navigate('/admin/dashboard');

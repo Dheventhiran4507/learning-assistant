@@ -359,8 +359,8 @@ exports.manageAccount = async (req, res) => {
         const targetRole = role || 'student';
 
         if (req.user.role === 'advisor') {
-            // Advisors can manage students and other advisors (Subject Staff) in their semester
-            if (!['student', 'advisor'].includes(targetRole)) {
+            // Advisors can manage students and other Subject Staff in their semester
+            if (!['student', 'advisor', 'staff'].includes(targetRole)) {
                 return res.status(403).json({
                     success: false,
                     message: 'Advisors can only manage student or staff accounts'

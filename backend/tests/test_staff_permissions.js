@@ -26,7 +26,7 @@ async function testPermissions() {
         // 1. Mock a staff user with specific subjects
         const staffUser = {
             id: 'mock_staff_id',
-            role: 'advisor',
+            role: 'staff',
             semester: 7,
             subjectsHandled: [{ subjectCode: 'CS3701', semester: 7 }]
         };
@@ -47,7 +47,7 @@ async function testPermissions() {
         
         // This is a unit test of the logic we added
         const query = { semester: staffUser.semester };
-        if (staffUser.role === 'advisor') {
+        if (staffUser.role === 'staff') {
             const handledCodes = staffUser.subjectsHandled.map(sh => sh.subjectCode.toUpperCase());
             query.subjectCode = { $in: handledCodes };
         }

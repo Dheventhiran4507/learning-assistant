@@ -18,7 +18,7 @@ const labController = {
             const file = req.file;
 
             // Authorization: Only assigned staff or Admins/HODs can assign labs for a subject
-            if (role === 'advisor') {
+            if (role === 'staff') {
                 const isAssigned = req.user.subjectsHandled?.some(
                     sh => sh.subjectCode.toUpperCase() === subjectCode.toUpperCase()
                 );
@@ -209,7 +209,7 @@ const labController = {
             }
 
             // Authorization check
-            if (req.user.role === 'advisor') {
+            if (req.user.role === 'staff') {
                 const isAssigned = req.user.subjectsHandled?.some(
                     sh => sh.subjectCode.toUpperCase() === assessment.subjectCode.toUpperCase()
                 );
@@ -246,8 +246,8 @@ const labController = {
 
             const query = { semester };
             
-            // If advisor, only show labs for their assigned subjects
-            if (role === 'advisor') {
+            // If staff, only show labs for their assigned subjects
+            if (role === 'staff') {
                 const handledCodes = subjectsHandled.map(sh => sh.subjectCode.toUpperCase());
                 query.subjectCode = { $in: handledCodes };
             }
