@@ -52,7 +52,7 @@ const StudentPostLabPage = () => {
                 setTimeLeft(prev => prev - 1);
             }, 1000);
         } else if (timeLeft === 0 && !result && selectedLab) {
-            submitQuiz();
+            submitQuiz(true);
         }
         return () => clearInterval(timer);
     }, [selectedLab, timeLeft, result]);
@@ -70,8 +70,8 @@ const StudentPostLabPage = () => {
         setAnswers(newAnswers);
     };
 
-    const submitQuiz = async () => {
-        if (answers.includes(null)) {
+    const submitQuiz = async (isAutoSubmit = false) => {
+        if (!isAutoSubmit && answers.includes(null)) {
             return toast.error('Please answer all questions before submitting.');
         }
 
@@ -79,7 +79,7 @@ const StudentPostLabPage = () => {
         try {
             const formattedAnswers = answers.map((ans, idx) => ({
                 questionIndex: idx,
-                selectedAnswer: ans,
+                selectedAnswer: ans || '', // Ensure empty string if null
                 timeTaken: 0 
             }));
 

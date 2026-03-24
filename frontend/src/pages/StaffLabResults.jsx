@@ -10,8 +10,12 @@ import {
     XMarkIcon,
     CheckCircleIcon,
     XCircleIcon,
-    DocumentMagnifyingGlassIcon
+    DocumentMagnifyingGlassIcon,
+    ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 const StaffLabResults = () => {
     const [assessments, setAssessments] = useState([]);
@@ -52,6 +56,65 @@ const StaffLabResults = () => {
         } finally {
             setLoadingResults(false);
         }
+    };
+
+    const exportToPDF = () => {
+        if (!results) return;
+        const doc = new jsPDF();
+        
+        // Header
+        doc.setFontSize(20);
+        doc.text('Lab Assessment Results', 14, 22);
+        doc.setFontSize(11);
+        doc.setTextColor(100);
+        doc.text(`Title: ${results.assessment.title}`, 14, 30);
+        doc.text(`Subject: ${results.assessment.subjectCode}`, 14, 35);
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 40);
+
+        // Summary Metrics
+        const avgScore = (results.submissions.reduce((acc, s) => acc + s.percentage, 0) / results.submissions.length).toFixed(1);
+        doc.text(`Total Submissions: ${results.submissions.length}`, 14, 50);
+        doc.text(`Average Score: ${avgScore}%`, 14, 55);
+
+        // Table
+        const tableColumn = ["Student Name", "Student ID", "Score", "Percentage", "Status"];
+        const tableRows = results.submissions.map(sub => [
+            sub.student?.name || 'N/A',
+            sub.student?.studentId || 'N/A',
+            `${sub.score}/${sub.maxScore}`,
+            `${sub.percentage.toFixed(1)}%`,
+            'Completed'
+        ]);
+
+        doc.autoTable({
+            head: [tableColumn],
+            body: tableRows,
+            startY: 65,
+            theme: 'grid',
+            headStyles: { fillStyle: [15, 23, 42] } // Dark blue header
+        });
+
+        doc.save(`Lab_Results_${results.assessment.subjectCode}_${results.assessment.title}.pdf`);
+    };
+
+    const exportToExcel = () => {
+        if (!results) return;
+        
+        const worksheetData = results.submissions.map(sub => ({
+            'Student Name': sub.student?.name || 'N/A',
+            'Student ID': sub.student?.studentId || 'N/A',
+            'Score': sub.score,
+            'Max Score': sub.maxScore,
+            'Percentage (%)': sub.percentage.toFixed(1),
+            'Status': 'Completed',
+            'Completed At': new Date(sub.completedAt).toLocaleString()
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Results");
+
+        XLSX.writeFile(workbook, `Lab_Results_${results.assessment.subjectCode}_${results.assessment.title}.xlsx`);
     };
 
     useEffect(() => {
@@ -142,6 +205,22 @@ const StaffLabResults = () => {
                                         <UserGroupIcon className="w-6 h-6 text-primary" />
                                         Student Performances
                                     </h3>
+                                    <div className="flex items-center gap-3">
+                                        <button 
+                                            onClick={exportToExcel}
+                                            className="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-[10px] font-black uppercase hover:bg-emerald-100 transition-all border border-emerald-100"
+                                        >
+                                            <ArrowDownTrayIcon className="w-3.5 h-3.5" />
+                                            Excel
+                                        </button>
+                                        <button 
+                                            onClick={exportToPDF}
+                                            className="flex items-center gap-2 px-4 py-2 bg-primary/5 text-primary rounded-xl text-[10px] font-black uppercase hover:bg-primary/10 transition-all border border-primary/10"
+                                        >
+                                            <ArrowDownTrayIcon className="w-3.5 h-3.5" />
+                                            PDF
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left border-collapse">
