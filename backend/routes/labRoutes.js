@@ -43,5 +43,6 @@ router.delete('/:id', protect, authorize('admin', 'hod', 'advisor', 'staff'), la
 // Student Routes
 router.get('/active', protect, labController.getLabs);
 router.post('/submit', protect, labController.submitLab);
+router.get('/submission/:submissionId', protect, labController.getSubmissionResults);
 
 module.exports = router;

@@ -9,7 +9,9 @@ import {
     ChevronRightIcon,
     AcademicCapIcon,
     LightBulbIcon,
-    XMarkIcon
+    XMarkIcon,
+    CheckCircleIcon,
+    DocumentMagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 
 const StudentPreLabPage = () => {
@@ -20,7 +22,23 @@ const StudentPreLabPage = () => {
     const [answers, setAnswers] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [result, setResult] = useState(null);
+    const [reviewResult, setReviewResult] = useState(null);
+    const [loadingReview, setLoadingReview] = useState(false);
     const [timeLeft, setTimeLeft] = useState(null);
+
+    const fetchReview = async (submissionId) => {
+        setLoadingReview(true);
+        try {
+            const response = await api.get(`/lab/submission/${submissionId}`);
+            if (response.data.success) {
+                setReviewResult(response.data.data);
+            }
+        } catch (error) {
+            toast.error('Failed to load review details');
+        } finally {
+            setLoadingReview(false);
+        }
+    };
 
     const fetchLabs = async () => {
         try {
@@ -154,9 +172,18 @@ const StudentPreLabPage = () => {
 
                             <div className="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
                                 {lab.isCompleted ? (
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] font-black text-slate-400 uppercase">Score Obtained</span>
-                                        <span className="text-2xl font-black text-emerald-600">{lab.submission.percentage.toFixed(0)}%</span>
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] font-black text-slate-400 uppercase">Score Obtained</span>
+                                            <span className="text-2xl font-black text-emerald-600">{lab.submission.percentage.toFixed(0)}%</span>
+                                        </div>
+                                        <button 
+                                            onClick={() => fetchReview(lab.submission._id)}
+                                            className="text-[10px] font-black uppercase text-primary hover:text-slate-900 transition-colors flex items-center gap-1"
+                                        >
+                                            <DocumentMagnifyingGlassIcon className="w-3 h-3" />
+                                            Review Answers
+                                        </button>
                                     </div>
                                 ) : (
                                     <button 
@@ -285,14 +312,106 @@ const StudentPreLabPage = () => {
                                         </div>
                                     </div>
 
-                                    <button
-                                        onClick={() => setSelectedLab(null)}
-                                        className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-black transition-all shadow-xl"
-                                    >
-                                        Close Portal
-                                    </button>
+                                    <div className="flex flex-col gap-3">
+                                        <button
+                                            onClick={() => {
+                                                const subId = result._id;
+                                                setSelectedLab(null);
+                                                fetchReview(subId);
+                                            }}
+                                            className="w-full bg-primary text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+                                        >
+                                            Review My Answers
+                                        </button>
+                                        <button
+                                            onClick={() => setSelectedLab(null)}
+                                            className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-black transition-all"
+                                        >
+                                            Close Portal
+                                        </button>
+                                    </div>
                                 </div>
                             )}
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Review Modal */}
+            <AnimatePresence>
+                {reviewResult && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6 bg-slate-900/95 backdrop-blur-xl"
+                    >
+                        <motion.div 
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-white w-full max-w-3xl h-[85vh] rounded-[3.5rem] overflow-hidden shadow-2xl relative flex flex-col"
+                        >
+                            <div className="p-8 border-b border-slate-50 flex items-center justify-between bg-white z-10">
+                                <div>
+                                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter">Your Response Analysis</h3>
+                                    <p className="text-[10px] font-black text-primary uppercase italic">Assessment Results: {reviewResult.percentage.toFixed(0)}% Correct</p>
+                                </div>
+                                <button onClick={() => setReviewResult(null)} className="p-2 hover:bg-slate-50 rounded-xl transition-all">
+                                    <XMarkIcon className="w-6 h-6 text-slate-300" />
+                                </button>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto p-8 space-y-6">
+                                {reviewResult.assessment.questions.map((q, idx) => {
+                                    const studentAns = reviewResult.answers.find(a => a.questionIndex === idx);
+                                    return (
+                                        <div key={idx} className={`rounded-[2.5rem] p-8 border-2 transition-all ${studentAns?.isCorrect ? 'bg-emerald-50/30 border-emerald-100' : 'bg-red-50/30 border-red-100'}`}>
+                                            <div className="flex items-start justify-between gap-4 mb-6">
+                                                <h4 className="text-base font-black text-slate-900 leading-tight">
+                                                    <span className={`mr-2 italic ${studentAns?.isCorrect ? 'text-emerald-500' : 'text-primary'}`}>Q{idx + 1}.</span>
+                                                    {q.question}
+                                                </h4>
+                                                <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${studentAns?.isCorrect ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
+                                                    {studentAns?.isCorrect ? <CheckCircleIcon className="w-5 h-5" /> : <XMarkIcon className="w-5 h-5" />}
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="space-y-1.5">
+                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Your Choice</p>
+                                                    <p className={`text-sm font-bold ${studentAns?.isCorrect ? 'text-emerald-700' : 'text-red-700'}`}>
+                                                        {studentAns?.selectedAnswer || 'Skipped'}
+                                                    </p>
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Correct Answer</p>
+                                                    <p className="text-sm font-bold text-slate-900">{q.correctAnswer}</p>
+                                                </div>
+                                            </div>
+
+                                            {(q.explanation || studentAns?.isCorrect === false) && (
+                                                <div className="mt-6 pt-6 border-t border-slate-100">
+                                                    <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                                                        <LightBulbIcon className="w-3.5 h-3.5" />
+                                                        Insights
+                                                    </p>
+                                                    <p className="text-xs text-slate-500 font-medium italic leading-relaxed">{q.explanation || 'Review the lab documentation for detailed conceptual understanding.'}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            <div className="p-8 border-t border-slate-50 bg-slate-50/50">
+                                <button 
+                                    onClick={() => setReviewResult(null)}
+                                    className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl hover:bg-black transition-all"
+                                >
+                                    Finish Review
+                                </button>
+                            </div>
                         </motion.div>
                     </motion.div>
                 )}

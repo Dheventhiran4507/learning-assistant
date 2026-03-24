@@ -126,17 +126,28 @@ const labController = {
                 isActive: true 
             }).select('-documentContent').sort({ createdAt: -1 });
 
+            // Hard Close Logic: Filter out expired assessments
+            const currentTime = new Date();
+            const activeLabs = labs.filter(lab => {
+                const expiryTime = new Date(lab.createdAt.getTime() + (lab.duration || 30) * 60000);
+                return currentTime <= expiryTime;
+            });
+
             // Also check which ones student has already submitted
             const submissions = await LabSubmission.find({ 
                 student: req.user.id 
             }).select('assessment score percentage');
 
-            const labsWithStatus = labs.map(lab => {
+            const labsWithStatus = activeLabs.map(lab => {
                 const submission = submissions.find(s => s.assessment.toString() === lab._id.toString());
                 return {
                     ...lab.toObject(),
                     isCompleted: !!submission,
-                    submission: submission || null
+                    submission: submission ? {
+                        _id: submission._id,
+                        score: submission.score,
+                        percentage: submission.percentage
+                    } : null
                 };
             });
 
@@ -272,6 +283,31 @@ const labController = {
             await LabAssessment.findByIdAndDelete(id);
             await LabSubmission.deleteMany({ assessment: id });
             res.json({ success: true, message: 'Assessment deleted successfully.' });
+        } catch (error) {
+            res.status(500).json({ success: false, message: error.message });
+        }
+    },
+    
+    // Student: Get detailed results for a submission
+    getSubmissionResults: async (req, res) => {
+        try {
+            const { submissionId } = req.params;
+            const submission = await LabSubmission.findById(submissionId)
+                .populate({
+                    path: 'assessment',
+                    select: 'title subjectCode type questions'
+                });
+
+            if (!submission) {
+                return res.status(404).json({ success: false, message: 'Submission not found.' });
+            }
+
+            // Student can only view their own submission
+            if (req.user.role === 'student' && submission.student.toString() !== req.user.id) {
+                return res.status(403).json({ success: false, message: 'Not authorized to view this submission.' });
+            }
+
+            res.json({ success: true, data: submission });
         } catch (error) {
             res.status(500).json({ success: false, message: error.message });
         }

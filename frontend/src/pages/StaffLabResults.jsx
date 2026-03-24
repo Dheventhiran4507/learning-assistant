@@ -15,7 +15,7 @@ import {
     LightBulbIcon
 } from '@heroicons/react/24/outline';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
 const StaffLabResults = () => {
@@ -87,12 +87,12 @@ const StaffLabResults = () => {
             'Completed'
         ]);
 
-        doc.autoTable({
+        autoTable(doc, {
             head: [tableColumn],
             body: tableRows,
             startY: 65,
             theme: 'grid',
-            headStyles: { fillStyle: [15, 23, 42] } // Dark blue header
+            headStyles: { fillColor: [15, 23, 42] } // Dark blue header
         });
 
         doc.save(`Lab_Results_${results.assessment.subjectCode}_${results.assessment.title}.pdf`);
