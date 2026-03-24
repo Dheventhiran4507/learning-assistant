@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { 
     CpuChipIcon, 
     ClipboardDocumentCheckIcon, 
+    ClockIcon,
     ChevronRightIcon,
     AcademicCapIcon,
     XMarkIcon
