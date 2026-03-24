@@ -36,6 +36,9 @@
     "eslint": "^8.56.0",
     "eslint-plugin-react": "^7.33.2"
   },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.6.1"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
