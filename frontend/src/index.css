@@ -16,35 +16,44 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
-    /* Professional Theme Colors - Indigo & Slate */
-    --primary: #4338ca;
-    --primary-light: #6366f1;
-    --primary-dark: #312e81;
+    /* Lumina Premium Palette */
+    --primary: #4f46e5; /* Indigo-600 */
+    --primary-light: #818cf8;
+    --primary-dark: #3730a3;
     --secondary: #6366f1;
-    --secondary-light: #818cf8;
-    --accent: #0ea5e9;
-    --accent-light: #38bdf8;
-    --success: #059669;
-    --warning: #d97706;
-    --error: #dc2626;
-    --background: #f8fafc;
-    --surface: #ffffff;
-    --glass: rgba(255, 255, 255, 0.7);
-
-    /* Professional Palette */
     --slate-50: #f8fafc;
     --slate-100: #f1f5f9;
     --slate-200: #e2e8f0;
     --slate-300: #cbd5e1;
     --slate-400: #94a3b8;
     --slate-500: #64748b;
-    --slate-600: #475569;
-    --slate-700: #334155;
-    --slate-800: #1e293b;
     --slate-900: #0f172a;
+    
+    --background: #fbfbfd;
+    --surface: #ffffff;
+    
+    /* Shadows */
+    --shadow-premium: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 20px 50px -12px rgba(0, 0, 0, 0.08);
 }
 
 @layer utilities {
+
+    .lumina-card {
+        @apply bg-white rounded-[2.5rem] border border-slate-100/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300;
+    }
+
+    .lumina-card-hover {
+        @apply hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] hover:-translate-y-1;
+    }
+
+    .lumina-text-gradient {
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 via-indigo-600 to-blue-600;
+    }
+
+    .lumina-nav-item {
+        @apply px-5 py-2 rounded-full text-[13px] font-bold uppercase tracking-wider transition-all duration-300;
+    }
 
     /* Professional Glass Variants */
     .glass {
@@ -90,10 +99,10 @@
 
     /* Technical Mesh Background */
     .bg-mesh {
-        background-color: #f8fafc;
+        background-color: var(--background);
         background-image:
-            radial-gradient(at 0% 0%, rgba(67, 56, 202, 0.03) 0px, transparent 50%),
-            radial-gradient(at 100% 0%, rgba(14, 165, 233, 0.03) 0px, transparent 50%);
+            radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.02) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(14, 165, 233, 0.02) 0px, transparent 50%);
     }
 
     .bg-mesh-subtle {

@@ -79,102 +79,87 @@ const Navbar = () => {
         <motion.nav
             initial={{ y: -100 }}
             animate={{ y: 0 }}
-            className="sticky top-0 z-50 w-full px-4 sm:px-6 py-4 sm:py-6 pointer-events-none"
+            className="sticky top-0 z-50 w-full bg-white border-b border-slate-100 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_4px_6px_-2px_rgba(0,0,0,0.05)]"
         >
-            <div className="max-w-7xl mx-auto pointer-events-auto">
-                <div className="glass rounded-2xl sm:rounded-[2rem] px-4 sm:px-8 py-3 sm:py-4 backdrop-blur-3xl border border-white/5 shadow-2xl flex items-center justify-between relative overflow-hidden">
-                    {/* Background Glow */}
-                    <div className="absolute top-0 left-1/4 w-1/2 h-full bg-gradient-to-r from-primary-500/10 via-secondary-500/10 to-primary-500/10 blur-3xl opacity-50"></div>
-
-                    <div className="flex items-center gap-4 sm:gap-12 relative z-10">
-                        <div className="flex items-center gap-2">
-                            {isSubPage && (
-                                <button
-                                    onClick={handleBack}
-                                    className="p-2 bg-slate-100 rounded-xl lg:hidden active:scale-95 transition-transform"
-                                >
-                                    <ChevronLeftIcon className="w-5 h-5 text-slate-900" />
-                                </button>
-                            )}
-                            <Link to="/dashboard" className="flex items-center gap-3 group">
-                                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-slate-900 flex items-center justify-center shadow-xl shadow-slate-900/10 group-hover:rotate-3 transition-transform">
-                                    <AcademicCapIcon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between h-20">
+                    <div className="flex items-center gap-8">
+                        <Link to="/dashboard" className="flex items-center gap-3 group">
+                            <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center shadow-lg shadow-slate-900/10 group-hover:scale-105 transition-transform">
+                                <AcademicCapIcon className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                                <span className="text-xl font-black text-slate-900 block leading-none tracking-tight uppercase">LUMINA</span>
+                                <div className="flex items-center gap-1.5 leading-none mt-0.5">
+                                    <span className="text-[10px] font-black text-indigo-600 tracking-widest uppercase">PORTAL</span>
+                                    <span className="text-[8px] font-bold text-slate-300">v1.1.2</span>
                                 </div>
-                                <div className="hidden sm:block">
-                                    <span className="text-lg sm:text-xl font-black text-gray-900 block leading-none tracking-tighter uppercase">LUMINA</span>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[8px] sm:text-[10px] font-black text-primary-600 tracking-[0.3em] uppercase">PORTAL</span>
-                                        <span className="text-[7px] font-bold text-slate-400 opacity-50">v1.1.2</span>
-                                    </div>
-                                </div>
-                            </Link>
-                        </div>
+                            </div>
+                        </Link>
 
-                        {/* Desktop Links */}
-                        <div className="hidden lg:flex items-center gap-2 p-1.5 bg-white/5 rounded-2xl border border-white/5">
+                        {/* Desktop Links - Minimalist centered */}
+                        <div className="hidden lg:flex items-center gap-1 ml-4">
                             {navLinks.map((link) => {
                                 const isActive = location.pathname === link.path;
                                 return (
                                     <Link
                                         key={link.path}
                                         to={link.path}
-                                        className={`relative px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-500 flex items-center gap-3
-                                            ${isActive ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'}
+                                        className={`lumina-nav-item flex items-center gap-2
+                                            ${isActive 
+                                                ? 'bg-indigo-50 text-indigo-700' 
+                                                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}
                                         `}
                                     >
-                                        <span className="text-base">{link.icon}</span>
+                                        <span className="opacity-80">{link.icon}</span>
                                         <span>{link.name}</span>
-                                        {isActive && (
-                                            <motion.div
-                                                layoutId="nav-active"
-                                                className="absolute inset-0 bg-gray-100 rounded-xl -z-10 shadow-inner"
-                                            />
-                                        )}
                                     </Link>
                                 );
                             })}
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-3 sm:gap-6 relative z-10">
-                        {/* Desktop User Info */}
-                        <div className="hidden md:flex flex-col items-end">
-                            <span className="text-gray-900 text-sm font-black">
-                                {typeof user?.name === 'string' ? user.name : (user?.name?.message || 'User')}
-                            </span>
-                            <span className="text-primary-600 text-[10px] font-black uppercase tracking-tighter">Semester {user?.semester || '1'}</span>
-                        </div>
+                    <div className="flex items-center gap-5">
+                        {/* Desktop User Info & Actions */}
+                        <div className="hidden md:flex items-center gap-5">
+                            <div className="flex flex-col items-end leading-tight">
+                                <span className="text-slate-900 text-sm font-black">
+                                    {typeof user?.name === 'string' ? user.name : (user?.name?.message || 'User')}
+                                </span>
+                                <span className="text-indigo-600 text-[10px] font-black uppercase tracking-widest">Semester {user?.semester || '1'}</span>
+                            </div>
 
-                        <div className="h-10 w-[1px] bg-slate-200 hidden md:block"></div>
+                            <div className="h-8 w-[1px] bg-slate-100"></div>
+
+                            {/* Sync Button - Solid circular */}
+                            <button
+                                onClick={handleSync}
+                                className="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-all group"
+                                title="Sync Data"
+                            >
+                                <ArrowPathIcon className="w-4 h-4 group-hover:rotate-180 transition-transform duration-700" />
+                            </button>
+
+                            <button
+                                onClick={handleLogout}
+                                className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 transition-all font-black uppercase tracking-widest text-[10px] group"
+                            >
+                                <ArrowRightOnRectangleIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                <span>Logout</span>
+                            </button>
+                        </div>
 
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setIsMenuOpen(true)}
-                            className="lg:hidden p-2 text-slate-900 hover:bg-slate-100 rounded-xl transition-colors"
+                            className="lg:hidden p-2 text-slate-600 hover:bg-slate-50 rounded-xl transition-colors"
                         >
                             <Bars3CenterLeftIcon className="w-6 h-6" />
-                        </button>
-
-                        {/* Desktop Sync Button */}
-                        <button
-                            onClick={handleSync}
-                            className="hidden lg:flex w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 items-center justify-center hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-all group mr-2"
-                            title="Force Sync App"
-                        >
-                            <ArrowPathIcon className="w-5 h-5 group-hover:rotate-180 transition-transform duration-700" />
-                        </button>
-
-                        <button
-                            onClick={handleLogout}
-                            className="flex items-center gap-2 px-3 sm:px-4 h-10 sm:h-12 rounded-xl sm:rounded-2xl bg-red-50 border border-red-100 text-red-600 hover:bg-red-100 hover:border-red-200 transition-all group"
-                            title="Sign Out"
-                        >
-                            <ArrowRightOnRectangleIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                            <span className="hidden xl:block text-[10px] font-black uppercase tracking-widest">Logout</span>
                         </button>
                     </div>
                 </div>
             </div>
+
 
             {/* Mobile Navigation Drawer */}
             <AnimatePresence>
