@@ -272,6 +272,10 @@ const StudentPreLabPage = () => {
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/90 backdrop-blur-md"
                     >
+                        <motion.div 
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
                             className="bg-white w-full max-w-2xl rounded-[3rem] overflow-hidden shadow-2xl relative"
                         >
                             {/* Security Overlay */}
