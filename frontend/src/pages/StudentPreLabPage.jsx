@@ -11,7 +11,8 @@ import {
     LightBulbIcon,
     XMarkIcon,
     CheckCircleIcon,
-    DocumentMagnifyingGlassIcon
+    DocumentMagnifyingGlassIcon,
+    ShieldExclamationIcon
 } from '@heroicons/react/24/outline';
 
 const StudentPreLabPage = () => {
@@ -25,6 +26,12 @@ const StudentPreLabPage = () => {
     const [reviewResult, setReviewResult] = useState(null);
     const [loadingReview, setLoadingReview] = useState(false);
     const [timeLeft, setTimeLeft] = useState(null);
+
+    // Anti-Cheat / Page Lock State
+    const [showWarning, setShowWarning] = useState(false);
+    const [isPrivacyShieldActive, setIsPrivacyShieldActive] = useState(false);
+    const MAX_VIOLATIONS = 1;
+    const [tabSwitchCount, setTabSwitchCount] = useState(0);
 
     const fetchReview = async (submissionId) => {
         setLoadingReview(true);
@@ -56,6 +63,63 @@ const StudentPreLabPage = () => {
     useEffect(() => {
         fetchLabs();
     }, []);
+
+    // ANTI-CHEAT: Focus Lock & Window Blur
+    useEffect(() => {
+        if (!selectedLab || result) return;
+
+        const triggerViolation = () => {
+            setTabSwitchCount(prev => {
+                const next = prev + 1;
+                setIsPrivacyShieldActive(true);
+                setShowWarning(true);
+                if (next >= MAX_VIOLATIONS) {
+                    submitQuiz(true); // Auto-submit on violation
+                    toast.error('❌ Assessment integrity violated! Auto-submitting.');
+                } else {
+                    toast.error('⚠️ Warning: Stay on this page!');
+                }
+                return next;
+            });
+        };
+
+        const handleVisibilityChange = () => { if (document.hidden) triggerViolation(); };
+        const handleBlur = () => triggerViolation();
+
+        const blockKeys = (e) => {
+            if (e.ctrlKey && ['c', 'a', 'v', 'u', 'i'].includes(e.key.toLowerCase())) e.preventDefault();
+            if (e.key === 'F12') e.preventDefault();
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('blur', handleBlur);
+        document.addEventListener('keydown', blockKeys, true);
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('blur', handleBlur);
+            document.removeEventListener('keydown', blockKeys, true);
+            document.removeEventListener('contextmenu', (e) => e.preventDefault());
+        };
+    }, [selectedLab, result]);
+
+    // PAGE LOCK: Block browser Back button
+    useEffect(() => {
+        if (!selectedLab || result) return;
+        window.history.pushState(null, '', window.location.href);
+        const handlePopState = () => {
+            window.history.pushState(null, '', window.location.href);
+            setIsPrivacyShieldActive(true);
+            setShowWarning(true);
+            toast.error('⚠️ Back button is blocked during assessment!');
+        };
+        window.addEventListener('popstate', handlePopState);
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+            window.history.back();
+        };
+    }, [selectedLab, result]);
 
     const startQuiz = (lab) => {
         setSelectedLab(lab);
@@ -208,12 +272,35 @@ const StudentPreLabPage = () => {
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/90 backdrop-blur-md"
                     >
-                        <motion.div 
-                            initial={{ scale: 0.9, y: 20 }}
-                            animate={{ scale: 1, y: 0 }}
-                            exit={{ scale: 0.9, y: 20 }}
                             className="bg-white w-full max-w-2xl rounded-[3rem] overflow-hidden shadow-2xl relative"
                         >
+                            {/* Security Overlay */}
+                            <AnimatePresence>
+                                {(showWarning || isPrivacyShieldActive) && (
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="absolute inset-0 z-[100] flex items-center justify-center backdrop-blur-2xl bg-slate-900/90 p-8 text-center"
+                                    >
+                                        <div className="max-w-xs">
+                                            <ShieldExclamationIcon className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                                            <h3 className="text-xl font-black text-white uppercase mb-2">Security Alert</h3>
+                                            <p className="text-slate-400 text-sm mb-6">Assessment window focus lost. Screen hidden to maintain integrity.</p>
+                                            {tabSwitchCount < MAX_VIOLATIONS ? (
+                                                <button 
+                                                    onClick={() => { setShowWarning(false); setIsPrivacyShieldActive(false); }}
+                                                    className="w-full py-3 bg-white text-slate-900 rounded-xl font-bold uppercase text-xs"
+                                                >
+                                                    Return to Test
+                                                </button>
+                                            ) : (
+                                                <p className="text-red-500 font-bold uppercase text-[10px]">Integrity Violated - Submitting</p>
+                                            )}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                             {!result ? (
                                 <div className="p-8 sm:p-12">
                                     {/* Progress Header */}

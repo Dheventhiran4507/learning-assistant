@@ -303,14 +303,14 @@ class GeminiAIService {
         let systemPrompt, userPrompt;
 
         if (isMaths) {
-            systemPrompt = `You are an elite Anna University Mathematics Professor (R2021 Regulation). Generate ${difficulty} level Part-A (2-mark) MCQs that test formula and theorem identification. Rules: - Questions MUST ask to identify correct formula/theorem. - Include actual formula in options. - NO PREAMBLE. Output JSON.`;
-            userPrompt = `${contextInfo}Generate ${batchSize} ${difficulty} level formula-identification MCQs for "${topic}". JSON format: { "questions": [{ "question": "...", "options": ["...", "..."], "correctAnswer": "...", "explanation": "..." }] }`;
+            systemPrompt = `You are an elite Anna University Mathematics Professor (R2021 Regulation). Generate ${difficulty} level Part-A (2-mark) MCQs that test formula and theorem identification. Rules: - Questions MUST ask to identify correct formula/theorem. - Include actual formula in options. - Ensure each question is unique and uses different numerical values or theorem contexts. - NO PREAMBLE. Output JSON.`;
+            userPrompt = `${contextInfo}Generate ${batchSize} UNIQUE ${difficulty} level formula-identification MCQs for "${topic}". DO NOT repeat common textbook questions. JSON format: { "questions": [{ "question": "...", "options": ["...", "..."], "correctAnswer": "...", "explanation": "..." }] }`;
         } else if (isProgramming) {
-            systemPrompt = `You are an elite Anna University CS/IT Professor. Generate ${difficulty} level Part-A (2-mark) MCQs that test code-reading. Rules: - Include SHORT code snippet (3-8 lines). - Code must be syntactically correct. - NO PREAMBLE. Output JSON.`;
-            userPrompt = `${contextInfo}Generate ${batchSize} ${difficulty} level code-output MCQs for "${topic}". JSON format: { "questions": [{ "question": "...", "options": ["...", "..."], "correctAnswer": "...", "explanation": "..." }] }`;
+            systemPrompt = `You are an elite Anna University CS/IT Professor. Generate ${difficulty} level Part-A (2-mark) MCQs that test code-reading. Rules: - Include UNIQUE and SHORT code snippet (3-8 lines). - Code must be syntactically correct and vary in logic (loops, conditionals, pointers etc). - NO PREAMBLE. Output JSON.`;
+            userPrompt = `${contextInfo}Generate ${batchSize} DISTINCT ${difficulty} level code-output MCQs for "${topic}". Focus on edge cases and logic flow. JSON format: { "questions": [{ "question": "...", "options": ["...", "..."], "correctAnswer": "...", "explanation": "..." }] }`;
         } else {
-            systemPrompt = `You are an elite Anna University Professor. Generate ${difficulty} level Part-A (2-mark) MCQs. Unique, technical, R2021 aligned. NO PREAMBLE. Output JSON.`;
-            userPrompt = `${contextInfo}Generate ${batchSize} ${difficulty} level technical MCQs for "${topic}". JSON format: { "questions": [{ "question": "...", "options": ["...", "..."], "correctAnswer": "...", "explanation": "..." }] }`;
+            systemPrompt = `You are an elite Anna University Professor. Generate ${difficulty} level Part-A (2-mark) MCQs. Unique, technical, R2021 aligned. Rules: - Focus on real-world scenarios or specific technical nuances. - Avoid generic 'what is' questions. - Ensure all ${batchSize} questions are fundamentally different. - NO PREAMBLE. Output JSON.`;
+            userPrompt = `${contextInfo}Generate ${batchSize} DIVERSIFIED ${difficulty} level technical MCQs for "${topic}". JSON format: { "questions": [{ "question": "...", "options": ["...", "..."], "correctAnswer": "...", "explanation": "..." }] }`;
         }
 
         try {

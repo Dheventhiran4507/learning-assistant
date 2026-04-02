@@ -224,7 +224,11 @@ export default function PracticePage() {
         return () => window.removeEventListener('popstate', handlePopState);
     }, [session]);
 
-    // PAGE LOCK: Block tab-close / URL navigate away from browser
+        return () => window.history.back(); // Clean up dummy state
+    }, [session]);
+
+    // PAGE LOCK: Block tab-close / URL navigate away - Removed as per user request for strict locking instead
+    /*
     useEffect(() => {
         const isReviewMode = session?.status === 'completed';
         if (!session || isReviewMode) return;
@@ -236,6 +240,7 @@ export default function PracticePage() {
         window.addEventListener('beforeunload', handleBeforeUnload);
         return () => window.removeEventListener('beforeunload', handleBeforeUnload);
     }, [session]);
+    */
 
     const handleSubjectSelect = (code, subjectData) => {
         setSelectedSubject(code);
@@ -794,11 +799,12 @@ export default function PracticePage() {
                         </div>
                     </div>
 
-                    <div className="glass-card p-10 rounded-[3rem] border border-slate-200 bg-slate-50/50">
-                        <LightBulbIcon className="w-10 h-10 text-amber-500 mb-6" />
-                        <h3 className="text-xl font-bold text-slate-900 mb-4">Study Tip</h3>
+                        <h3 className="text-xl font-bold text-slate-900 mb-4">{isAnswered ? 'Concept Insight' : 'Study Strategy'}</h3>
                         <p className="text-slate-600 leading-relaxed text-lg">
-                            {currentQuestion.aiFeedback.explanation.split('.')[0]}. Verbalizing this concept helps reinforce long-term retention.
+                            {isAnswered 
+                                ? `${currentQuestion.aiFeedback.explanation.split('.')[0]}. Verbalizing this concept helps reinforce long-term retention.`
+                                : "Focus on understanding the core logic rather than memorizing the pattern. Active recall is the key to mastery."
+                            }
                         </p>
                     </div>
 

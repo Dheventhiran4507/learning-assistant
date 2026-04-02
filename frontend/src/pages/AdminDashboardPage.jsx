@@ -606,7 +606,7 @@ const AdminDashboardPage = () => {
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="bg-white rounded-[2rem] p-8 max-w-lg w-full relative z-10 shadow-2xl"
+                            className="bg-white rounded-[2rem] p-8 max-w-lg w-full relative z-10 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
                         >
                             <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">
                                 {editingStudent ? 'Update' : 'Register'} {studentFormData.role === 'student' ? 'Student' : 'Subject Staff'}

@@ -119,7 +119,7 @@ exports.startSession = async (req, res) => {
                         subjectCode: syllabus.subjectCode, 
                         topic: { $regex: new RegExp(`^${topicNameNormalized}$`, 'i') }
                     } },
-                    { $sample: { size: questionsPerTopic } }
+                    { $sample: { size: 50 } } // Increased sample size for better variety
                 ]);
 
                 let processedDbQuestions = dbQuestions.map(q => ({
