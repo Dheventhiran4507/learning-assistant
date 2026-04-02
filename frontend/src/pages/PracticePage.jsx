@@ -221,7 +221,10 @@ export default function PracticePage() {
             });
         };
         window.addEventListener('popstate', handlePopState);
-        return () => window.removeEventListener('popstate', handlePopState);
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+            window.history.back();
+        };
     }, [session]);
 
 
