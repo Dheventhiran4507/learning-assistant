@@ -801,14 +801,16 @@ export default function PracticePage() {
                         </div>
                     </div>
 
-                        <h3 className="text-xl font-bold text-slate-900 mb-4">{isAnswered ? 'Concept Insight' : 'Study Strategy'}</h3>
-                        <p className="text-slate-600 leading-relaxed text-lg">
-                            {isAnswered 
-                                ? `${currentQuestion.aiFeedback.explanation.split('.')[0]}. Verbalizing this concept helps reinforce long-term retention.`
-                                : "Focus on understanding the core logic rather than memorizing the pattern. Active recall is the key to mastery."
-                            }
-                        </p>
-                    </div>
+                        <div className="glass-card p-10 rounded-[3rem] border border-slate-200 bg-slate-50/50">
+                            <LightBulbIcon className="w-10 h-10 text-amber-500 mb-6" />
+                            <h3 className="text-xl font-bold text-slate-900 mb-4">{isAnswered ? 'Concept Insight' : 'Study Strategy'}</h3>
+                            <p className="text-slate-600 leading-relaxed text-lg">
+                                {isAnswered 
+                                    ? `${currentQuestion.aiFeedback.explanation.split('.')[0]}. Verbalizing this concept helps reinforce long-term retention.`
+                                    : "Focus on understanding the core logic rather than memorizing the pattern. Active recall is the key to mastery."
+                                }
+                            </p>
+                        </div>
 
                     <div className="p-8 rounded-[2.5rem] bg-slate-100 border border-slate-200 text-center">
                         <div className="flex items-center justify-center gap-2 text-slate-600 font-bold mb-1">
