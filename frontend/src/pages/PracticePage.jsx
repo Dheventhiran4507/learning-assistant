@@ -224,8 +224,7 @@ export default function PracticePage() {
         return () => window.removeEventListener('popstate', handlePopState);
     }, [session]);
 
-        return () => window.history.back(); // Clean up dummy state
-    }, [session]);
+
 
     // PAGE LOCK: Block tab-close / URL navigate away - Removed as per user request for strict locking instead
     /*
