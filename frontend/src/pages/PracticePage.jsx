@@ -55,14 +55,11 @@ export default function PracticePage() {
     // Anti-Cheat Focus Lock State
     const MAX_VIOLATIONS = 1;
     const [tabSwitchCount, setTabSwitchCount] = useState(0);
-    const [showWarning, setShowWarning] = useState(false);
-    const [isPrivacyShieldActive, setIsPrivacyShieldActive] = useState(false);
 
     const { user } = useAuthStore();
 
     // PAGE LOCK: Custom safe navigation that blocks mid-session
     const pendingNavRef = useRef(null);
-    const [showBlockedNav, setShowBlockedNav] = useState(false);
 
     const safeNavigate = (to) => {
         if (session) {
@@ -130,8 +127,6 @@ export default function PracticePage() {
     // Reset violation counters on each new question
     useEffect(() => {
         setTabSwitchCount(0);
-        setShowWarning(false);
-        setIsPrivacyShieldActive(false);
     }, [currentIdx]);
 
     // Strict Kiosk Locking Logic
@@ -212,33 +207,30 @@ export default function PracticePage() {
         };
     }, [session, currentIdx, submitAnswer]);
 
-    // PAGE LOCK: Block browser Back button using history loop
+    // PAGE LOCK: Block browser Back button using history loop - Silent enforcement
     useEffect(() => {
         const isReviewMode = session?.status === 'completed';
         if (!session || isReviewMode) return;
-        // Push a dummy state so Back button hits this state first
+        
         window.history.pushState(null, '', window.location.href);
         const handlePopState = () => {
-            // Re-push so Back button never actually leaves
             window.history.pushState(null, '', window.location.href);
-            
-            // Re-enter fullscreen if they tried to navigate back
             if (!document.fullscreenElement && session) {
                 document.documentElement.requestFullscreen().catch(() => {});
             }
-
-            setTabSwitchCount(prev => {
-                const next = prev + 1;
-                if (next >= MAX_VIOLATIONS) {
-                    submitAnswer('__FOCUS_VIOLATION__');
-                }
-                return next;
-            });
         };
         window.addEventListener('popstate', handlePopState);
+        
+        const handleBeforeUnload = (e) => {
+            if (session) {
+                delete e['returnValue'];
+            }
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
         return () => {
             window.removeEventListener('popstate', handlePopState);
-            window.history.back();
+            window.removeEventListener('beforeunload', handleBeforeUnload);
         };
     }, [session]);
 
@@ -560,9 +552,6 @@ export default function PracticePage() {
                 }
             }}
         >
-
-            {/* WARNING OVERLAYS REMOVED AS PER USER REQUEST */}
-
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-12 bg-white p-4 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border border-gray-100 relative overflow-hidden shadow-lg">
                 <div className="absolute top-0 left-0 w-1.5 sm:w-2 h-full bg-gradient-to-b from-primary-500 to-secondary-500"></div>
