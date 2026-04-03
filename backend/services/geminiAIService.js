@@ -408,13 +408,28 @@ class GeminiAIService {
     }
 
     getQuestionStructuralFallback(topic, code = '', name = '', count = 5) {
-        const pool = [
-            { q: `In context of ${name || subjectCode}, what is the main mechanism of ${topic}?`, a: "Logical encapsulation", o: ["Logical encapsulation", "Hardware abstraction", "Manual indexing", "Random execution"], e: `${topic} provides a structured way to handle system components.` },
-            { q: `Which design principle is most essential for ${topic} in Anna University R2021 standards?`, a: "Accuracy and Scalability", o: ["Accuracy and Scalability", "Visual aesthetics", "Color coding", "Manual overrides"], e: "Engineering concepts prioritize accuracy and scalability above all." },
-            { q: `Under standard engineering practices for ${name || 'the subject'}, ${topic} typically addresses:`, a: "Consistency and Integrity", o: ["Consistency and Integrity", "Syntax highlighting", "Marketing", "None of these"], e: "It ensures overall system reliability." },
-            { q: `Identifying a critical failure point in ${topic} usually involves checking:`, a: "Boundary conditions", o: ["Boundary conditions", "Font size", "Background color", "Spelling"], e: "Boundary conditions are the most common failure points in technical logic." },
-            { q: `The primary benefit of implementing ${topic} correctly is:`, a: "Reduced system latency", o: ["Reduced system latency", "Increased lines of code", "Higher cost", "No change"], e: "Optimization leads to improved performance metrics." }
-        ];
+        const subCode = (code || '').toUpperCase();
+        const isTechnical = subCode.startsWith('CS') || subCode.startsWith('IT') || 
+                            subCode.startsWith('AD') || subCode.startsWith('CB') ||
+                            subCode.startsWith('AI') || subCode.startsWith('EC') ||
+                            subCode.startsWith('EE') || subCode.startsWith('ME');
+
+        let pool = [];
+        
+        if (isTechnical) {
+            pool = [
+                { q: `In context of ${name || subCode}, what is the main mechanism of ${topic}?`, a: "Logical encapsulation", o: ["Logical encapsulation", "Hardware abstraction", "Manual indexing", "Random execution"], e: `${topic} provides a structured way to handle system components.` },
+                { q: `Which design principle is most essential for ${topic} in technical standards?`, a: "Accuracy and Scalability", o: ["Accuracy and Scalability", "Visual aesthetics", "Color coding", "Manual overrides"], e: "Engineering concepts prioritize accuracy and scalability." },
+                { q: `Under standard industry practices, ${topic} typically addresses:`, a: "Consistency and Integrity", o: ["Consistency and Integrity", "Syntax highlighting", "Marketing", "None of these"], e: "It ensures overall system reliability." }
+            ];
+        } else {
+            // Humanities / Management / Values Fallback
+            pool = [
+                { q: `In the context of ${name || subCode}, what is the primary role of ${topic}?`, a: "Sustaining core values", o: ["Sustaining core values", "External regulation", "Industrial automation", "Technical efficiency"], e: `${topic} focuses on enhancing human understanding and ethical behavior.` },
+                { q: `Which of the following is most essential for effectively implementing ${topic}?`, a: "Critical awareness and empathy", o: ["Critical awareness and empathy", "Systematic programming", "Hardware reliability", "Data indexing"], e: "Social and ethical topics rely on human understanding and awareness." },
+                { q: `The fundamental objective of studying ${topic} is:`, a: "Holistic development", o: ["Holistic development", "Coding speed", "Mechanical strength", "System throughput"], e: "It aims for a broader understanding of values beyond technical metrics." }
+            ];
+        }
         
         const shuffled = this.shuffleArray(pool);
         return shuffled.slice(0, count).map(it => ({
