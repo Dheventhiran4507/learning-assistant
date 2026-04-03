@@ -134,71 +134,83 @@ export default function PracticePage() {
         setIsPrivacyShieldActive(false);
     }, [currentIdx]);
 
-    // Anti-Cheat: Focus Lock Effect
+    // Strict Kiosk Locking Logic
     useEffect(() => {
         const isReviewMode = session?.status === 'completed';
-        // Only active during an unanswered question
         const currentQ = session?.questions?.[currentIdx];
         if (!session || !currentQ || currentQ.isCorrect !== null || isReviewMode) return;
 
-        let violationCount = 0;
+        const lockKiosk = async () => {
+            try {
+                // 1. Force Fullscreen
+                if (!document.fullscreenElement) {
+                    await document.documentElement.requestFullscreen().catch(() => {});
+                }
+                // 2. Keyboard Lock (Chrome/Edge only) - prevents Esc, Tab, Meta, Alt from leaving fullscreen
+                if (navigator.keyboard && navigator.keyboard.lock) {
+                    await navigator.keyboard.lock(['Escape', 'Tab', 'MetaLeft', 'MetaRight', 'AltLeft', 'AltRight', 'AltGraph']);
+                }
+            } catch (err) {
+                console.warn('Strict Locking Error:', err);
+            }
+        };
 
         const triggerViolation = () => {
-            violationCount += 1;
-            setTabSwitchCount(violationCount);
-            
-            // Try to force full-screen back if they left it
-            if (!document.fullscreenElement && session) {
-                document.documentElement.requestFullscreen().catch(() => {});
-            }
+            setTabSwitchCount(prev => {
+                const next = prev + 1;
+                if (next >= MAX_VIOLATIONS) {
+                    submitAnswer('__FOCUS_VIOLATION__');
+                }
+                return next;
+            });
+            // Re-lock on every violation attempt
+            lockKiosk();
+        };
 
-            if (violationCount >= MAX_VIOLATIONS) {
-                // Auto-submit a wrong answer to penalize cheating
-                submitAnswer('__FOCUS_VIOLATION__');
+        const handleKeyDown = (e) => {
+            // Block OS/Navigation keys
+            const blockedKeys = ['Tab', 'Escape', 'Meta', 'Alt', 'F11', 'F12', 'F5'];
+            const isSystemShortcut = e.altKey || e.ctrlKey || e.metaKey;
+            
+            if (blockedKeys.includes(e.key) || (isSystemShortcut && e.key.toLowerCase() !== 'r')) { // Allow Ctrl+R maybe? No, block it too.
+                e.preventDefault();
+                e.stopPropagation();
+                if (['Escape', 'Tab', 'Meta', 'Alt'].includes(e.key)) triggerViolation();
+                return false;
             }
-            // NO WARNING MESSAGE SHOWN HERE AS PER USER REQUEST
+        };
+
+        const handleFullscreenChange = () => {
+            if (!document.fullscreenElement && session) lockKiosk();
         };
 
         const handleVisibilityChange = () => {
             if (document.hidden) triggerViolation();
         };
 
-        const handleBlur = () => {
-            triggerViolation();
-        };
+        const handleBlur = () => triggerViolation();
+        const handleContextMenu = (e) => e.preventDefault();
 
-        const handleFocus = () => {
-            // Content remains hidden/blurred until they dismiss the warning or if they already failed
-        };
-
-        window.addEventListener('focus', handleFocus);
-
-        const blockKeys = (e) => {
-            // Block copy, select-all, paste, view-source, devtools
-            if (e.ctrlKey && ['c', 'a', 'v', 'u', 'i'].includes(e.key.toLowerCase())) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-            if (e.key === 'F12') {
-                e.preventDefault();
-            }
-        };
-
-        const blockContextMenu = (e) => e.preventDefault();
-
+        // Attach listeners
+        window.addEventListener('keydown', handleKeyDown, true);
         document.addEventListener('visibilitychange', handleVisibilityChange);
         window.addEventListener('blur', handleBlur);
-        document.addEventListener('keydown', blockKeys, true);
-        document.addEventListener('contextmenu', blockContextMenu);
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('contextmenu', handleContextMenu);
+        
+        lockKiosk();
 
         return () => {
+            window.removeEventListener('keydown', handleKeyDown, true);
             document.removeEventListener('visibilitychange', handleVisibilityChange);
             window.removeEventListener('blur', handleBlur);
-            window.removeEventListener('focus', handleFocus);
-            document.removeEventListener('keydown', blockKeys, true);
-            document.removeEventListener('contextmenu', blockContextMenu);
+            document.removeEventListener('fullscreenchange', handleFullscreenChange);
+            document.removeEventListener('contextmenu', handleContextMenu);
+            if (navigator.keyboard && navigator.keyboard.unlock) {
+                navigator.keyboard.unlock();
+            }
         };
-    }, [session, currentIdx]);
+    }, [session, currentIdx, submitAnswer]);
 
     // PAGE LOCK: Block browser Back button using history loop
     useEffect(() => {
@@ -209,6 +221,12 @@ export default function PracticePage() {
         const handlePopState = () => {
             // Re-push so Back button never actually leaves
             window.history.pushState(null, '', window.location.href);
+            
+            // Re-enter fullscreen if they tried to navigate back
+            if (!document.fullscreenElement && session) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            }
+
             setTabSwitchCount(prev => {
                 const next = prev + 1;
                 if (next >= MAX_VIOLATIONS) {
@@ -533,7 +551,15 @@ export default function PracticePage() {
     const isAnswered = currentQuestion.isCorrect !== null;
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-12">
+        <div 
+            className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-12 select-none"
+            onPointerDown={() => {
+                // If they are out of lock, re-lock on click
+                if (session && !document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(() => {});
+                }
+            }}
+        >
 
             {/* WARNING OVERLAYS REMOVED AS PER USER REQUEST */}
 
