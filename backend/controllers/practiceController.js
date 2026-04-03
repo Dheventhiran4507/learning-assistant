@@ -138,8 +138,9 @@ exports.startSession = async (req, res) => {
 
                 // 2. If we have enough from DB, add them and move to next topic
                 if (processedDbQuestions.length >= questionsPerTopic) {
-                    logger.info(`Found ${processedDbQuestions.length} questions in DB for topic: ${t.topicName}`);
-                    generatedQuestions.push(...processedDbQuestions);
+                    logger.info(`Found ${processedDbQuestions.length} questions in DB for topic: ${t.topicName}. Selecting ${questionsPerTopic}.`);
+                    // Shuffle in memory for extra variety if needed, though $sample already did it
+                    generatedQuestions.push(...processedDbQuestions.slice(0, questionsPerTopic));
                     continue;
                 }
 

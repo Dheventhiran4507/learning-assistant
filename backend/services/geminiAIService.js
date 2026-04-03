@@ -303,27 +303,55 @@ class GeminiAIService {
         let systemPrompt, userPrompt;
 
         if (isMaths) {
-            systemPrompt = `You are an elite Anna University Mathematics Professor (R2021 Regulation). Generate ${difficulty} level Part-A (2-mark) MCQs that test formula and theorem identification. Rules: - Questions MUST ask to identify correct formula/theorem. - Include actual formula in options. - Ensure each question is unique and uses different numerical values or theorem contexts. - NO PREAMBLE. Output JSON.`;
-            userPrompt = `${contextInfo}Generate ${batchSize} UNIQUE ${difficulty} level formula-identification MCQs for "${topic}". DO NOT repeat common textbook questions. JSON format: { "questions": [{ "question": "...", "options": ["...", "..."], "correctAnswer": "...", "explanation": "..." }] }`;
+            systemPrompt = `You are an elite Anna University Mathematics Professor (R2021 Regulation). 
+            Generate ${difficulty} level Part-A (2-mark) MCQs based on the latest semester exam patterns. 
+            Rules: 
+            - Questions MUST focus on formula/theorem identification, property verification, or small numerical calculations. 
+            - Include the LaTeX formula in the question or options. 
+            - Ensure all ${batchSize} questions are unique and test different sub-concepts. 
+            - NO PREAMBLE. Output JSON.`;
+            userPrompt = `${contextInfo}Generate ${batchSize} UNIQUE ${difficulty} level Part-A (2-mark) exam-oriented MCQs for "${topic}". 
+            Focus on topics that typically appear in University exams.
+            JSON format: { "questions": [{ "question": "...", "options": ["...", "..."], "correctAnswer": "...", "explanation": "..." }] }`;
         } else if (isProgramming) {
-            systemPrompt = `You are an elite Anna University CS/IT Professor. Generate ${difficulty} level Part-A (2-mark) MCQs that test code-reading. Rules: - Include UNIQUE and SHORT code snippet (3-8 lines). - Code must be syntactically correct and vary in logic (loops, conditionals, pointers etc). - NO PREAMBLE. Output JSON.`;
-            userPrompt = `${contextInfo}Generate ${batchSize} DISTINCT ${difficulty} level code-output MCQs for "${topic}". Focus on edge cases and logic flow. JSON format: { "questions": [{ "question": "...", "options": ["...", "..."], "correctAnswer": "...", "explanation": "..." }] }`;
+            systemPrompt = `You are an elite Anna University CS/IT Professor (R2021 Regulation). 
+            Generate ${difficulty} level Part-A (2-mark) MCQs that test logical reasoning and code-reading. 
+            Rules: 
+            - Include a UNIQUE code snippet (3-10 lines) in some questions. 
+            - Code must be syntax-perfect (C/C++/Java/Python as appropriate). 
+            - Focus on edge cases, output prediction, and algorithm complexity. 
+            - NO PREAMBLE. Output JSON.`;
+            userPrompt = `${contextInfo}Generate ${batchSize} DISTINCT ${difficulty} level exam-style MCQs for "${topic}". 
+            Include code-output questions or technical logic questions.
+            JSON format: { "questions": [{ "question": "...", "options": ["...", "..."], "correctAnswer": "...", "explanation": "..." }] }`;
         } else {
-            systemPrompt = `You are an elite Anna University Professor. Generate ${difficulty} level Part-A (2-mark) MCQs. Unique, technical, R2021 aligned. Rules: - Focus on real-world scenarios or specific technical nuances. - Avoid generic 'what is' questions. - Ensure all ${batchSize} questions are fundamentally different. - NO PREAMBLE. Output JSON.`;
-            userPrompt = `${contextInfo}Generate ${batchSize} DIVERSIFIED ${difficulty} level technical MCQs for "${topic}". JSON format: { "questions": [{ "question": "...", "options": ["...", "..."], "correctAnswer": "...", "explanation": "..." }] }`;
+            systemPrompt = `You are an elite Anna University Professor for R2021 Regulation. 
+            Generate ${difficulty} level Part-A (2-mark) technical MCQs. 
+            Rules: 
+            - Focus on definitions, principles, and real-world engineering scenarios. 
+            - Avoid generic "what is" questions. 
+            - Use analytical wording like "Which of the following is NOT true about..." or "Identify the reason for...". 
+            - Ensure high technical accuracy and variety. 
+            - NO PREAMBLE. Output JSON.`;
+            userPrompt = `${contextInfo}Generate ${batchSize} DIVERSIFIED ${difficulty} level technical MCQs for "${topic}". 
+            Strictly follow the R2021 syllabus context for ${subjectCode}.
+            JSON format: { "questions": [{ "question": "...", "options": ["...", "..."], "correctAnswer": "...", "explanation": "..." }] }`;
         }
 
         try {
-            const prompt = `${systemPrompt}\n\n${userPrompt}`;
-            const cacheKey = `bulk_v3_${subjectCode || 'global'}_${unitTitle || ''}_${topic.replace(/\s+/g, '_')}_${difficulty}_${count}`;
-            if (this.cache.has(cacheKey)) {
-                logger.info(`🎯 Cache hit for ${topic}`);
-                return this.cache.get(cacheKey);
-            }
-
             await this.ensureServiceAvailable();
             let questions = [];
 
+            // Add a small random entropy factor (1-5) to the cache key to ensure 
+            // the very first generations are diverse across different sessions.
+            const randomnessFactor = Math.floor(Math.random() * 5); 
+            const cacheKey = `bulk_v4_${subjectCode || 'global'}_${unitTitle || ''}_${topic.replace(/\s+/g, '_')}_${difficulty}_${count}_${randomnessFactor}`;
+            if (this.cache.has(cacheKey)) {
+                logger.info(`🎯 Cache hit with variety factor ${randomnessFactor} for ${topic}`);
+                return this.cache.get(cacheKey);
+            }
+
+            const prompt = `${systemPrompt}\n\n${userPrompt}`;
             if (this.isServiceAvailable) {
                 logger.info(`🤖 Calling Gemini for ${count} questions on "${topic}"...`);
                 const result = await this.model.generateContent({
@@ -381,21 +409,11 @@ class GeminiAIService {
 
     getQuestionStructuralFallback(topic, code = '', name = '', count = 5) {
         const pool = [
-            { q: `What is the primary objective of ${topic}?`, a: "Efficiency", o: ["Efficiency", "Complexity", "Stagnation", "Isolation"], e: `${topic} focuses on improving system efficiency.` },
-            { q: `Identify the core principle behind ${topic}.`, a: "Modularity", o: ["Modularity", "Monolithism", "Entropy", "Rigidity"], e: "Modularity is essential for managing complex topics." },
-            { q: `In an Anna University R2021 context, ${topic} is categorized as?`, a: "Core Concept", o: ["Core Concept", "Elective only", "Non-technical", "Deprecated"], e: "It is a vital part of the R2021 curriculum." },
-            { q: `Which technical challenge is most common in ${topic}?`, a: "Scalability", o: ["Scalability", "Syntax", "Naming", "Coloring"], e: "Scalability is a universal challenge in engineering." },
-            { q: `The most frequent industry application for ${topic} is?`, a: "Automation", o: ["Automation", "Manual labor", "History", "Legality"], e: "Automation leverages these core concepts." },
-            { q: `Which layer usually handles ${topic}?`, a: "Logic Layer", o: ["Logic Layer", "Physical Layer", "User Layer", "None"], e: "Business logic implement the core rules." },
-            { q: `What defines a successful implementation of ${topic}?`, a: "Reliability", o: ["Reliability", "Length", "Cost", "Popularity"], e: "Reliability is the hallmark of good engineering." },
-            { q: `Which tool is often used for ${topic}?`, a: "Standard API", o: ["Standard API", "Calculator", "Pen and Paper", "None"], e: "Modern tools provide APIs for implementation." },
-            { q: `What is the first step in learning ${topic}?`, a: "Foundations", o: ["Foundations", "Advanced math", "Deployment", "Marketing"], e: "Foundations are key to mastering any topic." },
-            { q: `How does ${topic} impact system performance?`, a: "Optimizes latency", o: ["Optimizes latency", "Increases cost", "No impact", "Reduces security"], e: "Good implementation reduces latency." },
-            { q: `What is a common misconception about ${topic}?`, a: "It's too simple", o: ["It's too simple", "It's magic", "It's irrelevant", "It's illegal"], e: "Complexity often hides under simple concepts." },
-            { q: `Identify the main benefit of ${topic}.`, a: "Consistency", o: ["Consistency", "Speed", "Brevity", "Novelty"], e: "Consistency ensures predictable system behavior." },
-            { q: `Which regulation affects ${topic} the most?`, a: "IEEE R2021", o: ["IEEE R2021", "Traffic laws", "Sports rules", "None"], e: "Academic regulations define the study scope." },
-            { q: `The best approach for ${topic} is?`, a: "Systematic", o: ["Systematic", "Random", "Aggressive", "Passive"], e: "A systematic approach yields the best results." },
-            { q: `Where can you find official documentation for ${topic}?`, a: "Technical Manuals", o: ["Technical Manuals", "Newspapers", "Social Media", "Novels"], e: "Manuals are the source of truth." }
+            { q: `In context of ${name || subjectCode}, what is the main mechanism of ${topic}?`, a: "Logical encapsulation", o: ["Logical encapsulation", "Hardware abstraction", "Manual indexing", "Random execution"], e: `${topic} provides a structured way to handle system components.` },
+            { q: `Which design principle is most essential for ${topic} in Anna University R2021 standards?`, a: "Accuracy and Scalability", o: ["Accuracy and Scalability", "Visual aesthetics", "Color coding", "Manual overrides"], e: "Engineering concepts prioritize accuracy and scalability above all." },
+            { q: `Under standard engineering practices for ${name || 'the subject'}, ${topic} typically addresses:`, a: "Consistency and Integrity", o: ["Consistency and Integrity", "Syntax highlighting", "Marketing", "None of these"], e: "It ensures overall system reliability." },
+            { q: `Identifying a critical failure point in ${topic} usually involves checking:`, a: "Boundary conditions", o: ["Boundary conditions", "Font size", "Background color", "Spelling"], e: "Boundary conditions are the most common failure points in technical logic." },
+            { q: `The primary benefit of implementing ${topic} correctly is:`, a: "Reduced system latency", o: ["Reduced system latency", "Increased lines of code", "Higher cost", "No change"], e: "Optimization leads to improved performance metrics." }
         ];
         
         const shuffled = this.shuffleArray(pool);
