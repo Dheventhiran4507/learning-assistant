@@ -572,6 +572,22 @@ class GeminiAIService {
             return this.getStructuralFallback(subjectCode, officialName);
         }
     }
+
+    getStructuralFallback(subjectCode, officialName = null) {
+        return {
+            subjectName: officialName || `${subjectCode} Syllabus`,
+            units: Array.from({ length: 5 }, (_, i) => ({
+                unitNumber: i + 1,
+                unitTitle: `Unit ${i + 1}: ${officialName ? officialName + ' Part ' + (i + 1) : 'Fundamental Principles'}`,
+                topics: [
+                    { topicName: `Introduction to ${officialName || subjectCode} - Concepts`, difficulty: "easy" },
+                    { topicName: `Core Mechanics and ${officialName ? officialName : 'Methodology'}`, difficulty: "medium" },
+                    { topicName: `Advanced Applications of ${officialName || subjectCode}`, difficulty: "hard" }
+                ],
+                hours: 9
+            }))
+        };
+    }
 }
 
 module.exports = new GeminiAIService();

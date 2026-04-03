@@ -72,23 +72,14 @@ exports.getSubjectDetails = async (req, res) => {
             subjectCode: { $regex: new RegExp(`^${subjectCode}$`, 'i') }
         });
 
-        if (!syllabus) {
-            // Only advisor, hod, or admin can trigger AI generation
-            const canGenerate = ['advisor', 'hod', 'admin'].includes(req.user.role);
+        const needsGeneration = !syllabus || !syllabus.units || syllabus.units.length === 0;
 
-            if (!canGenerate) {
-                logger.warn(`User ${req.user.studentId} (${req.user.role}) attempted to view non-existent subject ${subjectCode}`);
-                return res.status(404).json({
-                    success: false,
-                    message: `Subject ${subjectCode} has not been configured by an advisor yet.`
-                });
-            }
-
-            logger.info(`Subject '${subjectCode}' not found. Advisor ${req.user.studentId} triggering AI Syllabus Generation...`);
+        if (needsGeneration) {
+            logger.info(`Subject '${subjectCode}' ${!syllabus ? 'not found' : 'has 0 units'}. Triggering AI Syllabus Generation...`);
 
             try {
                 // Determine if it's a valid looking subject code (e.g., CS3401, CME365, GE3751)
-                const isLikelySubject = /^[A-Z0-9]{5,8}$/i.test(subjectCode);
+                const isLikelySubject = /^[A-Z0-9]{5,10}$/i.test(subjectCode);
 
                 if (isLikelySubject) {
                     const aiService = require('../services/geminiAIService');
@@ -101,31 +92,45 @@ exports.getSubjectDetails = async (req, res) => {
 
                     const { subjectName: aiSubjectName, units } = await aiService.generateSyllabusStructure(subjectCode, officialName);
 
-                    // Create new syllabus entry
-                    syllabus = await Syllabus.create({
-                        subjectCode: subjectCode.toUpperCase(),
-                        subjectName: officialName || aiSubjectName,
-                        semester: req.query.semester || 1, // Default or from query
-                        units: units,
-                        regulation: 'R2021',
-                        isActive: true
-                    });
-
-                    logger.info(`Successfully auto-generated syllabus for ${subjectCode}: ${aiSubjectName}`);
+                    if (!syllabus) {
+                        // Create new syllabus entry
+                        syllabus = await Syllabus.create({
+                            subjectCode: subjectCode.toUpperCase(),
+                            subjectName: officialName || aiSubjectName,
+                            semester: req.query.semester || 1, // Default or from query
+                            units: units,
+                            regulation: 'R2021',
+                            isActive: true
+                        });
+                        logger.info(`Successfully auto-generated syllabus for ${subjectCode}: ${aiSubjectName}`);
+                    } else {
+                        // Repair existing empty syllabus
+                        syllabus.units = units;
+                        syllabus.subjectName = officialName || aiSubjectName; // Update name too if changed
+                        syllabus.lastUpdated = new Date();
+                        await syllabus.save();
+                        logger.info(`Successfully REPAIRED empty syllabus for ${subjectCode}: ${syllabus.subjectName}`);
+                    }
                 } else {
-                    return res.status(404).json({
-                        success: false,
-                        message: 'Subject not found and code format is invalid for auto-generation.'
-                    });
+                    if (!syllabus) {
+                        return res.status(404).json({
+                            success: false,
+                            message: 'Subject not found and code format is invalid for auto-generation.'
+                        });
+                    }
                 }
             } catch (aiError) {
                 logger.error(`AI Syllabus Generation failed for ${subjectCode}:`, aiError.message);
-                return res.status(404).json({
-                    success: false,
-                    message: 'Subject not found. AI generation failed.'
-                });
+                if (!syllabus) {
+                    return res.status(404).json({
+                        success: false,
+                        message: 'Subject not found. AI generation failed.'
+                    });
+                }
             }
-        } else if (req.query.semester && syllabus.semester !== parseInt(req.query.semester)) {
+        }
+        
+        if (syllabus && req.query.semester && syllabus.semester !== parseInt(req.query.semester)) {
             // If it exists but in a different semester, update it to the requested one
             // This happens when adding an elective that was previously assigned elsewhere
             const newSemester = parseInt(req.query.semester);
@@ -138,7 +143,7 @@ exports.getSubjectDetails = async (req, res) => {
         res.json({
             success: true,
             data: syllabus,
-            isAutoGenerated: syllabus.subjectName.includes('(AI Generated)')
+            isAutoGenerated: syllabus?.subjectName?.includes('(AI Generated)')
         });
     } catch (error) {
         logger.error('Error fetching subject details:', error);
