@@ -66,8 +66,9 @@ export default function PracticePage() {
 
     const safeNavigate = (to) => {
         if (session) {
-            pendingNavRef.current = to;
-            setShowBlockedNav(true);
+            // Silently block navigation during active session instead of showing a confirmation
+            console.log('Navigation locked during active session');
+            return;
         } else {
             navigate(to);
         }
@@ -145,16 +146,17 @@ export default function PracticePage() {
         const triggerViolation = () => {
             violationCount += 1;
             setTabSwitchCount(violationCount);
-            setIsPrivacyShieldActive(true);
+            
+            // Try to force full-screen back if they left it
+            if (!document.fullscreenElement && session) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            }
+
             if (violationCount >= MAX_VIOLATIONS) {
-                setShowWarning(false);
                 // Auto-submit a wrong answer to penalize cheating
                 submitAnswer('__FOCUS_VIOLATION__');
-                toast.error('❌ Session integrity violated! Question marked wrong.', { duration: 4000 });
-            } else {
-                setShowWarning(true);
-                toast.error(`⚠️ Warning: Stay on this page!`, { duration: 3000 });
             }
+            // NO WARNING MESSAGE SHOWN HERE AS PER USER REQUEST
         };
 
         const handleVisibilityChange = () => {
@@ -207,15 +209,10 @@ export default function PracticePage() {
         const handlePopState = () => {
             // Re-push so Back button never actually leaves
             window.history.pushState(null, '', window.location.href);
-            setIsPrivacyShieldActive(true);
-            setShowWarning(true);
             setTabSwitchCount(prev => {
                 const next = prev + 1;
                 if (next >= MAX_VIOLATIONS) {
                     submitAnswer('__FOCUS_VIOLATION__');
-                    toast.error('❌ Session integrity violated! Question marked wrong.', { duration: 4000 });
-                } else {
-                    toast.error(`⚠️ Warning: Back button is blocked!`, { duration: 3000 });
                 }
                 return next;
             });
@@ -269,6 +266,11 @@ export default function PracticePage() {
 
         setStarting(true);
         try {
+            // Request Fullscreen on start
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            }
+            
             const response = await api.post('/practice/start', {
                 subjectCode: sub,
                 difficulty: diff,
@@ -533,127 +535,7 @@ export default function PracticePage() {
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-12">
 
-            {/* ===== ANTI-CHEAT / PRIVACY SHIELD OVERLAY ===== */}
-            <AnimatePresence>
-                {(showWarning || isPrivacyShieldActive) && (
-                    <motion.div
-                        key="cheat-warning"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[200] flex items-center justify-center backdrop-blur-[30px] bg-slate-900/90"
-                        onClick={() => !isAnswered && setShowWarning(false)}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.7, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.7, opacity: 0 }}
-                            onClick={e => e.stopPropagation()}
-                            className="bg-white rounded-[2.5rem] p-12 max-w-md w-full mx-4 shadow-2xl text-center relative overflow-hidden"
-                        >
-                            {/* Red top accent */}
-                            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-red-500 to-orange-500 rounded-t-[2.5rem]" />
-
-                            <div className="flex items-center justify-center mb-6">
-                                <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center">
-                                    <ShieldExclamationIcon className="w-10 h-10 text-red-600" />
-                                </div>
-                            </div>
-
-                            <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 text-xs font-black uppercase tracking-widest px-4 py-2 rounded-full mb-4">
-                                <ExclamationTriangleIcon className="w-4 h-4" />
-                                Focus Violation
-                            </div>
-
-                            <h2 className="text-2xl font-black text-gray-900 mb-3 uppercase tracking-tight">Security Alert!</h2>
-                            <p className="text-gray-500 text-base leading-relaxed mb-6">
-                                Practice session-ல் இருக்கும்போது வேற tab-க்கோ அல்லது window-க்கோ போகக்கூடாது. Integrity-க்காக screen hide செய்யப்பட்டுள்ளது.
-                            </p>
-
-                            <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl mb-8 flex items-center gap-4 text-left">
-                                <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400">
-                                    <ClockIcon className="w-5 h-5" />
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Time Penalty</p>
-                                    <p className="text-sm font-bold text-slate-700 uppercase">Violation Recorded</p>
-                                </div>
-                            </div>
-
-                            {tabSwitchCount < MAX_VIOLATIONS ? (
-                                <button
-                                    onClick={() => {
-                                        setShowWarning(false);
-                                        setIsPrivacyShieldActive(false);
-                                    }}
-                                    className="w-full py-5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black text-lg transition-all shadow-xl shadow-slate-900/20 active:scale-95"
-                                >
-                                    BACK TO TEST
-                                </button>
-                            ) : (
-                                <div className="text-red-600 font-black text-sm uppercase tracking-widest">
-                                    Question marked as failed.
-                                </div>
-                            )}
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* ===== BLOCKED NAVIGATION CONFIRM OVERLAY ===== */}
-            <AnimatePresence>
-                {showBlockedNav && (
-                    <motion.div
-                        key="blocked-nav"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[200] flex items-center justify-center"
-                        style={{ backdropFilter: 'blur(8px)', backgroundColor: 'rgba(15,23,42,0.75)' }}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.8, opacity: 0 }}
-                            className="bg-white rounded-[2.5rem] p-12 max-w-md w-full mx-4 shadow-2xl text-center relative overflow-hidden"
-                        >
-                            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-orange-500 to-red-600 rounded-t-[2.5rem]" />
-
-                            <div className="flex items-center justify-center mb-6">
-                                <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center">
-                                    <ExclamationTriangleIcon className="w-10 h-10 text-orange-600" />
-                                </div>
-                            </div>
-
-                            <h2 className="text-xl sm:text-2xl font-black text-gray-900 mb-3">Session Still Active!</h2>
-                            <p className="text-gray-500 text-sm sm:text-base leading-relaxed mb-8">
-                                Practice session முடியாம வேற page-க்கு போனா இந்த question <strong>incomplete</strong>-ஆ mark ஆகும்.
-                            </p>
-
-                            <div className="flex flex-col gap-3">
-                                <button
-                                    onClick={() => { setShowBlockedNav(false); pendingNavRef.current = null; }}
-                                    className="w-full py-4 rounded-xl sm:rounded-2xl bg-primary-500 hover:bg-primary-600 text-white font-black text-base sm:text-lg transition-all"
-                                >
-                                    Continue Session 💪
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        const dest = pendingNavRef.current;
-                                        setShowBlockedNav(false);
-                                        setSession(null);
-                                        pendingNavRef.current = null;
-                                        if (dest) navigate(dest);
-                                    }}
-                                    className="w-full py-3 rounded-xl sm:rounded-2xl border border-gray-200 text-gray-500 hover:bg-gray-50 font-bold transition-all text-sm"
-                                >
-                                    Exit anyway
-                                </button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {/* WARNING OVERLAYS REMOVED AS PER USER REQUEST */}
 
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-12 bg-white p-4 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border border-gray-100 relative overflow-hidden shadow-lg">
