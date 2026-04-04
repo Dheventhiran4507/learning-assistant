@@ -28,8 +28,6 @@ const StudentPreLabPage = () => {
     const [timeLeft, setTimeLeft] = useState(null);
 
     // Anti-Cheat / Page Lock State
-    const [showWarning, setShowWarning] = useState(false);
-    const [isPrivacyShieldActive, setIsPrivacyShieldActive] = useState(false);
     const MAX_VIOLATIONS = 1;
     const [tabSwitchCount, setTabSwitchCount] = useState(0);
 
@@ -64,60 +62,104 @@ const StudentPreLabPage = () => {
         fetchLabs();
     }, []);
 
-    // ANTI-CHEAT: Focus Lock & Window Blur
+    // ANTI-CHEAT: Hard Silent Lock
     useEffect(() => {
         if (!selectedLab || result) return;
+
+        const lockKiosk = async () => {
+            try {
+                // 1. Force Fullscreen
+                if (!document.fullscreenElement) {
+                    await document.documentElement.requestFullscreen().catch(() => {});
+                }
+                // 2. Keyboard Lock (Chrome/Edge only)
+                if (navigator.keyboard && navigator.keyboard.lock) {
+                    await navigator.keyboard.lock(['Escape', 'Tab', 'MetaLeft', 'MetaRight', 'AltLeft', 'AltRight', 'AltGraph']);
+                }
+            } catch (err) {
+                console.warn('Strict Locking Error:', err);
+            }
+        };
 
         const triggerViolation = () => {
             setTabSwitchCount(prev => {
                 const next = prev + 1;
-                setIsPrivacyShieldActive(true);
-                setShowWarning(true);
                 if (next >= MAX_VIOLATIONS) {
                     submitQuiz(true); // Auto-submit on violation
-                    toast.error('❌ Assessment integrity violated! Auto-submitting.');
-                } else {
-                    toast.error('⚠️ Warning: Stay on this page!');
+                    toast.error('❌ Assessment integrity violated! Submitting.');
                 }
                 return next;
             });
+            // Re-lock on every violation attempt
+            lockKiosk();
         };
 
         const handleVisibilityChange = () => { if (document.hidden) triggerViolation(); };
         const handleBlur = () => triggerViolation();
 
-        const blockKeys = (e) => {
-            if (e.ctrlKey && ['c', 'a', 'v', 'u', 'i'].includes(e.key.toLowerCase())) e.preventDefault();
-            if (e.key === 'F12') e.preventDefault();
+        const handleKeyDown = (e) => {
+            // Block OS/Navigation keys
+            const blockedKeys = ['Tab', 'Escape', 'Meta', 'Alt', 'F11', 'F12', 'F5'];
+            const isSystemShortcut = e.altKey || e.ctrlKey || e.metaKey;
+            
+            if (blockedKeys.includes(e.key) || (isSystemShortcut && e.key.toLowerCase() !== 'r')) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (['Escape', 'Tab', 'Meta', 'Alt'].includes(e.key)) triggerViolation();
+                return false;
+            }
         };
 
+        const handleFullscreenChange = () => {
+            if (!document.fullscreenElement && selectedLab) lockKiosk();
+        };
+
+        const handleContextMenu = (e) => e.preventDefault();
+
+        // Attach listeners
+        window.addEventListener('keydown', handleKeyDown, true);
         document.addEventListener('visibilitychange', handleVisibilityChange);
         window.addEventListener('blur', handleBlur);
-        document.addEventListener('keydown', blockKeys, true);
-        document.addEventListener('contextmenu', (e) => e.preventDefault());
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('contextmenu', handleContextMenu);
+        
+        lockKiosk();
 
         return () => {
+            window.removeEventListener('keydown', handleKeyDown, true);
             document.removeEventListener('visibilitychange', handleVisibilityChange);
             window.removeEventListener('blur', handleBlur);
-            document.removeEventListener('keydown', blockKeys, true);
-            document.removeEventListener('contextmenu', (e) => e.preventDefault());
+            document.removeEventListener('fullscreenchange', handleFullscreenChange);
+            document.removeEventListener('contextmenu', handleContextMenu);
+            if (navigator.keyboard && navigator.keyboard.unlock) {
+                navigator.keyboard.unlock();
+            }
         };
     }, [selectedLab, result]);
 
-    // PAGE LOCK: Block browser Back button
+    // PAGE LOCK: Block browser Back button using history loop - Silent enforcement
     useEffect(() => {
         if (!selectedLab || result) return;
+        
         window.history.pushState(null, '', window.location.href);
         const handlePopState = () => {
             window.history.pushState(null, '', window.location.href);
-            setIsPrivacyShieldActive(true);
-            setShowWarning(true);
-            toast.error('⚠️ Back button is blocked during assessment!');
+            if (!document.fullscreenElement && selectedLab) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            }
         };
         window.addEventListener('popstate', handlePopState);
+        
+        const handleBeforeUnload = (e) => {
+            if (selectedLab) {
+                delete e['returnValue'];
+            }
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
         return () => {
             window.removeEventListener('popstate', handlePopState);
-            window.history.back();
+            window.removeEventListener('beforeunload', handleBeforeUnload);
         };
     }, [selectedLab, result]);
 
@@ -278,33 +320,6 @@ const StudentPreLabPage = () => {
                             exit={{ scale: 0.9, y: 20 }}
                             className="bg-white w-full max-w-2xl rounded-[3rem] overflow-hidden shadow-2xl relative"
                         >
-                            {/* Security Overlay */}
-                            <AnimatePresence>
-                                {(showWarning || isPrivacyShieldActive) && (
-                                    <motion.div
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        className="absolute inset-0 z-[100] flex items-center justify-center backdrop-blur-2xl bg-slate-900/90 p-8 text-center"
-                                    >
-                                        <div className="max-w-xs">
-                                            <ShieldExclamationIcon className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                                            <h3 className="text-xl font-black text-white uppercase mb-2">Security Alert</h3>
-                                            <p className="text-slate-400 text-sm mb-6">Assessment window focus lost. Screen hidden to maintain integrity.</p>
-                                            {tabSwitchCount < MAX_VIOLATIONS ? (
-                                                <button 
-                                                    onClick={() => { setShowWarning(false); setIsPrivacyShieldActive(false); }}
-                                                    className="w-full py-3 bg-white text-slate-900 rounded-xl font-bold uppercase text-xs"
-                                                >
-                                                    Return to Test
-                                                </button>
-                                            ) : (
-                                                <p className="text-red-500 font-bold uppercase text-[10px]">Integrity Violated - Submitting</p>
-                                            )}
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
                             {!result ? (
                                 <div className="p-8 sm:p-12">
                                     {/* Progress Header */}

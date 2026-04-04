@@ -129,11 +129,9 @@ export default function PracticePage() {
         setTabSwitchCount(0);
     }, [currentIdx]);
 
-    // Strict Kiosk Locking Logic
+    // ANTI-CHEAT: Hard Silent Lock
     useEffect(() => {
-        const isReviewMode = session?.status === 'completed';
-        const currentQ = session?.questions?.[currentIdx];
-        if (!session || !currentQ || currentQ.isCorrect !== null || isReviewMode) return;
+        if (!session || session.status === 'completed') return;
 
         const lockKiosk = async () => {
             try {
@@ -141,7 +139,7 @@ export default function PracticePage() {
                 if (!document.fullscreenElement) {
                     await document.documentElement.requestFullscreen().catch(() => {});
                 }
-                // 2. Keyboard Lock (Chrome/Edge only) - prevents Esc, Tab, Meta, Alt from leaving fullscreen
+                // 2. Keyboard Lock (Chrome/Edge only)
                 if (navigator.keyboard && navigator.keyboard.lock) {
                     await navigator.keyboard.lock(['Escape', 'Tab', 'MetaLeft', 'MetaRight', 'AltLeft', 'AltRight', 'AltGraph']);
                 }
@@ -155,6 +153,7 @@ export default function PracticePage() {
                 const next = prev + 1;
                 if (next >= MAX_VIOLATIONS) {
                     submitAnswer('__FOCUS_VIOLATION__');
+                    toast.error('❌ Assessment integrity violated! Submitting.');
                 }
                 return next;
             });
@@ -162,12 +161,15 @@ export default function PracticePage() {
             lockKiosk();
         };
 
+        const handleVisibilityChange = () => { if (document.hidden) triggerViolation(); };
+        const handleBlur = () => triggerViolation();
+
         const handleKeyDown = (e) => {
             // Block OS/Navigation keys
             const blockedKeys = ['Tab', 'Escape', 'Meta', 'Alt', 'F11', 'F12', 'F5'];
             const isSystemShortcut = e.altKey || e.ctrlKey || e.metaKey;
             
-            if (blockedKeys.includes(e.key) || (isSystemShortcut && e.key.toLowerCase() !== 'r')) { // Allow Ctrl+R maybe? No, block it too.
+            if (blockedKeys.includes(e.key) || (isSystemShortcut && e.key.toLowerCase() !== 'r')) {
                 e.preventDefault();
                 e.stopPropagation();
                 if (['Escape', 'Tab', 'Meta', 'Alt'].includes(e.key)) triggerViolation();
@@ -179,11 +181,6 @@ export default function PracticePage() {
             if (!document.fullscreenElement && session) lockKiosk();
         };
 
-        const handleVisibilityChange = () => {
-            if (document.hidden) triggerViolation();
-        };
-
-        const handleBlur = () => triggerViolation();
         const handleContextMenu = (e) => e.preventDefault();
 
         // Attach listeners
@@ -205,12 +202,11 @@ export default function PracticePage() {
                 navigator.keyboard.unlock();
             }
         };
-    }, [session, currentIdx, submitAnswer]);
+    }, [session, currentIdx]);
 
     // PAGE LOCK: Block browser Back button using history loop - Silent enforcement
     useEffect(() => {
-        const isReviewMode = session?.status === 'completed';
-        if (!session || isReviewMode) return;
+        if (!session || session.status === 'completed') return;
         
         window.history.pushState(null, '', window.location.href);
         const handlePopState = () => {

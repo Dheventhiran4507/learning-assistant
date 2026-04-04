@@ -72,10 +72,10 @@ exports.getSubjectDetails = async (req, res) => {
             subjectCode: { $regex: new RegExp(`^${subjectCode}$`, 'i') }
         });
 
-        const needsGeneration = !syllabus || !syllabus.units || syllabus.units.length === 0;
+        const needsGeneration = !syllabus || !syllabus.units || syllabus.units.length < 5;
 
         if (needsGeneration) {
-            logger.info(`Subject '${subjectCode}' ${!syllabus ? 'not found' : 'has 0 units'}. Triggering AI Syllabus Generation...`);
+            logger.info(`Subject '${subjectCode}' ${!syllabus ? 'not found' : 'has ' + syllabus.units.length + ' units (Expected 5)'}. Triggering AI Syllabus Generation...`);
 
             try {
                 // Determine if it's a valid looking subject code (e.g., CS3401, CME365, GE3751)

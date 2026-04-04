@@ -27,7 +27,7 @@ const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const handleSync = async () => {
-        if (window.confirm('Update-ai force panni synchronize panna thuraiya? App oru vaatti refresh aahum.')) {
+        if (window.confirm('Force synchronize data? This will refresh the application and clear local cache.')) {
             if ('serviceWorker' in navigator) {
                 const registrations = await navigator.serviceWorker.getRegistrations();
                 for (let registration of registrations) {

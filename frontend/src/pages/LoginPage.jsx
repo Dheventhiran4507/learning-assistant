@@ -189,7 +189,7 @@ const LoginPage = () => {
                             <button
                                 type="button"
                                 onClick={async () => {
-                                    if (window.confirm('App-ai reset panna thuraiya? Idhu blank page issue-ai fix pannum.')) {
+                                    if (window.confirm('Reset application data and refresh session?')) {
                                         if ('serviceWorker' in navigator) {
                                             const regs = await navigator.serviceWorker.getRegistrations();
                                             for (let r of regs) await r.unregister();
@@ -200,7 +200,7 @@ const LoginPage = () => {
                                 }}
                                 className="mt-4 text-[10px] text-slate-400 hover:text-indigo-500 transition-colors underline underline-offset-2"
                             >
-                                App work aagala? Reset pannunga →
+                                App not working? Reset Session →
                             </button>
                         </div>
                     </div>

@@ -31,6 +31,14 @@ const StaffLoginPage = () => {
             if (response.data.success) {
                 const { student, token } = response.data.data;
 
+                // Block students from logging in via staff portal
+                if (student.role === 'student') {
+                    toast.error('This is the Staff Portal. Please use the Student Portal to login.');
+                    setLoading(false);
+                    setTimeout(() => navigate('/login'), 2000);
+                    return;
+                }
+
                 // Suggest Staff Portal if Admin/Staff tries to login here (though they shouldn't)
                 if (['admin', 'hod', 'advisor', 'staff'].includes(student.role)) {
                     login(student, token);
@@ -38,7 +46,7 @@ const StaffLoginPage = () => {
                     navigate('/admin/dashboard');
                 } else {
                     login(student, token);
-                    toast.success('Welcome to Vidal Portal');
+                    toast.success('Welcome to Portal');
                     navigate('/dashboard');
                 }
             }
@@ -58,102 +66,148 @@ const StaffLoginPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4 relative overflow-hidden font-sans">
-            {/* Background Effects */}
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] -mr-64 -mt-64 animate-pulse"></div>
-            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-slate-500/10 rounded-full blur-[120px] -ml-64 -mb-64 animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+            {/* Background Blobs - Using global styles for consistency */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+                <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px]"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-slate-500/10 rounded-full blur-[120px]"></div>
+            </div>
 
             <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-lg p-12 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[3rem] shadow-2xl relative z-10"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8 items-center"
             >
-                <div className="text-center mb-12">
-                    <div className="w-20 h-20 bg-slate-900 border border-slate-800 rounded-3xl mx-auto mb-6 flex items-center justify-center shadow-2xl">
-                        <ShieldCheckIcon className="w-10 h-10 text-white" />
-                    </div>
-                    <h1 className="text-4xl font-black text-white mb-3 tracking-tighter uppercase">Staff <span className="text-indigo-400">Terminal</span></h1>
-                    <div className="flex items-center justify-center gap-3">
-                        <p className="text-slate-500 font-bold text-sm tracking-widest uppercase">Institutional Management Control</p>
-                        <span className="text-[10px] font-bold text-slate-600 opacity-80" id="staff-version-marker">v1.1.2 [FINAL_FIX]</span>
-                    </div>
+                {/* 3D Illustration Side */}
+                <div className="hidden md:flex flex-col justify-center items-center text-center p-8">
+                    <motion.div
+                        animate={{ y: [0, -20, 0] }}
+                        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                        className="mb-8 relative"
+                    >
+                        {/* Abstract 3D shape representation using CSS gradients */}
+                        <div className="w-64 h-64 bg-slate-900 rounded-[3rem] shadow-2xl transform rotate-3 flex items-center justify-center border border-slate-800">
+                            <div className="w-48 h-48 bg-slate-800 rounded-[2.5rem] transform -rotate-3 flex items-center justify-center border border-slate-700">
+                                <ShieldCheckIcon className="w-24 h-24 text-white" />
+                            </div>
+                        </div>
+                    </motion.div>
+                    <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tighter uppercase">Institutional Control</h2>
+                    <p className="text-slate-500 text-lg max-w-md font-medium">
+                        Administrative terminal for managing academic workflows and student performance metrics.
+                    </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] px-2 text-center block">Institutional Identity</label>
-                        <div className="relative">
-                            <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400">
-                                <UserIcon className="w-5 h-5" />
-                            </div>
-                            <input
-                                type="text"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                className="w-full bg-white/5 border border-white/10 rounded-2xl pl-16 pr-6 py-5 text-white placeholder-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500/40 transition-all font-bold"
-                                placeholder="name@university.edu.in"
-                            />
-                        </div>
-                    </div>
+                {/* Login Form Side */}
+                <div className="glass p-8 md:p-12 rounded-3xl shadow-2xl border border-gray-100 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none"></div>
 
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] px-2 text-center block">Security Clearance</label>
-                        <div className="relative">
-                            <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400">
-                                <LockClosedIcon className="w-5 h-5" />
+                    <div className="relative z-10">
+                        <div className="text-center mb-10">
+                            <h1 className="text-3xl font-black text-slate-900 uppercase tracking-widest">
+                                Staff Portal
+                            </h1>
+                            <div className="flex items-center justify-center gap-2 mt-1">
+                                <p className="text-slate-500 font-medium">Authentication required for secure access</p>
+                                <span className="text-[10px] font-bold text-slate-400 opacity-60">v1.1.2 [FINAL_FIX]</span>
                             </div>
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                className="w-full bg-white/5 border border-white/10 rounded-2xl pl-16 pr-12 py-5 text-white placeholder-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500/40 transition-all font-bold"
-                                placeholder="••••••••"
-                            />
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700 ml-1">Institutional Email</label>
+                                <div className="relative group">
+                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                                        <UserIcon className="w-5 h-5" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary/5 focus:border-primary text-slate-900 placeholder-slate-400 outline-none transition-all font-medium"
+                                        placeholder="name@university.edu.in"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700 ml-1">Clearance Key</label>
+                                <div className="relative group">
+                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                                        <LockClosedIcon className="w-5 h-5" />
+                                    </div>
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        required
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="w-full pl-12 pr-12 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary/5 focus:border-primary text-slate-900 placeholder-slate-400 outline-none transition-all font-medium"
+                                        placeholder="••••••••"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                                    >
+                                        {showPassword ? (
+                                            <EyeSlashIcon className="w-5 h-5" />
+                                        ) : (
+                                            <EyeIcon className="w-5 h-5" />
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full py-5 font-black text-white bg-slate-900 rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed mt-4 flex items-center justify-center gap-2"
+                            >
+                                {loading ? (
+                                    <>
+                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                        <span>Verifying...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>Validate Access</span>
+                                        <ArrowRightIcon className="w-5 h-5" />
+                                    </>
+                                )}
+                            </button>
+                        </form>
+
+                        <div className="mt-8 text-center px-4">
+                            <div className="pt-6 border-t border-gray-100 flex flex-col items-center justify-center gap-3">
+                                <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Are you a Student?</span>
+                                <button 
+                                    onClick={() => navigate('/login')}
+                                    className="w-full py-4 bg-white border-2 border-slate-200 rounded-2xl font-black text-sm uppercase tracking-widest text-slate-900 shadow-sm hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-2"
+                                >
+                                    <UserIcon className="w-5 h-5" /> Go to Student Login
+                                </button>
+                            </div>
+
                             <button
                                 type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                                onClick={async () => {
+                                    if (window.confirm('Reset application data and refresh session?')) {
+                                        if ('serviceWorker' in navigator) {
+                                            const regs = await navigator.serviceWorker.getRegistrations();
+                                            for (let r of regs) await r.unregister();
+                                        }
+                                        localStorage.clear();
+                                        window.location.reload(true);
+                                    }
+                                }}
+                                className="mt-4 text-[10px] text-slate-400 hover:text-indigo-500 transition-colors underline underline-offset-2"
                             >
-                                {showPassword ? (
-                                    <EyeSlashIcon className="w-5 h-5" />
-                                ) : (
-                                    <EyeIcon className="w-5 h-5" />
-                                )}
+                                System issues? Reset application →
                             </button>
                         </div>
                     </div>
-
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full py-5 bg-white text-slate-950 rounded-2xl font-black text-lg shadow-2xl relative overflow-hidden group disabled:opacity-50 hover:bg-indigo-50 transition-all"
-                    >
-                        {loading ? (
-                            <div className="flex items-center justify-center gap-2">
-                                <div className="w-5 h-5 border-2 border-slate-950/30 border-t-slate-950 rounded-full animate-spin"></div>
-                                <span>VERIFYING...</span>
-                            </div>
-                        ) : (
-                            <div className="flex items-center justify-center gap-2 tracking-widest">
-                                <span>VALIDATE ACCESS</span>
-                                <ArrowRightIcon className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                            </div>
-                        )}
-                    </button>
-                </form>
-
-                <div className="mt-12 pt-8 border-t border-white/10 text-center">
-                    <p className="text-gray-500 text-sm font-medium mb-4">
-                        Secure Access Point. Authorized Personnel Only.
-                    </p>
-                    <button 
-                        onClick={() => navigate('/login')}
-                        className="text-indigo-400 hover:text-white transition-colors duration-300 text-sm font-bold tracking-wider uppercase flex items-center justify-center gap-2 mx-auto"
-                    >
-                        <UserIcon className="w-4 h-4" /> Go to Student Login
-                    </button>
                 </div>
             </motion.div>
         </div>
