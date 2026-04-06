@@ -17,8 +17,11 @@ import {
     ArrowPathIcon,
     SparklesIcon,
     ExclamationTriangleIcon,
-    ShieldExclamationIcon
+    ShieldExclamationIcon,
+    LockClosedIcon
 } from '@heroicons/react/24/outline';
+import { useSecurityLock } from '../hooks/useSecurityLock';
+import SecurityLock from '../components/common/SecurityLock';
 
 export default function PracticePage() {
     const [searchParams] = useSearchParams();
@@ -129,99 +132,13 @@ export default function PracticePage() {
         setTabSwitchCount(0);
     }, [currentIdx]);
 
-    // ANTI-CHEAT: Hard Silent Lock
-    useEffect(() => {
-        if (!session || session.status === 'completed') return;
+    // 1. Unified Security Lock
+    const { violationCount } = useSecurityLock(
+        !!session && session.status !== 'completed',
+        () => toast.error('❌ Assessment integrity check: Please stay focused!')
+    );
 
-        const lockKiosk = async () => {
-            try {
-                // 1. Force Fullscreen
-                if (!document.fullscreenElement) {
-                    await document.documentElement.requestFullscreen().catch(() => {});
-                }
-                // 2. Keyboard Lock (Chrome/Edge only)
-                if (navigator.keyboard && navigator.keyboard.lock) {
-                    await navigator.keyboard.lock(['Escape', 'Tab', 'MetaLeft', 'MetaRight', 'AltLeft', 'AltRight', 'AltGraph']);
-                }
-            } catch (err) {
-                console.warn('Strict Locking Error:', err);
-            }
-        };
-
-        const triggerViolation = () => {
-            // Re-lock on every violation attempt
-            lockKiosk();
-            toast.error('❌ Assessment integrity check: Please stay in Fullscreen mode!');
-        };
-
-        const handleVisibilityChange = () => { if (document.hidden) triggerViolation(); };
-        const handleBlur = () => triggerViolation();
-
-        const handleKeyDown = (e) => {
-            // Block OS/Navigation keys
-            const blockedKeys = ['Tab', 'Escape', 'Meta', 'Alt', 'F11', 'F12', 'F5'];
-            const isSystemShortcut = e.altKey || e.ctrlKey || e.metaKey;
-            
-            if (blockedKeys.includes(e.key) || (isSystemShortcut && e.key.toLowerCase() !== 'r')) {
-                e.preventDefault();
-                e.stopPropagation();
-                if (['Escape', 'Tab', 'Meta', 'Alt'].includes(e.key)) triggerViolation();
-                return false;
-            }
-        };
-
-        const handleFullscreenChange = () => {
-            if (!document.fullscreenElement && session) lockKiosk();
-        };
-
-        const handleContextMenu = (e) => e.preventDefault();
-
-        // Attach listeners
-        window.addEventListener('keydown', handleKeyDown, true);
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        window.addEventListener('blur', handleBlur);
-        document.addEventListener('fullscreenchange', handleFullscreenChange);
-        document.addEventListener('contextmenu', handleContextMenu);
-        
-        lockKiosk();
-
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown, true);
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-            window.removeEventListener('blur', handleBlur);
-            document.removeEventListener('fullscreenchange', handleFullscreenChange);
-            document.removeEventListener('contextmenu', handleContextMenu);
-            if (navigator.keyboard && navigator.keyboard.unlock) {
-                navigator.keyboard.unlock();
-            }
-        };
-    }, [session, currentIdx]);
-
-    // PAGE LOCK: Block browser Back button using history loop - Silent enforcement
-    useEffect(() => {
-        if (!session || session.status === 'completed') return;
-        
-        window.history.pushState(null, '', window.location.href);
-        const handlePopState = () => {
-            window.history.pushState(null, '', window.location.href);
-            if (!document.fullscreenElement && session) {
-                document.documentElement.requestFullscreen().catch(() => {});
-            }
-        };
-        window.addEventListener('popstate', handlePopState);
-        
-        const handleBeforeUnload = (e) => {
-            if (session) {
-                delete e['returnValue'];
-            }
-        };
-        window.addEventListener('beforeunload', handleBeforeUnload);
-
-        return () => {
-            window.removeEventListener('popstate', handlePopState);
-            window.removeEventListener('beforeunload', handleBeforeUnload);
-        };
-    }, [session]);
+    // 2. Navigation Blocking handled by useSecurityLock.
 
 
 
@@ -265,9 +182,12 @@ export default function PracticePage() {
 
         setStarting(true);
         try {
-            // Request Fullscreen on start
+            // Request Fullscreen on start (User Gesture)
             if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().catch(() => {});
+                await document.documentElement.requestFullscreen().catch(() => {
+                    toast.error('❌ Please enable fullscreen to start assessment.');
+                    throw new Error('Fullscreen blocked');
+                });
             }
             
             const response = await api.post('/practice/start', {
@@ -534,13 +454,11 @@ export default function PracticePage() {
     return (
         <div 
             className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-12 select-none"
-            onPointerDown={() => {
-                // If they are out of lock, re-lock on click
-                if (session && !document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(() => {});
-                }
-            }}
         >
+            <SecurityLock 
+                isActive={!!session && session.status !== 'completed'} 
+                title={session.subject.subjectName} 
+            />
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-12 bg-white p-4 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border border-gray-100 relative overflow-hidden shadow-lg">
                 <div className="absolute top-0 left-0 w-1.5 sm:w-2 h-full bg-gradient-to-b from-primary-500 to-secondary-500"></div>

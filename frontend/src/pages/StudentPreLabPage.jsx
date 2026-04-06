@@ -12,8 +12,11 @@ import {
     XMarkIcon,
     CheckCircleIcon,
     DocumentMagnifyingGlassIcon,
-    ShieldExclamationIcon
+    ShieldExclamationIcon,
+    LockClosedIcon
 } from '@heroicons/react/24/outline';
+import { useSecurityLock } from '../hooks/useSecurityLock';
+import SecurityLock from '../components/common/SecurityLock';
 
 const StudentPreLabPage = () => {
     const [labs, setLabs] = useState([]);
@@ -62,26 +65,10 @@ const StudentPreLabPage = () => {
         fetchLabs();
     }, []);
 
-    // ANTI-CHEAT: Hard Silent Lock
-    useEffect(() => {
-        if (!selectedLab || result) return;
-
-        const lockKiosk = async () => {
-            try {
-                // 1. Force Fullscreen
-                if (!document.fullscreenElement) {
-                    await document.documentElement.requestFullscreen().catch(() => {});
-                }
-                // 2. Keyboard Lock (Chrome/Edge only)
-                if (navigator.keyboard && navigator.keyboard.lock) {
-                    await navigator.keyboard.lock(['Escape', 'Tab', 'MetaLeft', 'MetaRight', 'AltLeft', 'AltRight', 'AltGraph']);
-                }
-            } catch (err) {
-                console.warn('Strict Locking Error:', err);
-            }
-        };
-
-        const triggerViolation = () => {
+    // 1. Unified Security Lock
+    const { violationCount } = useSecurityLock(
+        !!selectedLab && !result,
+        () => {
             setTabSwitchCount(prev => {
                 const next = prev + 1;
                 if (next >= MAX_VIOLATIONS) {
@@ -90,85 +77,26 @@ const StudentPreLabPage = () => {
                 }
                 return next;
             });
-            // Re-lock on every violation attempt
-            lockKiosk();
-        };
+        }
+    );
 
-        const handleVisibilityChange = () => { if (document.hidden) triggerViolation(); };
-        const handleBlur = () => triggerViolation();
-
-        const handleKeyDown = (e) => {
-            // Block OS/Navigation keys
-            const blockedKeys = ['Tab', 'Escape', 'Meta', 'Alt', 'F11', 'F12', 'F5'];
-            const isSystemShortcut = e.altKey || e.ctrlKey || e.metaKey;
-            
-            if (blockedKeys.includes(e.key) || (isSystemShortcut && e.key.toLowerCase() !== 'r')) {
-                e.preventDefault();
-                e.stopPropagation();
-                if (['Escape', 'Tab', 'Meta', 'Alt'].includes(e.key)) triggerViolation();
-                return false;
+    const startQuiz = async (lab) => {
+        try {
+            // Explicitly request lock (User Gesture)
+            if (document.documentElement.requestFullscreen) {
+                await document.documentElement.requestFullscreen().catch(() => {
+                    toast.error('❌ Fullscreen required to start assessment.');
+                    throw new Error('Lock failure');
+                });
             }
-        };
-
-        const handleFullscreenChange = () => {
-            if (!document.fullscreenElement && selectedLab) lockKiosk();
-        };
-
-        const handleContextMenu = (e) => e.preventDefault();
-
-        // Attach listeners
-        window.addEventListener('keydown', handleKeyDown, true);
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        window.addEventListener('blur', handleBlur);
-        document.addEventListener('fullscreenchange', handleFullscreenChange);
-        document.addEventListener('contextmenu', handleContextMenu);
-        
-        lockKiosk();
-
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown, true);
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-            window.removeEventListener('blur', handleBlur);
-            document.removeEventListener('fullscreenchange', handleFullscreenChange);
-            document.removeEventListener('contextmenu', handleContextMenu);
-            if (navigator.keyboard && navigator.keyboard.unlock) {
-                navigator.keyboard.unlock();
-            }
-        };
-    }, [selectedLab, result]);
-
-    // PAGE LOCK: Block browser Back button using history loop - Silent enforcement
-    useEffect(() => {
-        if (!selectedLab || result) return;
-        
-        window.history.pushState(null, '', window.location.href);
-        const handlePopState = () => {
-            window.history.pushState(null, '', window.location.href);
-            if (!document.fullscreenElement && selectedLab) {
-                document.documentElement.requestFullscreen().catch(() => {});
-            }
-        };
-        window.addEventListener('popstate', handlePopState);
-        
-        const handleBeforeUnload = (e) => {
-            if (selectedLab) {
-                delete e['returnValue'];
-            }
-        };
-        window.addEventListener('beforeunload', handleBeforeUnload);
-
-        return () => {
-            window.removeEventListener('popstate', handlePopState);
-            window.removeEventListener('beforeunload', handleBeforeUnload);
-        };
-    }, [selectedLab, result]);
-
-    const startQuiz = (lab) => {
-        setSelectedLab(lab);
-        setCurrentQuestion(0);
-        setAnswers(new Array(lab.questions.length).fill(null));
-        setResult(null);
-        setTimeLeft((lab.duration || 30) * 60);
+            setSelectedLab(lab);
+            setCurrentQuestion(0);
+            setAnswers(new Array(lab.questions.length).fill(null));
+            setResult(null);
+            setTimeLeft((lab.duration || 30) * 60);
+        } catch (err) {
+            console.error('Quiz start lock failure:', err);
+        }
     };
 
     useEffect(() => {
@@ -237,6 +165,7 @@ const StudentPreLabPage = () => {
 
     return (
         <div className="max-w-6xl mx-auto px-4 py-12">
+            <SecurityLock isActive={!!selectedLab && !result} title={selectedLab?.title} />
             <header className="mb-12">
                 <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
