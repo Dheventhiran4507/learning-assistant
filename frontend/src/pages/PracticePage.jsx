@@ -637,10 +637,10 @@ export default function PracticePage() {
                         <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-2">Syncing progress...</p>
                     </div>
                 </div>
-                    </div>
-                </motion.div>
-            )}
-        </AnimatePresence>
-    </div>
+            </div>
+            </motion.div>
+        )}
+    </AnimatePresence>
+</div>
 );
 }
