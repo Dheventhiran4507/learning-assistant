@@ -14,17 +14,17 @@ export const useSecurityLock = (isActive, onViolation) => {
         if (onViolation) onViolation();
     }, [isActive, onViolation]);
 
-    // 1. Keyboard & Input Lock
+    // 1. Hard Keyboard & Input Lock
     useEffect(() => {
         if (!isActive) return;
 
         const lockKiosk = async () => {
             try {
-                // Keyboard Lock (Chrome/Edge only)
+                // Keyboard Lock (Chrome/Edge only) - Hard system-level interception
                 if (navigator.keyboard && navigator.keyboard.lock) {
                     await navigator.keyboard.lock([
                         'Escape', 'Tab', 'MetaLeft', 'MetaRight', 
-                        'AltLeft', 'AltRight', 'F11', 'F12', 'F5'
+                        'AltLeft', 'AltRight', 'KeyR', 'F1', 'F3', 'F5', 'F6', 'F11', 'F12'
                     ]);
                 }
             } catch (err) {
@@ -33,16 +33,23 @@ export const useSecurityLock = (isActive, onViolation) => {
         };
 
         const handleKeyDown = (e) => {
-            const blockedKeys = ['Tab', 'Escape', 'Meta', 'Alt', 'F11', 'F12', 'F5'];
+            // High-priority blocked keys
+            const blockedKeys = [
+                'Tab', 'Escape', 'Meta', 'Alt', 'F1', 'F3', 'F5', 'F6', 'F11', 'F12', 
+                'PrintScreen', 'ContextMenu'
+            ];
             const isSystemShortcut = e.altKey || e.ctrlKey || e.metaKey;
 
-            // Block restricted keys and shortcuts (except R for refresh if allowed, but usually not)
+            // Immediately block restricted keys and shortcuts
             if (blockedKeys.includes(e.key) || isSystemShortcut) {
+                // Allow Ctrl+C and Ctrl+V only if strictly needed (usually not for assessments)
+                // For maximum security, we block EVERYTHING except standard character input.
+                
                 e.preventDefault();
                 e.stopPropagation();
                 
-                // Only specific keys trigger a "violation" alert, others are just blocked
-                if (['Tab', 'Meta', 'Alt'].includes(e.key)) {
+                // Alert on high-risk navigation keys
+                if (['Tab', 'Meta', 'Alt', 'Escape'].includes(e.key)) {
                     triggerViolation();
                 }
                 return false;
@@ -54,16 +61,18 @@ export const useSecurityLock = (isActive, onViolation) => {
             return false;
         };
 
-        window.addEventListener('keydown', handleKeyDown, true);
-        document.addEventListener('contextmenu', handleContextMenu);
+        // Capture phase listeners for total interception
+        window.addEventListener('keydown', handleKeyDown, { capture: true, passive: false });
+        document.addEventListener('contextmenu', handleContextMenu, { capture: true });
+        
         lockKiosk();
         
-        // Reinforce lock every 2 seconds
-        const lockInterval = setInterval(lockKiosk, 2000);
+        // Reinforce lock every 1 second to combat background refocusing
+        const lockInterval = setInterval(lockKiosk, 1000);
 
         return () => {
-            window.removeEventListener('keydown', handleKeyDown, true);
-            document.removeEventListener('contextmenu', handleContextMenu);
+            window.removeEventListener('keydown', handleKeyDown, { capture: true });
+            document.removeEventListener('contextmenu', handleContextMenu, { capture: true });
             clearInterval(lockInterval);
             if (navigator.keyboard && navigator.keyboard.unlock) {
                 navigator.keyboard.unlock();

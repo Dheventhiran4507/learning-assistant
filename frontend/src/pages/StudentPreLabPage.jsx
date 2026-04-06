@@ -234,8 +234,8 @@ const StudentPreLabPage = () => {
                 </div>
             )}
 
-            {/* Quiz Modal */}
-            <AnimatePresence>
+            {/* Quiz Modal - Gated by security logic */}
+            <AnimatePresence mode="wait">
                 {selectedLab && (
                     <motion.div 
                         initial={{ opacity: 0 }}

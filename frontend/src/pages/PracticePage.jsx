@@ -459,7 +459,17 @@ export default function PracticePage() {
                 isActive={!!session && session.status !== 'completed'} 
                 title={session.subject.subjectName} 
             />
-            {/* Header */}
+            
+            {/* Gated Quiz Content - Only visible if session exists */}
+            <AnimatePresence mode="wait">
+                {session && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="space-y-8"
+                    >
+                        {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-12 bg-white p-4 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border border-gray-100 relative overflow-hidden shadow-lg">
                 <div className="absolute top-0 left-0 w-1.5 sm:w-2 h-full bg-gradient-to-b from-primary-500 to-secondary-500"></div>
                 <div>
@@ -627,7 +637,10 @@ export default function PracticePage() {
                         <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-2">Syncing progress...</p>
                     </div>
                 </div>
-            </div>
-        </div>
-    );
+                    </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    </div>
+);
 }
