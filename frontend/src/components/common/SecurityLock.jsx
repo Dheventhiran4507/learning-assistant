@@ -10,28 +10,46 @@ import toast from 'react-hot-toast';
  * @param {function} onLockRestored - Callback when fullscreen is successfully re-entered.
  */
 const SecurityLock = ({ isActive, title = 'Assessment', onLockRestored }) => {
-    const [isFullscreen, setIsFullscreen] = useState(true);
+    const [isLocked, setIsLocked] = useState(false);
     const [isReentering, setIsReentering] = useState(false);
 
-    const checkFullscreen = useCallback(() => {
-        setIsFullscreen(!!document.fullscreenElement);
+    const checkSecurity = useCallback(() => {
+        const hasFullscreen = !!document.fullscreenElement;
+        const hasFocus = document.hasFocus();
+        const isVisible = !document.hidden;
+
+        // Lock if any security condition is failed
+        setIsLocked(!hasFullscreen || !hasFocus || !isVisible);
     }, []);
 
     useEffect(() => {
-        if (!isActive) return;
+        if (!isActive) {
+            setIsLocked(false);
+            return;
+        }
 
-        // Periodic check to ensure fullscreen remains active
-        const interval = setInterval(checkFullscreen, 500);
-        document.addEventListener('fullscreenchange', checkFullscreen);
+        // Periodic check for focus/visibility/fullscreen
+        const interval = setInterval(checkSecurity, 500);
+        
+        const handleEvents = () => checkSecurity();
+        
+        document.addEventListener('fullscreenchange', handleEvents);
+        window.addEventListener('blur', handleEvents);
+        window.addEventListener('focus', handleEvents);
+        document.addEventListener('visibilitychange', handleEvents);
 
-        // Initial check
-        checkFullscreen();
+        // Initial check after a short delay to allow transition
+        const timeout = setTimeout(checkSecurity, 100);
 
         return () => {
             clearInterval(interval);
-            document.removeEventListener('fullscreenchange', checkFullscreen);
+            clearTimeout(timeout);
+            document.removeEventListener('fullscreenchange', handleEvents);
+            window.removeEventListener('blur', handleEvents);
+            window.removeEventListener('focus', handleEvents);
+            document.removeEventListener('visibilitychange', handleEvents);
         };
-    }, [isActive, checkFullscreen]);
+    }, [isActive, checkSecurity]);
 
     const requestLock = async () => {
         setIsReentering(true);
@@ -53,7 +71,7 @@ const SecurityLock = ({ isActive, title = 'Assessment', onLockRestored }) => {
 
     return (
         <AnimatePresence>
-            {!isFullscreen && (
+            {isLocked && (
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
