@@ -82,9 +82,9 @@ const StaffLabResults = () => {
         const tableRows = results.submissions.map(sub => [
             sub.student?.name || 'N/A',
             sub.student?.studentId || 'N/A',
-            `${sub.score}/${sub.maxScore}`,
-            `${sub.percentage.toFixed(1)}%`,
-            'Completed'
+            sub.status === 'absent' ? '0/0' : `${sub.score}/${sub.maxScore}`,
+            sub.status === 'absent' ? '0.0%' : `${sub.percentage.toFixed(1)}%`,
+            sub.status === 'absent' ? 'Absent' : 'Completed'
         ]);
 
         autoTable(doc, {
@@ -104,11 +104,11 @@ const StaffLabResults = () => {
         const worksheetData = results.submissions.map(sub => ({
             'Student Name': sub.student?.name || 'N/A',
             'Student ID': sub.student?.studentId || 'N/A',
-            'Score': sub.score,
+            'Score': sub.status === 'absent' ? 0 : sub.score,
             'Max Score': sub.maxScore,
-            'Percentage (%)': sub.percentage.toFixed(1),
-            'Status': 'Completed',
-            'Completed At': new Date(sub.completedAt).toLocaleString()
+            'Percentage (%)': sub.status === 'absent' ? 0 : sub.percentage.toFixed(1),
+            'Status': sub.status === 'absent' ? 'Absent' : 'Completed',
+            'Date': sub.completedAt ? new Date(sub.completedAt).toLocaleString() : 'N/A'
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(worksheetData);
@@ -178,23 +178,25 @@ const StaffLabResults = () => {
                             className="space-y-8"
                         >
                             {/* Summary Metrics */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                                 <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm">
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Submissions</p>
-                                    <p className="text-4xl font-black text-slate-900">{results.submissions.length}</p>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Students</p>
+                                    <p className="text-4xl font-black text-slate-900">{results.stats?.totalStudents || 0}</p>
+                                </div>
+                                <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm">
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Appeared</p>
+                                    <p className="text-4xl font-black text-primary">{results.stats?.appeared || 0}</p>
+                                </div>
+                                <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm">
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Absent</p>
+                                    <p className="text-4xl font-black text-red-500">{results.stats?.absent || 0}</p>
                                 </div>
                                 <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm">
                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Average Score</p>
-                                    <p className="text-4xl font-black text-primary">
-                                        {results.submissions.length > 0 
-                                            ? (results.submissions.reduce((acc, s) => acc + s.percentage, 0) / results.submissions.length).toFixed(1) 
-                                            : 0}%
-                                    </p>
-                                </div>
-                                <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm">
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Top Score</p>
                                     <p className="text-4xl font-black text-emerald-600">
-                                        {results.submissions.length > 0 ? Math.max(...results.submissions.map(s => s.percentage)).toFixed(0) : 0}%
+                                        {results.stats?.appeared > 0 
+                                            ? (results.submissions.filter(s => s.status !== 'absent').reduce((acc, s) => acc + s.percentage, 0) / results.stats.appeared).toFixed(1) 
+                                            : 0}%
                                     </p>
                                 </div>
                             </div>
@@ -236,7 +238,7 @@ const StaffLabResults = () => {
                                         </thead>
                                         <tbody className="divide-y divide-slate-50">
                                             {results.submissions.map(sub => (
-                                                <motion.tr key={sub._id} className="hover:bg-slate-50/50 transition-colors group">
+                                                <motion.tr key={sub._id} className={`hover:bg-slate-50/50 transition-colors group ${sub.status === 'absent' ? 'opacity-70' : ''}`}>
                                                     <td className="px-8 py-6">
                                                         <div className="flex flex-col">
                                                             <span className="text-sm font-black text-slate-900 uppercase tracking-tight">{sub.student?.name}</span>
@@ -244,29 +246,32 @@ const StaffLabResults = () => {
                                                                 <span className="text-[8px] font-bold text-slate-400 uppercase bg-slate-100 px-1.5 py-0.5 rounded">ID: {sub.student?.studentId}</span>
                                                                 <span className="text-[8px] font-bold text-primary-600 uppercase bg-primary/5 px-1.5 py-0.5 rounded">Batch: {sub.student?.batch}</span>
                                                             </div>
-                                                            {sub.student?.rollNumber && (
-                                                                <span className="text-[8px] font-bold text-slate-400 uppercase mt-1">Roll: {sub.student.rollNumber}</span>
-                                                            )}
                                                         </div>
                                                     </td>
                                                     <td className="px-8 py-6 text-center font-bold text-slate-600">
-                                                        {sub.score} / {sub.maxScore}
+                                                        {sub.status === 'absent' ? '-' : `${sub.score} / ${sub.maxScore}`}
                                                     </td>
                                                     <td className="px-8 py-6 text-center">
-                                                        <span className={`text-sm font-black ${sub.percentage >= 70 ? 'text-emerald-600' : 'text-primary'}`}>
-                                                            {sub.percentage.toFixed(0)}%
+                                                        <span className={`text-sm font-black ${sub.status === 'absent' ? 'text-slate-300' : (sub.percentage >= 70 ? 'text-emerald-600' : 'text-primary')}`}>
+                                                            {sub.status === 'absent' ? '0%' : `${sub.percentage.toFixed(0)}%`}
                                                         </span>
                                                     </td>
                                                     <td className="px-8 py-6 text-center">
-                                                        <span className="text-[9px] font-black bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full uppercase italic">Completed</span>
+                                                        {sub.status === 'absent' ? (
+                                                            <span className="text-[9px] font-black bg-red-50 text-red-500 px-3 py-1 rounded-full uppercase italic">Absent</span>
+                                                        ) : (
+                                                            <span className="text-[9px] font-black bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full uppercase italic">Completed</span>
+                                                        )}
                                                     </td>
                                                     <td className="px-8 py-6 text-right">
-                                                        <button 
-                                                            onClick={() => setViewingStudent(sub)}
-                                                            className="text-[10px] font-black uppercase text-primary hover:text-slate-900 transition-colors px-4 py-2 bg-primary/5 rounded-xl group-hover:bg-primary/10"
-                                                        >
-                                                            View Answers
-                                                        </button>
+                                                        {sub.status !== 'absent' && (
+                                                            <button 
+                                                                onClick={() => setViewingStudent(sub)}
+                                                                className="text-[10px] font-black uppercase text-primary hover:text-slate-900 transition-colors px-4 py-2 bg-primary/5 rounded-xl group-hover:bg-primary/10"
+                                                            >
+                                                                View Answers
+                                                            </button>
+                                                        )}
                                                     </td>
                                                 </motion.tr>
                                             ))}

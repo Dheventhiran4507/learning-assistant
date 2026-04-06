@@ -234,14 +234,43 @@ const labController = {
             }
 
             const submissions = await LabSubmission.find({ assessment: assessmentId })
-                .populate('student', 'name studentId email semester')
+                .populate('student', 'name studentId email semester batch rollNumber')
                 .sort({ percentage: -1 });
+
+            // Fetch ALL students for this semester to identify absentees
+            const allStudents = await Student.find({ 
+                role: 'student', 
+                semester: assessment.semester 
+            }).select('name studentId email semester batch rollNumber');
+
+            // Merge students with their submissions
+            const results = allStudents.map(student => {
+                const submission = submissions.find(s => s.student?._id?.toString() === student._id.toString());
+                if (submission) {
+                    return submission.toObject();
+                } else {
+                    return {
+                        _id: `absent-${student._id}`,
+                        student: student.toObject(),
+                        answers: [],
+                        score: 0,
+                        maxScore: assessment.questions.length,
+                        percentage: 0,
+                        status: 'absent'
+                    };
+                }
+            });
 
             res.json({
                 success: true,
                 data: {
                     assessment,
-                    submissions
+                    submissions: results, // Return merged results as 'submissions'
+                    stats: {
+                        totalStudents: allStudents.length,
+                        appeared: submissions.length,
+                        absent: allStudents.length - submissions.length
+                    }
                 }
             });
         } catch (error) {
