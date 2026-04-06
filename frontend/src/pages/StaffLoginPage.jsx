@@ -39,12 +39,13 @@ const StaffLoginPage = () => {
                     return;
                 }
 
-                // Suggest Staff Portal if Admin/Staff tries to login here (though they shouldn't)
+                // STAFF REDIRECT: Ensure all staff roles go to the Academic Admin Dashboard
                 if (['admin', 'hod', 'advisor', 'staff'].includes(student.role)) {
                     login(student, token);
-                    toast.success('System Initialized - Welcome Admin');
+                    toast.success('Access Granted - Welcome back to Academic Admin');
                     navigate('/admin/dashboard');
                 } else {
+                    // Fallback should not be needed but here as safety
                     login(student, token);
                     toast.success('Welcome to Portal');
                     navigate('/dashboard');

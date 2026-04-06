@@ -82,6 +82,14 @@ const StudentPostLabPage = () => {
 
     const startQuiz = async (lab) => {
         try {
+            // GLOBAL TIMING: Check if assessment is already expired
+            const expiresAt = new Date(lab.createdAt).getTime() + (lab.duration * 60 * 1000);
+            const remaining = Math.floor((expiresAt - Date.now()) / 1000);
+
+            if (remaining <= 0) {
+                return toast.error('❌ This assessment has closed (Deadline passed).');
+            }
+
             // Explicitly request lock (User Gesture)
             if (document.documentElement.requestFullscreen) {
                 await document.documentElement.requestFullscreen().catch(() => {
@@ -93,7 +101,7 @@ const StudentPostLabPage = () => {
             setCurrentQuestion(0);
             setAnswers(new Array(lab.questions.length).fill(null));
             setResult(null);
-            setTimeLeft((lab.duration || 30) * 60);
+            setTimeLeft(remaining); // Use global remaining time instead of student-specific timer
         } catch (err) {
             console.error('Quiz start lock failure:', err);
         }
@@ -221,12 +229,19 @@ const StudentPostLabPage = () => {
                                         </button>
                                     </div>
                                 ) : (
-                                    <button 
-                                        onClick={() => startQuiz(lab)}
-                                        className="w-full bg-primary text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 hover:bg-primary/90 active:scale-95 transition-all"
-                                    >
-                                        Start Quiz <ChevronRightIcon className="w-4 h-4" />
-                                    </button>
+                                    // Check for global expiry
+                                    (new Date(lab.createdAt).getTime() + (lab.duration * 60 * 1000) < Date.now()) ? (
+                                        <div className="w-full bg-slate-100 text-slate-400 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 cursor-not-allowed">
+                                            <XMarkIcon className="w-4 h-4" /> Assessment Closed
+                                        </div>
+                                    ) : (
+                                        <button 
+                                            onClick={() => startQuiz(lab)}
+                                            className="w-full bg-primary text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 hover:bg-primary/90 active:scale-95 transition-all"
+                                        >
+                                            Start Quiz <ChevronRightIcon className="w-4 h-4" />
+                                        </button>
+                                    )
                                 )}
                             </div>
                         </motion.div>

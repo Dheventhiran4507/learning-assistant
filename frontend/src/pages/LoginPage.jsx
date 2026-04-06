@@ -31,19 +31,19 @@ const LoginPage = () => {
             const data = await authService.login({ email: email.trim(), password });
             if (data.success) {
                 const user = data.data.student;
+                const token = data.data.token;
                 
-                // Block staff from logging in via student portal
-                if (user.role === 'admin' || user.role === 'hod' || user.role === 'advisor') {
-                    toast.error('This is the Student Portal. Please use the Staff Portal to login.');
-                    setLoading(false);
-                    // Automatically redirect staff to their portal after a short delay
-                    setTimeout(() => navigate('/staff-login'), 2000);
-                    return;
+                // Redirect staff to Academic Admin (Admin Dashboard)
+                if (['admin', 'hod', 'advisor', 'staff'].includes(user.role)) {
+                    login(user, token);
+                    toast.success(`Success - Welcome to the Academic Terminal`);
+                    navigate('/admin/dashboard');
+                } else {
+                    // Fallback for anyone else not restricted
+                    login(user, token);
+                    toast.success(`Welcome back, ${user.name}!`);
+                    navigate('/dashboard');
                 }
-
-                login(user, data.data.token);
-                toast.success(`Welcome back, ${user.name}!`);
-                navigate('/dashboard');
             } else {
                 const msg = typeof data.message === 'string' ? data.message : (data.message?.message || 'Login failed');
                 toast.error(msg);
