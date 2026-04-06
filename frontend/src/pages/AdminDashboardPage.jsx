@@ -52,6 +52,7 @@ const AdminDashboardPage = () => {
     const [regeneratingSubjects, setRegeneratingSubjects] = useState({});
     const [selectedSubject, setSelectedSubject] = useState(null);
     const [savingStudent, setSavingStudent] = useState(false);
+    const [doubts, setDoubts] = useState([]);
 
     // Fetch fresh user data to ensure role and semester are up to date
     useEffect(() => {
@@ -404,12 +405,35 @@ const AdminDashboardPage = () => {
                             >
                                 Institutional Staff
                             </button>
+                            <button
+                                onClick={() => setActiveTab('doubts')}
+                                className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${activeTab === 'doubts' ? 'bg-slate-900 text-white shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
+                            >
+                                Doubt Desk
+                            </button>
                         </div>
+                    )}
+
+                    {isStaff && (
+                         <div className="flex gap-4 border-b border-slate-100 pb-4">
+                            <button
+                                onClick={() => setActiveTab('students')}
+                                className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${activeTab === 'students' ? 'bg-slate-900 text-white shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
+                            >
+                                Student Metrics
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('doubts')}
+                                className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${activeTab === 'doubts' ? 'bg-slate-900 text-white shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
+                            >
+                                Doubt Desk
+                            </button>
+                         </div>
                     )}
 
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <h2 className="text-xl font-bold text-slate-900 uppercase tracking-tighter">
-                            {activeTab === 'students' ? 'Cohort Intelligence' : 'Institutional Directory'}
+                            {activeTab === 'students' ? 'Cohort Intelligence' : activeTab === 'staff' ? 'Institutional Directory' : 'Student Doubts'}
                         </h2>
                         <div className="flex gap-4 w-full md:w-auto">
                             <div className="relative flex-1 md:w-64">
@@ -444,13 +468,19 @@ const AdminDashboardPage = () => {
                                         <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-right">Predicted Score</th>
                                         <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest"></th>
                                     </tr>
-                                ) : (
+                                ) : activeTab === 'staff' ? (
                                     <tr>
                                         <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest">Staff Member</th>
                                         <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-center">Assigned Semester</th>
                                         <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-center">Role</th>
                                         <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-right">Status</th>
                                         <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest"></th>
+                                    </tr>
+                                ) : (
+                                    <tr>
+                                        <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest">Student / Subject</th>
+                                        <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-center">Query Content</th>
+                                        <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-right">Timestamp</th>
                                     </tr>
                                 )}
                             </thead>
@@ -529,7 +559,7 @@ const AdminDashboardPage = () => {
                                             </td>
                                         </motion.tr>
                                     ))
-                                ) : (
+                                ) : activeTab === 'staff' ? (
                                     staff.filter(s => s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.email.toLowerCase().includes(searchTerm.toLowerCase())).map((member, idx) => (
                                         <motion.tr
                                             key={member._id}
@@ -573,6 +603,39 @@ const AdminDashboardPage = () => {
                                                         <TrashIcon className="w-4 h-4" />
                                                     </button>
                                                 </div>
+                                            </td>
+                                        </motion.tr>
+                                    ))
+                                ) : (
+                                    doubts.filter(d => 
+                                        d.student?.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                        d.userMessage?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                        d.subject?.subjectCode?.toLowerCase().includes(searchTerm.toLowerCase())
+                                    ).map((doubt, idx) => (
+                                        <motion.tr
+                                            key={doubt._id}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: idx * 0.03 }}
+                                            className="hover:bg-gray-50/50 transition-colors group"
+                                        >
+                                            <td className="px-8 py-6">
+                                                <div className="flex flex-col">
+                                                    <p className="font-bold text-slate-900">{doubt.student?.name || 'Anonymous'}</p>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[9px] font-black text-primary uppercase">{doubt.subject?.subjectCode || 'General'}</span>
+                                                        <span className="text-[9px] text-slate-400 font-bold">Sem {doubt.student?.semester}</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <p className="text-xs text-slate-600 leading-relaxed max-w-md italic overflow-hidden text-ellipsis line-clamp-2">
+                                                    "{doubt.userMessage}"
+                                                </p>
+                                                <p className="text-[10px] text-slate-400 mt-1 font-medium">AI Resp: {doubt.aiResponse?.substring(0, 60)}...</p>
+                                            </td>
+                                            <td className="px-8 py-6 text-right text-[10px] font-bold text-slate-400 uppercase">
+                                                {new Date(doubt.createdAt).toLocaleDateString()}
                                             </td>
                                         </motion.tr>
                                     ))

@@ -291,4 +291,42 @@ function extractTopic(message) {
     return keywords.join(' ');
 }
 
+exports.getStaffDoubts = async (req, res) => {
+    try {
+        const role = req.user.role;
+        const subjectsHandled = req.user.subjectsHandled || [];
+
+        // HODs/Admins see all doubts for the semester
+        // Staff only see doubts for their assigned subjects
+        const query = { intent: 'doubt' };
+
+        if (role === 'staff') {
+            const handledCodes = subjectsHandled.map(sh => sh.subjectCode.toUpperCase());
+            query['subject.subjectCode'] = { $in: handledCodes };
+        } else if (role === 'advisor' || role === 'hod' || role === 'admin') {
+            // Further semester filtering if needed, but for now we follow the existing pattern
+            // if (req.user.semester) query.semester = req.user.semester; 
+            // The Chat model doesn't have a direct semester field, but we can filter by staff's subjects
+        }
+
+        const doubts = await Chat.find(query)
+            .populate('student', 'name studentId semester')
+            .sort({ createdAt: -1 })
+            .limit(100);
+
+        res.status(200).json({
+            success: true,
+            count: doubts.length,
+            data: doubts
+        });
+    } catch (error) {
+        logger.error('Get staff doubts error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to retrieve doubts',
+            error: error.message
+        });
+    }
+};
+
 module.exports = exports;

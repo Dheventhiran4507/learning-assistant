@@ -258,10 +258,11 @@ const labController = {
 
             const query = { semester };
             
-            // If staff, only show labs for their assigned subjects
+            // If staff, only show labs for their assigned subjects AND created by them
             if (role === 'staff') {
                 const handledCodes = subjectsHandled.map(sh => sh.subjectCode.toUpperCase());
                 query.subjectCode = { $in: handledCodes };
+                query.createdBy = req.user.id;
             }
 
             const assessments = await LabAssessment.find(query)

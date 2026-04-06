@@ -149,16 +149,9 @@ export default function PracticePage() {
         };
 
         const triggerViolation = () => {
-            setTabSwitchCount(prev => {
-                const next = prev + 1;
-                if (next >= MAX_VIOLATIONS) {
-                    submitAnswer('__FOCUS_VIOLATION__');
-                    toast.error('❌ Assessment integrity violated! Submitting.');
-                }
-                return next;
-            });
             // Re-lock on every violation attempt
             lockKiosk();
+            toast.error('❌ Assessment integrity check: Please stay in Fullscreen mode!');
         };
 
         const handleVisibilityChange = () => { if (document.hidden) triggerViolation(); };
@@ -583,12 +576,14 @@ export default function PracticePage() {
                             <div className="text-base sm:text-2xl font-black text-gray-900">{currentIdx + 1}<span className="text-gray-400 text-xs sm:text-lg">/{session.questions.length}</span></div>
                         </div>
                     </div>
-                    <button
-                        onClick={() => setSession(null)}
-                        className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors border border-gray-200"
-                    >
-                        <XMarkIcon className="w-5 h-5 sm:w-6 sm:h-6" />
-                    </button>
+                    {session.status === 'completed' && (
+                        <button
+                            onClick={() => setSession(null)}
+                            className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors border border-gray-200"
+                        >
+                            <XMarkIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+                        </button>
+                    )}
                 </div>
             </div>
 

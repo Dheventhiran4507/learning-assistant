@@ -41,4 +41,9 @@ router.put('/:chatId/feedback', chatController.provideFeedback);
 // @access  Private
 router.delete('/:chatId', chatController.deleteChat);
 
+// @route   GET /api/chat/staff/doubts
+// @desc    Get student doubts for assigned subjects
+// @access  Private (Staff/HOD/Admin)
+router.get('/staff/doubts', chatController.getStaffDoubts);
+
 module.exports = router;
