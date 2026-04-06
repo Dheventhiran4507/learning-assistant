@@ -9,6 +9,8 @@ const logger = require('../utils/logger');
 
 const { sendLabAssignedEmail } = require('../utils/emailService');
 
+const mammoth = require('mammoth');
+
 const labController = {
     // Staff: Upload document and assign lab
     assignLab: async (req, res) => {
@@ -36,36 +38,53 @@ const labController = {
             }
 
             let textContent = '';
-            if (file.mimetype === 'application/pdf') {
+            let questions = [];
+            const isImage = file.mimetype.startsWith('image/');
+
+            if (isImage) {
+                // Multimodal Processing: Send image directly to Gemini
+                const imageBuffer = fs.readFileSync(file.path);
+                questions = await aiService.generateQuestionsFromImage(imageBuffer, file.mimetype, questionCount, {
+                    type,
+                    subjectCode
+                });
+                textContent = `[Image Content Analyzed: ${file.originalname}]`;
+            } else if (file.mimetype === 'application/pdf') {
                 const dataBuffer = fs.readFileSync(file.path);
                 const data = await pdf(dataBuffer);
                 textContent = data.text;
+            } else if (file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+                // DOCX Processing
+                const result = await mammoth.extractRawText({ path: file.path });
+                textContent = result.value;
             } else {
+                // Fallback: Read as text (TXT, C, JAVA, etc.)
                 textContent = fs.readFileSync(file.path, 'utf8');
             }
 
             // Clean up temporary file
-            fs.unlinkSync(file.path);
+            if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
 
-            if (!textContent || textContent.trim().length < 50) {
-                return res.status(400).json({ success: false, message: 'Document content too short or unreadable.' });
+            // If not image, questions still need to be generated from text
+            if (!isImage) {
+                if (!textContent || textContent.trim().length < 20) {
+                    return res.status(400).json({ success: false, message: 'Document content is empty or unreadable.' });
+                }
+
+                // Generate AI Questions from Text
+                const qCount = parseInt(questionCount) || 5;
+                const prompt = `Based on the following document content, generate ${qCount} highly relevant technical MCQs for a ${type} quiz.
+                Document Content:
+                ${textContent.substring(0, 5000)}
+                
+                Return JSON format: { "questions": [{ "question": "...", "options": ["...", "..."], "correctAnswer": "...", "explanation": "..." }] }`;
+
+                const aiResponse = await aiService.universalGenerateSyllabus(prompt);
+                questions = aiResponse.questions || aiResponse.data || [];
             }
 
-            // Generate AI Questions
-            const qCount = parseInt(questionCount) || 5;
-            const prompt = `Based on the following lab document content, generate ${qCount} highly relevant technical MCQs for a ${type} quiz. 
-            The questions should test understanding of the concepts mentioned in the text.
-            
-            Document Content:
-            ${textContent.substring(0, 4000)} // Truncate to avoid token limits
-            
-            Return JSON format: { "questions": [{ "question": "...", "options": ["...", "..."], "correctAnswer": "...", "explanation": "..." }] }`;
-
-            const aiResponse = await aiService.universalGenerateSyllabus(prompt);
-            const questions = aiResponse.questions || aiResponse.data || [];
-
             if (!questions || questions.length === 0) {
-                throw new Error('AI failed to generate questions for this document.');
+                throw new Error('AI failed to generate questions for this document format.');
             }
 
             const newAssessment = new LabAssessment({
@@ -75,7 +94,7 @@ const labController = {
                 semester,
                 subjectCode,
                 questions,
-                documentContent: textContent.substring(0, 10000), // Store first 10k chars
+                documentContent: textContent.substring(0, 10000),
                 createdBy: req.user.id,
                 duration: parseInt(duration) || 30
             });
@@ -86,25 +105,19 @@ const labController = {
             try {
                 const students = await Student.find({ role: 'student', semester: semester });
                 const staffName = req.user.name;
-                
-                // Fetch subject name for the email
                 const subject = await Syllabus.findOne({ subjectCode: subjectCode.toUpperCase() });
                 const subjectName = subject ? subject.subjectName : subjectCode;
 
-                // Send emails in background
                 students.forEach(student => {
                     sendLabAssignedEmail(student.email, student.name, staffName, subjectName, title, type);
                 });
-                
-                logger.info(`📧 Lab notification emails triggered for ${students.length} students in Semester ${semester}`);
             } catch (emailError) {
                 logger.error('Email notification error:', emailError);
-                // Don't fail the request if email fails
             }
 
             res.status(201).json({
                 success: true,
-                message: `${type === 'pre-lab' ? 'Pre-lab' : 'Post-lab'} assigned successfully. Emails triggered for Semester ${semester}.`,
+                message: `${type === 'pre-lab' ? 'Pre-lab' : 'Post-lab'} assigned successfully. Multi-format support active.`,
                 data: newAssessment
             });
 

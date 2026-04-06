@@ -441,10 +441,26 @@ class GeminiAIService {
     }
 
     cleanAndParseJSON(text) {
-        let cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
-        try { return JSON.parse(cleanText); } catch (e) {
-            cleanText = cleanText.replace(/\\([^"\\\/bfnrtu])/g, '\\\\$1');
-            try { return JSON.parse(cleanText); } catch (e2) { throw e2; }
+        // Remove markdown formatting and common preamble text
+        let cleanText = text
+            .replace(/```json/g, '')
+            .replace(/```/g, '')
+            .replace(/^[^{]*/, '') // Remove everything before the first {
+            .replace(/[^}]*$/, '') // Remove everything after the last }
+            .trim();
+
+        try { 
+            return JSON.parse(cleanText); 
+        } catch (e) {
+            logger.warn(`Initial JSON parse failed: ${e.message}. Retrying with escape fix...`);
+            try {
+                // Fix escaped characters that AI sometimes gets wrong
+                cleanText = cleanText.replace(/\\([^"\\\/bfnrtu])/g, '\\\\$1');
+                return JSON.parse(cleanText); 
+            } catch (e2) { 
+                logger.error(`Critical JSON parse failure: ${e2.message}\nText: ${cleanText.substring(0, 200)}...`);
+                throw e2; 
+            }
         }
     }
 
@@ -507,14 +523,63 @@ class GeminiAIService {
 
     async universalGenerateSyllabus(prompt) {
         try {
+            await this.ensureServiceAvailable();
+            if (!this.isServiceAvailable) return await this.generateSyllabusWithGroq(prompt);
+
             const result = await this.model.generateContent({
                 contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                generationConfig: { temperature: 0.2, responseMimeType: "application/json" }
+                generationConfig: { 
+                    temperature: 0.2, 
+                    responseMimeType: "application/json" 
+                }
             });
-            return this.cleanAndParseJSON((await result.response).text());
+            const text = (await result.response).text();
+            return this.cleanAndParseJSON(text);
         } catch (e) {
+            logger.warn(`Gemini universal generation failed: ${e.message}`);
             if (e.message.includes('429')) await this.rotateKey();
             return await this.generateSyllabusWithGroq(prompt);
+        }
+    }
+
+    /**
+     * Multimodal MCQ Generation from Image/Document
+     * Extracts text/concepts from image and generates MCQs in one shot.
+     */
+    async generateQuestionsFromImage(imageBuffer, mimeType, count = 5, context = {}) {
+        const qCount = parseInt(count) || 5;
+        const subCode = (context.subjectCode || '').toUpperCase();
+        const type = context.type || 'pre-lab';
+        
+        const systemPrompt = `You are an elite Anna University Professor (R2021 Regulation). 
+        Extract relevant technical concepts from the provided image and generate ${qCount} high-quality MCQs for a ${type} assessment.
+        Rules:
+        - Questions must be technical and testing understanding.
+        - JSON format ONLY: { "questions": [{ "question": "...", "options": ["...", "..."], "correctAnswer": "...", "explanation": "..." }] }
+        - NO PREAMBLE.`;
+
+        try {
+            await this.ensureServiceAvailable();
+            if (!this.isServiceAvailable) throw new Error('AI Service offline for vision tasks');
+
+            logger.info(`🤖 Calling Gemini Vision for ${qCount} questions from Image (${mimeType})...`);
+            
+            const result = await this.model.generateContent([
+                systemPrompt,
+                {
+                    inlineData: {
+                        data: imageBuffer.toString('base64'),
+                        mimeType
+                    }
+                }
+            ]);
+
+            const text = (await result.response).text();
+            const parsed = this.cleanAndParseJSON(text);
+            return parsed.questions || parsed.data || [];
+        } catch (error) {
+            logger.error(`❌ Gemini Vision failed: ${error.message}`);
+            throw error;
         }
     }
 
