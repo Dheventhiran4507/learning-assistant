@@ -57,10 +57,14 @@ export const useSecurityLock = (isActive, onViolation) => {
         window.addEventListener('keydown', handleKeyDown, true);
         document.addEventListener('contextmenu', handleContextMenu);
         lockKiosk();
+        
+        // Reinforce lock every 2 seconds
+        const lockInterval = setInterval(lockKiosk, 2000);
 
         return () => {
             window.removeEventListener('keydown', handleKeyDown, true);
             document.removeEventListener('contextmenu', handleContextMenu);
+            clearInterval(lockInterval);
             if (navigator.keyboard && navigator.keyboard.unlock) {
                 navigator.keyboard.unlock();
             }
