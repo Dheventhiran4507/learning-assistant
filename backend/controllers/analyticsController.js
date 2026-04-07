@@ -19,7 +19,7 @@ exports.getHODStats = async (req, res) => {
         }
 
         const students = await Student.find(query)
-            .select('name studentId semester learningStats subjectProgress weakAreas examPredictions');
+            .select('name studentId role semester learningStats subjectProgress weakAreas examPredictions');
 
         if (!students || students.length === 0) {
             return res.json({
@@ -100,7 +100,7 @@ exports.getStaff = async (req, res) => {
         }
 
         const staff = await Student.find(query)
-            .select('name email semester isActive studentId subjectsHandled');
+            .select('name email role semester isActive studentId subjectsHandled');
 
         res.json({
             success: true,

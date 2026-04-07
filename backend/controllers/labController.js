@@ -254,7 +254,7 @@ const labController = {
             const allStudents = await Student.find({ 
                 role: 'student', 
                 semester: assessment.semester 
-            }).select('name studentId email semester batch rollNumber');
+            }).select('name studentId role email semester batch rollNumber');
 
             // Merge students with their submissions
             const results = allStudents.map(student => {
