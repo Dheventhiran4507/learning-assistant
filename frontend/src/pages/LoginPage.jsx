@@ -33,17 +33,15 @@ const LoginPage = () => {
                 const user = data.data.student;
                 const token = data.data.token;
                 
-                // Redirect staff to Academic Admin (Admin Dashboard)
-                if (['admin', 'hod', 'advisor', 'staff'].includes(user.role)) {
-                    login(user, token);
-                    toast.success(`Success - Welcome to the Academic Terminal`);
-                    navigate('/admin/dashboard');
-                } else {
-                    // Fallback for anyone else not restricted
-                    login(user, token);
-                    toast.success(`Welcome back, ${user.name}!`);
-                    navigate('/dashboard');
+                if (user.role !== 'student') {
+                    toast.error('This is the Student Portal. Staff and Administrators should use the Staff Portal to login.');
+                    setLoading(false);
+                    return;
                 }
+
+                login(user, token);
+                toast.success(`Welcome back, ${user.name}!`);
+                navigate('/dashboard');
             } else {
                 const msg = typeof data.message === 'string' ? data.message : (data.message?.message || 'Login failed');
                 toast.error(msg);
@@ -108,7 +106,6 @@ const LoginPage = () => {
                             </h1>
                             <div className="flex items-center justify-center gap-2 mt-1">
                                 <p className="text-slate-500 font-medium">Authentication required for secure access</p>
-                                <span className="text-[10px] font-bold text-slate-400 opacity-60">v1.1.2 [FINAL_FIX]</span>
                             </div>
                         </div>
 
@@ -179,9 +176,9 @@ const LoginPage = () => {
 
                         <div className="mt-8 text-center px-4">
                             <div className="pt-6 border-t border-gray-100 flex flex-col items-center justify-center gap-3">
-                                <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Are you a Staff Member?</span>
+                                <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Are you Staff or Admin?</span>
                                 <Link to="/staff-login" className="w-full py-4 bg-white border-2 border-slate-200 rounded-2xl font-black text-sm uppercase tracking-widest text-slate-900 shadow-sm hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-2">
-                                    <ShieldCheckIcon className="w-5 h-5" /> Staff / Admin Login
+                                    <ShieldCheckIcon className="w-5 h-5" /> Institutional Portal Login
                                 </Link>
                             </div>
 

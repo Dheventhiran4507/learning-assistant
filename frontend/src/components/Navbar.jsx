@@ -92,7 +92,6 @@ const Navbar = () => {
                                 <span className="text-xl font-black text-slate-900 block leading-none tracking-tight uppercase">LUMINA</span>
                                 <div className="flex items-center gap-1.5 leading-none mt-0.5">
                                     <span className="text-[10px] font-black text-indigo-600 tracking-widest uppercase">PORTAL</span>
-                                    <span className="text-[8px] font-bold text-slate-300">v1.1.2</span>
                                 </div>
                             </div>
                         </Link>

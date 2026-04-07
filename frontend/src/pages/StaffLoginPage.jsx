@@ -33,7 +33,7 @@ const StaffLoginPage = () => {
 
                 // Block students from logging in via staff portal
                 if (student.role === 'student') {
-                    toast.error('This is the Staff Portal. Please use the Student Portal to login.');
+                    toast.error('This is the Institutional Portal. Students should use the Student Portal to login.');
                     setLoading(false);
                     setTimeout(() => navigate('/login'), 2000);
                     return;
@@ -107,11 +107,10 @@ const StaffLoginPage = () => {
                     <div className="relative z-10">
                         <div className="text-center mb-10">
                             <h1 className="text-3xl font-black text-slate-900 uppercase tracking-widest">
-                                Staff Portal
+                                Institutional Portal
                             </h1>
                             <div className="flex items-center justify-center gap-2 mt-1">
                                 <p className="text-slate-500 font-medium">Authentication required for secure access</p>
-                                <span className="text-[10px] font-bold text-slate-400 opacity-60">v1.1.2 [FINAL_FIX]</span>
                             </div>
                         </div>
 
