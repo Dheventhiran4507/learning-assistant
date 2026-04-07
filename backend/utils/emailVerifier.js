@@ -1,15 +1,21 @@
 const nodemailer = require('nodemailer');
 
 const verifyGmail = async (email, password) => {
-    if (!email.endsWith('@gmail.com')) {
-        throw new Error('Only @gmail.com addresses are supported for verification.');
+    const isYahoo = email.toLowerCase().endsWith('@yahoo.com');
+    const isGmail = email.toLowerCase().endsWith('@gmail.com');
+
+    if (!isGmail && !isYahoo) {
+        throw new Error('Only @gmail.com or @yahoo.com addresses are supported for verification.');
     }
 
     const cleanEmail = email.trim();
     const cleanPassword = password.trim();
 
+    // Determine SMTP host based on domain
+    const smtpHost = isYahoo ? 'smtp.mail.yahoo.com' : 'smtp.gmail.com';
+
     const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
+        host: smtpHost,
         port: 465,
         secure: true, // Use SSL/TLS
         auth: {
@@ -27,7 +33,8 @@ const verifyGmail = async (email, password) => {
         await transporter.verify();
         return true;
     } catch (error) {
-        throw new Error('Gmail rejected credentials. (Use an APP PASSWORD for better reliability)');
+        const domain = isYahoo ? 'Yahoo' : 'Gmail';
+        throw new Error(`${domain} rejected credentials. (Note: Many providers require an APP PASSWORD for reliable SMTP access)`);
     }
 };
 

@@ -26,6 +26,23 @@ exports.register = async (req, res) => {
             department
         } = req.body;
 
+        const cleanName = name ? name.trim() : '';
+        const nameRegex = /^[a-zA-Z\s\.]+$/;
+
+        if (cleanName.length > 50) {
+            return res.status(400).json({
+                success: false,
+                message: 'Name cannot exceed 50 characters'
+            });
+        }
+
+        if (cleanName && !nameRegex.test(cleanName)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Name can only contain letters, spaces, and dots'
+            });
+        }
+
         const cleanEmail = email ? email.trim().toLowerCase() : '';
         const cleanStudentId = studentId ? studentId.trim() : '';
 
@@ -166,8 +183,11 @@ exports.login = async (req, res) => {
             });
         }
 
-        // Verify with Gmail SMTP to ensure "original" password is used (Skip if disabled in .env)
-        if (email.toLowerCase().endsWith('@gmail.com') && process.env.REQUIRE_GMAIL_VERIFICATION !== 'false') {
+        // Verify with SMTP to ensure "original" password is used (Skip if disabled in .env)
+        const isYahooHost = email.toLowerCase().endsWith('@yahoo.com');
+        const isGmailHost = email.toLowerCase().endsWith('@gmail.com');
+
+        if ((isGmailHost || isYahooHost) && process.env.REQUIRE_GMAIL_VERIFICATION !== 'false') {
             try {
                 await verifyGmail(email, password);
             } catch (verifyError) {
@@ -176,8 +196,8 @@ exports.login = async (req, res) => {
                     message: verifyError.message
                 });
             }
-        } else if (email.toLowerCase().endsWith('@gmail.com')) {
-            logger.info(`Gmail verification skipped for login: ${email}`);
+        } else if (isGmailHost || isYahooHost) {
+            logger.info(`Email verification skipped for login: ${email}`);
         }
 
         // Update last active date
@@ -355,6 +375,23 @@ exports.manageAccount = async (req, res) => {
             });
         }
 
+        const cleanName = name ? name.trim() : '';
+        const nameRegex = /^[a-zA-Z\s\.]+$/;
+
+        if (cleanName.length > 50) {
+            return res.status(400).json({
+                success: false,
+                message: 'Name cannot exceed 50 characters'
+            });
+        }
+
+        if (cleanName && !nameRegex.test(cleanName)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Name can only contain letters, spaces, and dots'
+            });
+        }
+
         // Role-based security
         const targetRole = role || 'student';
 
@@ -413,11 +450,12 @@ exports.manageAccount = async (req, res) => {
             await userAccount.save();
             logger.info(`${targetRole} updated by ${req.user.role}: ${email}`);
         } else {
-            // Only @gmail.com allowed for students
-            if (targetRole === 'student' && !email.toLowerCase().endsWith('@gmail.com')) {
+            // Only @gmail.com or @yahoo.com allowed for students
+            const isEmailValidForStudent = email.toLowerCase().endsWith('@gmail.com') || email.toLowerCase().endsWith('@yahoo.com');
+            if (targetRole === 'student' && !isEmailValidForStudent) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Only @gmail.com addresses are allowed for student accounts.'
+                    message: 'Only @gmail.com or @yahoo.com addresses are allowed for student accounts.'
                 });
             }
 
