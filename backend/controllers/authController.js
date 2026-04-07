@@ -27,7 +27,7 @@ exports.register = async (req, res) => {
         } = req.body;
 
         const cleanName = name ? name.trim() : '';
-        const nameRegex = /^[a-zA-Z\s\u0B80-\u0BFF]*[^a-zA-Z\s\u0B80-\u0BFF]?[a-zA-Z\s\u0B80-\u0BFF]*$/;
+        const nameRegex = /^[a-zA-Z\s\u0B80-\u0BFF]+$/;
 
         if (cleanName.length > 50) {
             return res.status(400).json({
@@ -39,7 +39,7 @@ exports.register = async (req, res) => {
         if (cleanName && !nameRegex.test(cleanName)) {
             return res.status(400).json({
                 success: false,
-                message: 'Name can contain at most one special character'
+                message: 'Name can only contain letters and spaces'
             });
         }
 
@@ -376,7 +376,7 @@ exports.manageAccount = async (req, res) => {
         }
 
         const cleanName = name ? name.trim() : '';
-        const nameRegex = /^[a-zA-Z\s\u0B80-\u0BFF]*[^a-zA-Z\s\u0B80-\u0BFF]?[a-zA-Z\s\u0B80-\u0BFF]*$/;
+        const nameRegex = /^[a-zA-Z\s\u0B80-\u0BFF]+$/;
 
         if (cleanName.length > 50) {
             return res.status(400).json({
@@ -388,7 +388,7 @@ exports.manageAccount = async (req, res) => {
         if (cleanName && !nameRegex.test(cleanName)) {
             return res.status(400).json({
                 success: false,
-                message: 'Name can contain at most one special character'
+                message: 'Name can only contain letters and spaces'
             });
         }
 
