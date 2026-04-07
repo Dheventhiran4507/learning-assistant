@@ -27,7 +27,7 @@ exports.register = async (req, res) => {
         } = req.body;
 
         const cleanName = name ? name.trim() : '';
-        const nameRegex = /^[a-zA-Z\s\.]+$/;
+        const nameRegex = /^[a-zA-Z\s\.\-',\u0B80-\u0BFF]+$/;
 
         if (cleanName.length > 50) {
             return res.status(400).json({
@@ -376,7 +376,7 @@ exports.manageAccount = async (req, res) => {
         }
 
         const cleanName = name ? name.trim() : '';
-        const nameRegex = /^[a-zA-Z\s\.]+$/;
+        const nameRegex = /^[a-zA-Z\s\.\-',\u0B80-\u0BFF]+$/;
 
         if (cleanName.length > 50) {
             return res.status(400).json({
@@ -493,6 +493,15 @@ exports.manageAccount = async (req, res) => {
 
     } catch (error) {
         logger.error('Manage account error:', error);
+        
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(val => val.message);
+            return res.status(400).json({
+                success: false,
+                message: messages.join(', ')
+            });
+        }
+        
         res.status(500).json({
             success: false,
             message: 'Failed to manage account',

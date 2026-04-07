@@ -14,7 +14,7 @@ const studentSchema = new mongoose.Schema({
         required: [true, 'Name is required'],
         trim: true,
         maxlength: [50, 'Name cannot exceed 50 characters'],
-        match: [/^[a-zA-Z\s\.]+$/, 'Name can only contain letters, spaces, and dots']
+        match: [/^[a-zA-Z\s\.\-',\u0B80-\u0BFF]+$/, 'Name can only contain letters, spaces, dots, hyphens, or apostrophes']
     },
     email: {
         type: String,
