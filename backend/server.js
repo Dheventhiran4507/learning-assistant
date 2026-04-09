@@ -90,30 +90,20 @@ app.use('/api/lab', labRoutes);
 const frontendPath = path.resolve(__dirname, '../frontend/dist');
 app.use(express.static(frontendPath));
 
-// Redirect Frontend Routes to Vercel (Production Safety)
+// Handle Frontend Routing
 app.get('*', (req, res) => {
-    const FRONTEND_URL = process.env.FRONTEND_URL || 'https://learning-assistant-beryl.vercel.app';
-    
     // If it's an API request that wasn't handled, return 404
     if (req.url.startsWith('/api')) {
         logger.warn(`API route not found: ${req.url}`);
         return res.status(404).json({ message: 'API route not found' });
     }
     
-    // In production, redirect all frontend navigation to Vercel
-    if (process.env.NODE_ENV === 'production' && !req.url.includes('.')) {
-        logger.info(`Redirecting ${req.url} to ${FRONTEND_URL}${req.url}`);
-        return res.redirect(`${FRONTEND_URL}${req.url}`);
-    }
-
-    // Otherwise serve the local frontend index.html
+    // Serve the local frontend index.html for all other routes (SPA handling)
     const indexPath = path.join(frontendPath, 'index.html');
     res.sendFile(indexPath, (err) => {
         if (err) {
             logger.error(`Error sending index.html: ${err.message}`);
-            // If it fails on production, we've already tried redirecting above, 
-            // but just in case of file requests like .ico that weren't caught:
-            res.status(404).send('Resource not found.');
+            res.status(404).send('Resource not found. Ensure frontend is built.');
         }
     });
 });
