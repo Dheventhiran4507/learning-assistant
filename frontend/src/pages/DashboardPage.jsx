@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/authStore';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import './DashboardPage.css';
 import {
     BookOpenIcon,
     AcademicCapIcon,
@@ -15,7 +16,7 @@ import {
     CursorArrowRaysIcon,
     DocumentMagnifyingGlassIcon,
     PresentationChartLineIcon
-} from '@heroicons/react/24/outline';
+} from '@heroicons/react/24/outline'; // cleaned unused icons
 
 const DashboardPage = () => {
     const { user, updateUser } = useAuthStore();
@@ -71,93 +72,93 @@ const DashboardPage = () => {
     }, 0);
 
     const stats_cards = [
-        { label: 'Syllabus Coverage', value: `${syllabusProgress}%`, icon: <BookOpenIcon className="w-8 h-8 text-indigo-600" />, color: 'from-indigo-600 to-slate-900' },
-        { label: 'Topics Mastered', value: topicsMastered.toString(), icon: <AcademicCapIcon className="w-8 h-8 text-slate-800" />, color: 'from-slate-700 to-slate-900' },
-        { label: 'Research Queries', value: (stats?.learningStats?.totalDoubtsCleared || 0).toString(), icon: <DocumentMagnifyingGlassIcon className="w-8 h-8 text-indigo-500" />, color: 'from-indigo-400 to-indigo-600' },
+        { label: 'Syllabus Coverage', value: `${syllabusProgress}%`, icon: <BookOpenIcon className="dashboard-stat-icon icon-primary" /> },
+        { label: 'Topics Mastered', value: topicsMastered.toString(), icon: <AcademicCapIcon className="dashboard-stat-icon icon-dark" /> },
+        { label: 'Research Queries', value: (stats?.learningStats?.totalDoubtsCleared || 0).toString(), icon: <DocumentMagnifyingGlassIcon className="dashboard-stat-icon icon-accent" /> },
     ];
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-screen bg-white">
-                <div className="text-center">
-                    <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-gray-600 font-medium">Loading Dashboard...</p>
+            <div className="dashboard-loading-container">
+                <div className="dashboard-loading-content">
+                    <div className="dashboard-loading-spinner"></div>
+                    <p className="dashboard-loading-text">Loading Dashboard...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+        <div className="dashboard-container">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="pb-10"
+                className="dashboard-header-wrapper"
             >
-                <h1 className="text-7xl font-black text-slate-900 mb-4 leading-none tracking-tight">
+                <h1 className="dashboard-title">
                     SYSTEM <span className="lumina-text-gradient">ACCESS</span>
                 </h1>
-                <p className="text-slate-500 text-lg font-medium max-w-2xl">
+                <p className="dashboard-subtitle">
                     Welcome, {user?.name}. Intelligence dashboard synchronized for Regulation 2021 protocols.
                 </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="dashboard-stats-grid">
                 {stats_cards.map((stat, index) => (
                     <motion.div
                         key={index}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="lumina-card p-10 flex flex-col items-center text-center lumina-card-hover border-none"
+                        className="lumina-card dashboard-stat-card lumina-card-hover"
                     >
-                        <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-6 text-slate-900 border border-slate-100 shadow-sm">
+                        <div className="dashboard-stat-icon-wrapper">
                             {stat.icon}
                         </div>
-                        <h3 className="text-5xl font-black text-slate-900 mb-2">{stat.value}</h3>
-                        <p className="text-slate-400 text-[11px] font-black uppercase tracking-[0.2em]">{stat.label}</p>
+                        <h3 className="dashboard-stat-value">{stat.value}</h3>
+                        <p className="dashboard-stat-label">{stat.label}</p>
                     </motion.div>
                 ))}
             </div>
 
-            <div className="space-y-8 pt-10">
-                <div className="flex items-center justify-between">
+            <div className="dashboard-semester-section">
+                <div className="dashboard-semester-header">
                     <div>
-                        <h2 className="text-4xl font-black text-slate-900 tracking-tight">Select Semester</h2>
-                        <p className="text-slate-400 font-medium mt-1">Regulation 2021 • Anna University Syllabus</p>
+                        <h2 className="dashboard-semester-title">Select Semester</h2>
+                        <p className="dashboard-semester-subtitle">Regulation 2021 • Anna University Syllabus</p>
                     </div>
-                    <div className="bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 shadow-sm">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-2">Available: </span>
-                        <span className="text-slate-900 font-black text-sm">S1 - S{userCurrentSemester}</span>
+                    <div className="dashboard-semester-badge">
+                        <span className="dashboard-semester-badge-label">Available: </span>
+                        <span className="dashboard-semester-badge-value">S1 - S{userCurrentSemester}</span>
                     </div>
                 </div>
 
                 {/* Lumina Style Dropdown Selector */}
-                <div className="relative dropdown-container">
+                <div className="dashboard-dropdown-container dropdown-container">
                     <motion.button
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className="w-full lumina-card p-8 flex items-center justify-between group hover:border-indigo-200"
+                        className="lumina-card dashboard-dropdown-btn group"
                         whileHover={{ y: -2 }}
                         whileTap={{ scale: 0.995 }}
                     >
-                        <div className="flex items-center gap-6">
-                            <div className="w-14 h-14 rounded-2xl bg-indigo-50/50 flex items-center justify-center text-indigo-600 border border-indigo-100/50">
-                                <BookOpenIcon className="w-7 h-7" />
+                        <div className="dashboard-dropdown-btn-left">
+                            <div className="dashboard-dropdown-icon-wrapper">
+                                <BookOpenIcon className="dashboard-dropdown-icon" />
                             </div>
-                            <div className="text-left">
-                                <h3 className="text-xl font-black text-slate-900">
+                            <div className="dashboard-dropdown-text-wrapper">
+                                <h3 className="dashboard-dropdown-title">
                                     {selectedSemester ? `Semester ${selectedSemester}` : 'Choose Your Semester'}
                                 </h3>
-                                <p className="text-slate-400 font-medium text-sm">
+                                <p className="dashboard-dropdown-subtitle">
                                     Select from S1 to S{userCurrentSemester} to access your curriculum
                                 </p>
                             </div>
                         </div>
                         <motion.div
                             animate={{ rotate: isDropdownOpen ? 180 : 0 }}
-                            className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors"
+                            className="dashboard-dropdown-chevron-wrapper"
                         >
-                            <ChevronDownIcon className="w-5 h-5 stroke-[3]" />
+                            <ChevronDownIcon className="dashboard-chevron" />
                         </motion.div>
                     </motion.button>
 
@@ -169,9 +170,9 @@ const DashboardPage = () => {
                                 animate={{ opacity: 1, scale: 1, y: 4 }}
                                 exit={{ opacity: 0, scale: 0.98, y: -5 }}
                                 transition={{ duration: 0.15 }}
-                                className="absolute left-0 right-0 z-50 bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] overflow-hidden"
+                                className="dashboard-dropdown-menu"
                             >
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-h-80 overflow-y-auto custom-scrollbar pr-2">
+                                <div className="dashboard-dropdown-grid custom-scrollbar">
                                     {availableSemesters.map((sem) => (
                                         <motion.button
                                             key={sem}
@@ -182,21 +183,19 @@ const DashboardPage = () => {
                                             }}
                                             whileHover={{ scale: 1.02 }}
                                             whileTap={{ scale: 0.98 }}
-                                            className={`relative flex flex-col items-center justify-center p-4 rounded-xl transition-all border ${
-                                                user?.semester === sem
-                                                    ? 'bg-indigo-50 border-indigo-200 hover:border-indigo-300'
-                                                    : 'bg-slate-50 border-slate-100 hover:border-slate-300 hover:bg-white hover:shadow-sm'
+                                            className={`dashboard-dropdown-item ${
+                                                user?.semester === sem ? 'active' : 'inactive'
                                                 }`}
                                         >
                                             {user?.semester === sem && (
-                                                <div className="absolute -top-2 text-[9px] font-black bg-indigo-500 text-white px-2 py-0.5 rounded-full uppercase tracking-widest shadow-sm">
+                                                <div className="dashboard-dropdown-item-badge">
                                                     Current
                                                 </div>
                                             )}
-                                            <div className={`text-2xl font-black mb-1 ${user?.semester === sem ? 'text-indigo-600' : 'text-slate-700'}`}>
+                                            <div className={`dashboard-dropdown-item-title ${user?.semester === sem ? 'item-title-active' : 'item-title-inactive'}`}>
                                                 S{sem}
                                             </div>
-                                            <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                                            <div className="dashboard-dropdown-item-subtitle">
                                                 Semester {sem}
                                             </div>
                                         </motion.button>
@@ -212,58 +211,58 @@ const DashboardPage = () => {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12"
+                        className="dashboard-quick-access-grid"
                     >
                         <motion.button
                             whileHover={{ y: -5 }}
                             onClick={() => navigate(`/semester/${user.semester}`)}
-                            className="lumina-card p-10 text-center lumina-card-hover border-none"
+                            className="lumina-card dashboard-quick-card lumina-card-hover"
                         >
-                            <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center mx-auto mb-6 text-indigo-600 border border-slate-100 shadow-sm">
-                                <BookOpenIcon className="w-7 h-7" />
+                            <div className="dashboard-quick-icon-wrapper">
+                                <BookOpenIcon className="dashboard-quick-icon" />
                             </div>
-                            <h4 className="text-slate-900 font-black text-lg mb-2">Current Semester</h4>
-                            <p className="text-slate-400 text-sm font-medium">Access Semester {user.semester} topics</p>
+                            <h4 className="dashboard-quick-title">Current Semester</h4>
+                            <p className="dashboard-quick-subtitle">Access Semester {user.semester} topics</p>
                         </motion.button>
                         <motion.button
                             whileHover={{ y: -5 }}
                             onClick={() => navigate('/practice')}
-                            className="lumina-card p-10 text-center lumina-card-hover border-none"
+                            className="lumina-card dashboard-quick-card lumina-card-hover"
                         >
-                            <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center mx-auto mb-6 text-indigo-600 border border-slate-100 shadow-sm">
-                                <CursorArrowRaysIcon className="w-7 h-7" />
+                            <div className="dashboard-quick-icon-wrapper">
+                                <CursorArrowRaysIcon className="dashboard-quick-icon" />
                             </div>
-                            <h4 className="text-slate-900 font-black text-lg mb-2">Practice Hub</h4>
-                            <p className="text-slate-400 text-sm font-medium">Interactive AI study sessions</p>
+                            <h4 className="dashboard-quick-title">Practice Hub</h4>
+                            <p className="dashboard-quick-subtitle">Interactive AI study sessions</p>
                         </motion.button>
                         <motion.button
                             whileHover={{ y: -5 }}
                             onClick={() => navigate('/analytics')}
-                            className="lumina-card p-10 text-center lumina-card-hover border-none"
+                            className="lumina-card dashboard-quick-card lumina-card-hover"
                         >
-                            <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center mx-auto mb-6 text-indigo-600 border border-slate-100 shadow-sm">
-                                <ChartBarIcon className="w-7 h-7" />
+                            <div className="dashboard-quick-icon-wrapper">
+                                <ChartBarIcon className="dashboard-quick-icon" />
                             </div>
-                            <h4 className="text-slate-900 font-black text-lg mb-2">Learning Analytics</h4>
-                            <p className="text-slate-400 text-sm font-medium">Track your detailed progress</p>
+                            <h4 className="dashboard-quick-title">Learning Analytics</h4>
+                            <p className="dashboard-quick-subtitle">Track your detailed progress</p>
                         </motion.button>
                     </motion.div>
                 )}
             </div>
 
             {/* Footer Insight */}
-            <div className="lumina-card p-16 bg-slate-900 text-white border-none relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] -mr-48 -mt-48"></div>
-                <div className="relative z-10 max-w-2xl">
-                    <h3 className="text-4xl font-black mb-6 tracking-tight">Master Your <span className="text-indigo-400">Curriculum</span></h3>
-                    <p className="text-slate-400 text-xl leading-relaxed mb-10 font-medium">
+            <div className="lumina-card dashboard-footer-card">
+                <div className="dashboard-footer-bg-blob"></div>
+                <div className="dashboard-footer-content">
+                    <h3 className="dashboard-footer-title">Master Your <span className="dashboard-footer-title-highlight">Curriculum</span></h3>
+                    <p className="dashboard-footer-subtitle">
                         Our AI-powered syllabus engine structures complex subjects into manageable units, helping you master the Anna University curriculum efficiently.
                     </p>
                     <button 
                         onClick={() => navigate('/practice')} 
-                        className="bg-white text-slate-900 px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-slate-100 transition-all flex items-center gap-3 group"
+                        className="dashboard-footer-btn group"
                     >
-                        Start Learning Now <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+                        Start Learning Now <ArrowRightIcon className="dashboard-arrow" />
                     </button>
                 </div>
             </div>

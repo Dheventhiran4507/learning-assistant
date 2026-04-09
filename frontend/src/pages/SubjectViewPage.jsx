@@ -12,6 +12,7 @@ import {
     ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { useAuthStore } from '../store/authStore';
+import './SubjectViewPage.css'; // Import the new CSS
 
 const SubjectViewPage = () => {
     const { subjectCode } = useParams();
@@ -77,54 +78,50 @@ const SubjectViewPage = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-screen">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-center"
-                >
-                    <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-slate-900 font-bold text-lg">Loading curriculum details...</p>
-                </motion.div>
+            <div className="loading-container">
+                <div className="loading-content">
+                    <div className="loading-spinner"></div>
+                    <p className="loading-text">Loading curriculum details...</p>
+                </div>
             </div>
         );
     }
 
-    if (!subject) return <div className="text-center text-gray-900 py-20">Subject not found</div>;
+    if (!subject) return <div className="loading-container"><div className="loading-text">Subject not found</div></div>;
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="subject-view-container">
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-12"
+                className="subject-view-header"
             >
-                <div className="flex items-center gap-3 mb-6 text-sm">
-                    <Link to="/dashboard" className="text-slate-500 hover:text-primary transition-colors font-medium">Dashboard</Link>
-                    <ChevronRightIcon className="w-4 h-4 text-slate-400" />
-                    <Link to={`/semester/${subject.semester}`} className="text-slate-500 hover:text-primary transition-colors font-medium">Semester {subject.semester}</Link>
-                    <ChevronRightIcon className="w-4 h-4 text-slate-400" />
-                    <span className="text-slate-900 font-bold">{subject.subjectCode}</span>
+                <div className="subject-view-breadcrumb">
+                    <Link to="/dashboard" className="breadcrumb-link">Dashboard</Link>
+                    <ChevronRightIcon className="breadcrumb-separator" />
+                    <Link to={`/semester/${subject.semester}`} className="breadcrumb-link">Semester {subject.semester}</Link>
+                    <ChevronRightIcon className="breadcrumb-separator" />
+                    <span className="breadcrumb-current">{subject.subjectCode}</span>
                 </div>
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div className="subject-view-header-flex">
                     <div>
-                        <h1 className="text-6xl font-black text-slate-900 mb-4 leading-tight">
-                            {subject.subjectName} <span className="text-gradient underline decoration-indigo-500/10 underline-offset-8">Curriculum</span>
+                        <h1 className="subject-view-title">
+                            {subject.subjectName} <span className="subject-title-highlight">Curriculum</span>
                         </h1>
-                        <p className="text-slate-600 text-xl font-medium">Standardized syllabus breakdown • Regulation {subject.regulation}</p>
+                        <p className="subject-view-subtitle">Standardized syllabus breakdown • Regulation {subject.regulation}</p>
                     </div>
-                    <div className="flex flex-col items-center gap-3">
-                        <div className="glass-card px-6 py-4 rounded-2xl border border-slate-200">
-                            <div className="text-xs font-black text-slate-500 uppercase tracking-widest mb-1 text-center">Modules</div>
-                            <div className="text-3xl font-black text-slate-900 text-center">{subject.units?.length || 0}</div>
+                    <div className="subject-view-actions">
+                        <div className="subject-modules-card">
+                            <div className="modules-card-label">Modules</div>
+                            <div className="modules-card-value">{subject.units?.length || 0}</div>
                         </div>
                         {isAdmin && (
                             <button
                                 onClick={handleRegenerate}
                                 disabled={isRegenerating}
-                                className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-primary transition-colors"
+                                className="regenerate-btn"
                             >
-                                <ArrowPathIcon className={`w-3 h-3 ${isRegenerating ? 'animate-spin' : ''}`} />
+                                <ArrowPathIcon className={`regenerate-icon ${isRegenerating ? 'icon-spin' : ''}`} />
                                 {isRegenerating ? 'Regenerating...' : 'Refresh Grounding'}
                             </button>
                         )}
@@ -132,7 +129,7 @@ const SubjectViewPage = () => {
                 </div>
             </motion.div>
 
-            <div className="grid grid-cols-1 gap-6">
+            <div className="units-grid">
                 {subject.units?.map((unit, index) => (
                     <motion.div
                         key={unit.unitNumber}
@@ -140,47 +137,42 @@ const SubjectViewPage = () => {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.08 }}
                         whileHover={{ x: 8 }}
-                        className="glass-card rounded-[2rem] p-8 group relative overflow-hidden"
+                        className="unit-card"
+                        onClick={() => navigate(`/unit/${subjectCode}/${unit.unitNumber}`)}
                     >
-                        {/* Gradient Border on Hover */}
-                        <div className="absolute left-0 top-0 h-full w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="unit-card-marker"></div>
+                        <div className="unit-card-glow"></div>
 
-                        {/* Background Glow */}
-                        <div className="absolute -top-20 -left-20 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-
-                        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                            <div className="flex items-center gap-6">
-                                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-3xl font-black text-white shadow-xl shadow-primary-500/20 group-hover:scale-110 transition-transform">
-                                    {unit.unitNumber}
+                        <div className="unit-card-main">
+                            <div className="unit-number-box">
+                                {unit.unitNumber}
+                            </div>
+                            <div className="unit-card-content">
+                                <h3 className="unit-title">
+                                    {unit.unitTitle}
+                                </h3>
+                                <div className="unit-meta">
+                                    <BookOpenIcon className="unit-meta-icon" />
+                                    <p className="unit-meta-text">{unit.topics?.length || 0} Topics • {getUnitProgress(unit)}% Proficiency</p>
                                 </div>
-                                <div>
-                                    <h3 className="text-2xl font-bold text-slate-900 mb-2 group-hover:text-primary transition-all">
-                                        {unit.unitTitle}
-                                    </h3>
-                                    <div className="flex items-center gap-2 text-slate-500 mb-3">
-                                        <BookOpenIcon className="w-5 h-5 text-indigo-500" />
-                                        <p className="font-medium">{unit.topics?.length || 0} Topics • {getUnitProgress(unit)}% Proficiency</p>
-                                    </div>
-                                    {/* Mini Progress Bar */}
-                                    <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                                        <motion.div
-                                            initial={{ width: 0 }}
-                                            animate={{ width: `${getUnitProgress(unit)}%` }}
-                                            className="h-full bg-gradient-to-r from-primary-500 to-secondary-500"
-                                        />
-                                    </div>
+                                <div className="unit-progress-container">
+                                    <motion.div
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${getUnitProgress(unit)}%` }}
+                                        className="unit-progress-bar"
+                                    />
                                 </div>
                             </div>
-
-                            <Link
-                                to={`/unit/${subjectCode}/${unit.unitNumber}`}
-                                className="btn-premium text-center px-8 py-3 whitespace-nowrap"
-                            >
-                                <div className="flex items-center gap-2">
-                                    Analyze Modules <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                </div>
-                            </Link>
                         </div>
+
+                        <Link
+                            to={`/unit/${subjectCode}/${unit.unitNumber}`}
+                            className="unit-analyze-btn btn-premium"
+                        >
+                            <div className="analyze-btn-content">
+                                Analyze Modules <ArrowRightIcon className="analyze-btn-icon" />
+                            </div>
+                        </Link>
                     </motion.div>
                 ))}
             </div>

@@ -13,6 +13,7 @@ import {
     ChevronRightIcon,
     SparklesIcon
 } from '@heroicons/react/24/outline';
+import './UnitViewPage.css'; // Import the new CSS
 
 const UnitViewPage = () => {
     const { subjectCode, unitNumber } = useParams();
@@ -69,102 +70,104 @@ const UnitViewPage = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-screen bg-slate-50">
-                <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <div className="loading-spinner-container">
+                <div className="loading-spinner"></div>
             </div>
         );
     }
 
-    if (!unit) return <div className="text-center text-slate-900 py-20 bg-slate-50 h-screen">Unit configuration not found</div>;
+    if (!unit) return <div className="unit-view-container"><div className="loading-spinner-container"><div className="loading-text">Unit configuration not found</div></div></div>;
 
     return (
-        <div className="min-h-screen bg-slate-50/50 pb-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="unit-view-container">
+            <div className="unit-view-wrapper">
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-12"
+                    className="unit-view-header"
                 >
-                    <div className="flex items-center gap-3 mb-6 text-sm">
-                        <Link to="/dashboard" className="text-slate-500 hover:text-primary transition-colors font-medium">Dashboard</Link>
-                        <ChevronRightIcon className="w-4 h-4 text-slate-400" />
-                        <Link to={`/semester/${subject?.semester}`} className="text-slate-500 hover:text-primary transition-colors font-medium">Semester {subject?.semester}</Link>
-                        <ChevronRightIcon className="w-4 h-4 text-slate-400" />
-                        <Link to={`/subject/${subjectCode}`} className="text-slate-500 hover:text-primary transition-colors font-medium">{subjectCode}</Link>
-                        <ChevronRightIcon className="w-4 h-4 text-slate-400" />
-                        <span className="text-slate-900 font-bold">Module {unitNumber}</span>
+                    <div className="unit-view-breadcrumb">
+                        <Link to="/dashboard" className="breadcrumb-link">Dashboard</Link>
+                        <ChevronRightIcon className="breadcrumb-separator" />
+                        <Link to={`/semester/${subject?.semester}`} className="breadcrumb-link">Semester {subject?.semester}</Link>
+                        <ChevronRightIcon className="breadcrumb-separator" />
+                        <Link to={`/subject/${subjectCode}`} className="breadcrumb-link">{subjectCode}</Link>
+                        <ChevronRightIcon className="breadcrumb-separator" />
+                        <span className="breadcrumb-current">Module {unitNumber}</span>
                     </div>
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div className="unit-view-header-flex">
                         <div>
-                            <h1 className="text-5xl font-black text-slate-900 mb-4 leading-tight">
-                                {unit.unitTitle} <span className="text-gradient underline decoration-indigo-500/10 underline-offset-8">Concepts</span>
+                            <h1 className="unit-view-title">
+                                {unit.unitTitle} <span className="unit-title-highlight">Concepts</span>
                             </h1>
-                            <p className="text-slate-600 text-xl font-medium max-w-2xl">Master each module through focused academic analysis and testing.</p>
+                            <p className="unit-view-subtitle">Master each module through focused academic analysis and testing.</p>
                         </div>
-                        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                            <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 text-center">Module Proficiency</div>
-                            <div className="text-2xl font-black text-slate-900 text-center">{calculateUnitProgress()}% <span className="text-slate-500 font-bold text-sm uppercase">Acquired</span></div>
+                        <div className="unit-proficiency-card shadow-sm">
+                            <div className="proficiency-label">Module Proficiency</div>
+                            <div className="proficiency-value">{calculateUnitProgress()}% <span>Acquired</span></div>
                         </div>
                     </div>
                 </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="topics-grid">
                     {unit.topics.map((topic, index) => (
                         <motion.div
                             key={topic.topicName}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.05 }}
-                            className="glass-card rounded-[2.5rem] p-8 flex flex-col justify-between group h-full border border-gray-100 hover:border-primary-500/30 transition-all duration-500"
+                            className="topic-card group"
                         >
                             <div>
-                                <div className="flex items-center justify-between mb-8">
-                                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${topic.difficulty === 'hard' ? 'bg-red-50 text-red-600 border-red-100' :
-                                        topic.difficulty === 'medium' ? 'bg-amber-50 text-amber-600 border-amber-100' :
-                                            'bg-emerald-50 text-emerald-600 border-emerald-100'
+                                <div className="topic-card-header">
+                                    <span className={`complexity-badge ${topic.difficulty === 'hard' ? 'hard' :
+                                        topic.difficulty === 'medium' ? 'medium' :
+                                            'easy'
                                         }`}>
                                         {topic.difficulty || 'Standard'} Complexity
                                     </span>
-                                    <div className="flex items-center gap-3">
+                                    <div className="topic-status-icons">
                                         {isTopicCompleted(topic.topicName) && (
-                                            <div className="bg-emerald-500 text-white px-3 py-1 rounded-full text-[10px] font-black flex items-center gap-1 shadow-md shadow-emerald-500/20">
-                                                <CheckCircleIcon className="w-3 h-3" /> VERIFIED
+                                            <div className="verified-badge">
+                                                <CheckCircleIcon className="verified-icon" /> VERIFIED
                                             </div>
                                         )}
-                                        <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center group-hover:bg-indigo-50 transition-colors">
-                                            <SparklesIcon className="w-5 h-5 text-indigo-500" />
+                                        <div className="sparkle-icon-wrapper">
+                                            <SparklesIcon className="topic-sparkle-icon" />
                                         </div>
                                     </div>
                                 </div>
-                                <h3 className={`text-3xl font-bold mb-4 leading-tight group-hover:text-primary-600 transition-colors ${isTopicCompleted(topic.topicName) ? 'text-gray-400' : 'text-gray-900'}`}>
+                                <h3 className={`topic-name ${isTopicCompleted(topic.topicName) ? 'completed' : ''}`}>
                                     {topic.topicName}
                                 </h3>
                                 {topic.subtopics && topic.subtopics.length > 0 ? (
-                                    <div className="flex flex-wrap gap-2 mb-8">
+                                    <div className="subtopics-wrap">
                                         {topic.subtopics.map(st => (
-                                            <span key={st} className="text-[10px] font-bold bg-gray-100 text-gray-600 px-3 py-1 rounded-lg border border-gray-200">
+                                            <span key={st} className="subtopic-tag">
                                                 {st}
                                             </span>
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-slate-500 text-sm mb-8 leading-relaxed italic">Comprehensive academic study covers theoretical principles and practical applications of {topic.topicName}.</p>
+                                    <p className="topic-desc">Comprehensive academic study covers theoretical principles and practical applications of {topic.topicName}.</p>
                                 )}
                             </div>
 
-                            <div className="flex gap-4">
-                                <button
-                                    onClick={() => startTopicPractice(topic.topicName, topic.difficulty || 'medium')}
-                                    className="flex-1 btn-premium py-4 font-black rounded-2xl flex items-center justify-center gap-2"
-                                >
-                                    <CursorArrowRaysIcon className="w-5 h-5" />
-                                    Interactive Practice
-                                </button>
+                            <div className="topic-card-actions">
+                                <div className="practice-btn-wrapper">
+                                    <button
+                                        onClick={() => startTopicPractice(topic.topicName, topic.difficulty || 'medium')}
+                                        className="btn-premium topic-practice-btn"
+                                    >
+                                        <CursorArrowRaysIcon className="practice-icon" />
+                                        Interactive Practice
+                                    </button>
+                                </div>
                                 <Link
                                     to={`/chat?q=Explain the concept of ${encodeURIComponent(topic.topicName)} in ${subjectCode}`}
-                                    className="w-14 h-14 bg-white border border-slate-200 flex items-center justify-center rounded-2xl hover:bg-slate-50 transition-all group/btn shadow-sm"
+                                    className="chat-btn-circle group/btn"
                                 >
-                                    <ChatBubbleLeftRightIcon className="w-6 h-6 text-slate-500 group-hover/btn:text-primary transition-colors" />
+                                    <ChatBubbleLeftRightIcon className="chat-circle-icon" />
                                 </Link>
                             </div>
                         </motion.div>
@@ -175,22 +178,19 @@ const UnitViewPage = () => {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
-                    className="mt-16 p-1 bg-gradient-to-r from-primary-500 via-purple-500 to-secondary-500 rounded-[2rem] shadow-2xl shadow-primary-500/20"
+                    className="achievement-card-gradient"
                 >
-                    <div className="bg-white rounded-[1.8rem] p-12 text-center relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-20 pointer-events-none"></div>
-                        <div className="relative z-10">
-                            <h2 className="text-4xl font-black text-slate-900 mb-4">Module Achievement Test</h2>
-                            <p className="text-slate-600 max-w-2xl mx-auto mb-8 text-lg">
-                                Ready to validate your overall understanding of {unit.unitTitle}? Complete the comprehensive module assessment.
-                            </p>
-                            <button
-                                onClick={() => navigate(`/practice?subject=${subjectCode}&unit=${unitNumber}`)}
-                                className="btn-premium px-12 py-4 rounded-2xl text-lg shadow-xl"
-                            >
-                                Start Assessment <ArrowRightIcon className="w-5 h-5 inline ml-2" />
-                            </button>
-                        </div>
+                    <div className="achievement-card-content">
+                        <div className="achievement-title">Module Achievement Test</div>
+                        <p className="achievement-desc">
+                            Ready to validate your overall understanding of {unit.unitTitle}? Complete the comprehensive module assessment.
+                        </p>
+                        <button
+                            onClick={() => navigate(`/practice?subject=${subjectCode}&unit=${unitNumber}`)}
+                            className="btn-premium achievement-start-btn"
+                        >
+                            Start Assessment <ArrowRightIcon className="achievement-arrow-icon" />
+                        </button>
                     </div>
                 </motion.div>
             </div>

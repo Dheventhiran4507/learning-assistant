@@ -12,6 +12,7 @@ import {
     BeakerIcon,
     IdentificationIcon
 } from '@heroicons/react/24/outline';
+import './StaffLabManager.css'; // Import the new CSS
 
 const StaffLabManager = () => {
     const [file, setFile] = useState(null);
@@ -109,128 +110,128 @@ const StaffLabManager = () => {
     };
 
     return (
-        <div className="max-w-6xl mx-auto px-4 py-12 space-y-12">
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-gray-100">
+        <div className="lab-manager-container">
+            <header className="lab-manager-header">
                 <div>
-                    <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-3">
-                        <BeakerIcon className="w-10 h-10 text-primary" />
-                        Lab <span className="text-primary italic">Manager</span>
+                    <h1 className="lab-manager-title">
+                        <BeakerIcon className="lab-manager-title-icon" />
+                        Lab <span>Manager</span>
                     </h1>
-                    <p className="text-slate-500 font-medium mt-2">Assign AI-powered Pre-lab and Post-lab assessments from technical documents.</p>
+                    <p className="lab-manager-subtitle">Assign AI-powered Pre-lab and Post-lab assessments from technical documents.</p>
                 </div>
             </header>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lab-manager-grid">
                 {/* Upload Form */}
-                <div className="lg:col-span-1">
-                    <form onSubmit={handleUpload} className="bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-xl space-y-6 sticky top-24">
-                        <div className="space-y-4">
-                            <h2 className="text-xl font-bold text-slate-900 uppercase tracking-tighter">Assign New Task</h2>
+                <div className="manager-form-column">
+                    <form onSubmit={handleUpload} className="lab-manager-form">
+                        <div className="form-inner-wrapper">
+                            <h2 className="form-section-title">Assign New Task</h2>
                             
-                            <div>
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Lab Type</label>
-                                <div className="flex bg-slate-50 p-1 rounded-xl">
+                            <div className="input-group">
+                                <label className="input-label">Lab Type</label>
+                                <div className="type-toggle-container">
                                     <button
                                         type="button"
                                         onClick={() => setType('pre-lab')}
-                                        className={`flex-1 py-2 px-4 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${type === 'pre-lab' ? 'bg-white shadow-sm text-primary' : 'text-slate-400'}`}
+                                        className={`type-toggle-btn ${type === 'pre-lab' ? 'active' : 'inactive'}`}
                                     >
                                         Pre-Lab
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setType('post-lab')}
-                                        className={`flex-1 py-2 px-4 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${type === 'post-lab' ? 'bg-white shadow-sm text-primary' : 'text-slate-400'}`}
+                                        className={`type-toggle-btn ${type === 'post-lab' ? 'active' : 'inactive'}`}
                                     >
                                         Post-Lab
                                     </button>
                                 </div>
                             </div>
 
-                                <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Subject Assigned</label>
-                                    <select
-                                        value={subjectCode}
-                                        onChange={(e) => setSubjectCode(e.target.value)}
-                                        className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 ring-primary/20 uppercase"
-                                    >
-                                        <option value="" disabled>Select Subject</option>
-                                        {subjectsHandled.map(sh => (
-                                            <option key={sh.subjectCode} value={sh.subjectCode}>
-                                                {sh.subjectCode} (Sem {sh.semester})
-                                            </option>
-                                        ))}
-                                        {subjectsHandled.length === 0 && (
-                                            <option value="" disabled>No subjects assigned</option>
-                                        )}
-                                    </select>
+                            <div className="input-group">
+                                <label className="input-label">Subject Assigned</label>
+                                <select
+                                    value={subjectCode}
+                                    onChange={(e) => setSubjectCode(e.target.value)}
+                                    className="manager-select"
+                                >
+                                    <option value="" disabled>Select Subject</option>
+                                    {subjectsHandled.map(sh => (
+                                        <option key={sh.subjectCode} value={sh.subjectCode}>
+                                            {sh.subjectCode} (Sem {sh.semester})
+                                        </option>
+                                    ))}
                                     {subjectsHandled.length === 0 && (
-                                        <p className="text-[9px] text-red-400 mt-1 italic font-medium">Please contact Admin to assign subjects to you.</p>
+                                        <option value="" disabled>No subjects assigned</option>
                                     )}
-                                </div>
+                                </select>
+                                {subjectsHandled.length === 0 && (
+                                    <p className="error-hint">Please contact Admin to assign subjects to you.</p>
+                                )}
+                            </div>
 
-                            <div>
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Assessment Config (Qty & Duration)</label>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="relative">
+                            <div className="input-group">
+                                <label className="input-label">Assessment Config (Qty & Duration)</label>
+                                <div className="config-grid">
+                                    <div className="relative-input-container">
                                         <input
                                             type="number"
                                             min="1"
                                             max="15"
                                             value={questionCount}
                                             onChange={(e) => setQuestionCount(e.target.value)}
-                                            className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 ring-primary/20"
+                                            className="manager-input"
                                         />
-                                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400 uppercase">Qty</span>
+                                        <span className="input-suffix">Qty</span>
                                     </div>
-                                    <div className="relative">
+                                    <div className="relative-input-container">
                                         <input
                                             type="number"
                                             min="5"
                                             max="180"
                                             value={duration}
                                             onChange={(e) => setDuration(e.target.value)}
-                                            className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 ring-primary/20"
+                                            className="manager-input"
                                         />
-                                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400 uppercase underline decoration-primary/40">Min</span>
+                                        <span className="input-suffix input-suffix-underline">Min</span>
                                     </div>
                                 </div>
-                                <div className="flex justify-between mt-1">
-                                    <p className="text-[9px] text-slate-400 italic font-medium">Qty: 1-15</p>
-                                    <p className="text-[9px] text-slate-400 italic font-medium">Duration: 5-180m</p>
+                                <div className="config-hints">
+                                    <p className="hint-text">Qty: 1-15</p>
+                                    <p className="hint-text">Duration: 5-180m</p>
                                 </div>
                             </div>
 
-                            <div>
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Assessment Title</label>
+                            <div className="input-group">
+                                <label className="input-label">Assessment Title</label>
                                 <input
                                     type="text"
                                     placeholder="Enter title..."
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
-                                    className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 ring-primary/20"
+                                    className="manager-input"
                                 />
                             </div>
 
-                            <div>
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Upload Lab Manual / Document</label>
-                                <div className="relative group">
+                            <div className="input-group">
+                                <label className="input-label">Upload Lab Manual / Document</label>
+                                <div className="file-upload-zone">
                                     <input
                                         type="file"
                                         onChange={handleFileChange}
-                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                        className="hidden-file-input"
                                         accept=".pdf,.txt"
                                     />
-                                    <div className="border-2 border-dashed border-slate-200 rounded-2xl p-8 flex flex-col items-center justify-center group-hover:border-primary/50 transition-colors bg-slate-50/50">
+                                    <div className="upload-display">
                                         {file ? (
                                             <>
-                                                <CheckCircleIcon className="w-10 h-10 text-emerald-500 mb-2" />
-                                                <p className="text-[10px] font-black uppercase text-emerald-600 truncate max-w-full italic px-2">{file.name}</p>
+                                                <CheckCircleIcon className="upload-icon success" />
+                                                <p className="upload-status-text success">{file.name}</p>
                                             </>
                                         ) : (
                                             <>
-                                                <CloudArrowUpIcon className="w-10 h-10 text-slate-300 mb-2 group-hover:text-primary transition-colors" />
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Drop PDF or Click to Browse</p>
+                                                <CloudArrowUpIcon className="upload-icon pending" />
+                                                <p className="upload-status-text pending">Drop PDF or Click to Browse</p>
                                             </>
                                         )}
                                     </div>
@@ -241,10 +242,10 @@ const StaffLabManager = () => {
                         <button
                             type="submit"
                             disabled={isUploading}
-                            className={`w-full py-4 rounded-2xl text-white font-black uppercase tracking-widest text-xs shadow-xl transition-all flex items-center justify-center gap-2 ${isUploading ? 'bg-slate-400 cursor-not-allowed' : 'bg-slate-900 hover:bg-black active:scale-95'}`}
+                            className={`activate-btn ${isUploading ? 'loading' : 'ready'} activate-btn-spaced`}
                         >
                             {isUploading ? (
-                                <><ArrowPathIcon className="w-4 h-4 animate-spin" /> Generating Assessment...</>
+                                <><ArrowPathIcon className="animate-spin duration-icon-small" /> Generating Assessment...</>
                             ) : (
                                 'Activate Learning'
                             )}
@@ -253,55 +254,55 @@ const StaffLabManager = () => {
                 </div>
 
                 {/* Active List */}
-                <div className="lg:col-span-2 space-y-8">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-bold text-slate-900 uppercase tracking-tighter">Active {type === 'pre-lab' ? 'Pre-Lab' : 'Post-Lab'} Tasks</h2>
-                        <button onClick={fetchAssessments} className="p-2 hover:bg-slate-100 rounded-lg transition-all text-slate-400">
-                            <ArrowPathIcon className="w-5 h-5" />
+                <div className="manager-list-column">
+                    <div className="list-header">
+                        <h2 className="form-section-title">Active {type === 'pre-lab' ? 'Pre-Lab' : 'Post-Lab'} Tasks</h2>
+                        <button onClick={fetchAssessments} className="refresh-btn">
+                            <ArrowPathIcon className="refresh-icon" />
                         </button>
                     </div>
 
                     {loading ? (
-                        <div className="flex justify-center p-12">
-                            <div className="w-8 h-8 border-4 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="loading-spinner-container">
+                            <div className="loading-spinner"></div>
                         </div>
                     ) : assessments.length === 0 ? (
-                        <div className="text-center py-24 bg-slate-50/50 rounded-[2.5rem] border border-dashed border-slate-200">
-                            <DocumentTextIcon className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                            <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">No assessments assigned for this category yet.</p>
+                        <div className="no-tasks-card">
+                            <DocumentTextIcon className="no-tasks-icon" />
+                            <p className="no-tasks-text">No assessments assigned for this category yet.</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="task-cards-grid">
                             {assessments.map((lab, idx) => (
                                 <motion.div
                                     key={lab._id}
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ delay: idx * 0.05 }}
-                                    className="bg-white border border-gray-100 p-6 rounded-[2rem] shadow-sm hover:shadow-md transition-all group relative overflow-hidden"
+                                    className="task-card"
                                 >
-                                    <div className="absolute top-0 right-0 w-16 h-16 bg-slate-50 flex items-center justify-center rounded-bl-3xl">
-                                        <span className="text-xs font-black text-slate-300">#{idx + 1}</span>
+                                    <div className="task-card-index">
+                                        <span>#{idx + 1}</span>
                                     </div>
                                     
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <span className="text-[10px] font-black bg-primary/10 text-primary px-3 py-1 rounded-full uppercase italic">{lab.subjectCode}</span>
-                                        <span className="text-[10px] font-black text-slate-400 uppercase">Sem {lab.semester}</span>
+                                    <div className="task-card-meta">
+                                        <span className="task-subject-tag">{lab.subjectCode}</span>
+                                        <span className="task-sem-tag">Sem {lab.semester}</span>
                                     </div>
 
-                                    <h3 className="text-lg font-black text-slate-900 uppercase leading-none mb-2">{lab.title}</h3>
-                                    <p className="text-xs text-slate-500 line-clamp-2 mb-6 font-medium leading-relaxed">{lab.description || 'No description provided.'}</p>
+                                    <h3 className="task-card-title">{lab.title}</h3>
+                                    <p className="task-card-desc">{lab.description || 'No description provided.'}</p>
 
-                                    <div className="flex items-center justify-between border-t border-gray-50 pt-4 mt-auto">
-                                        <div className="flex items-center gap-1.5 text-slate-400">
-                                            <IdentificationIcon className="w-4 h-4" />
-                                            <span className="text-[10px] font-black uppercase tracking-tighter">{lab.questions?.length || 0} Questions Generated</span>
+                                    <div className="task-card-footer">
+                                        <div className="task-qty-info">
+                                            <IdentificationIcon className="task-qty-icon" />
+                                            <span className="task-qty-text">{lab.questions?.length || 0} Questions Generated</span>
                                         </div>
                                         <button 
                                             onClick={() => handleDelete(lab._id)}
-                                            className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                            className="delete-task-btn"
                                         >
-                                            <TrashIcon className="w-4 h-4" />
+                                            <TrashIcon className="delete-task-icon" />
                                         </button>
                                     </div>
                                 </motion.div>

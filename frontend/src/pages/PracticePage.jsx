@@ -22,6 +22,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useSecurityLock } from '../hooks/useSecurityLock';
 import SecurityLock from '../components/common/SecurityLock';
+import './PracticePage.css'; // Added CSS import
 
 export default function PracticePage() {
     const [searchParams] = useSearchParams();
@@ -291,25 +292,25 @@ export default function PracticePage() {
     };
 
     if (loading) return (
-        <div className="flex items-center justify-center h-screen bg-white">
-            <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+        <div className="practice-loading">
+            <div className="practice-spinner"></div>
         </div>
     );
 
     if (!session) {
         return (
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
+            <div className="practice-container">
                 <AnimatePresence>
                     {starting && (
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 bg-white/80 backdrop-blur-sm z-[100] flex flex-col items-center justify-center"
+                            className="practice-session-overlay"
                         >
-                            <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                            <p className="text-gray-900 font-bold text-xl">Starting Practice Session...</p>
-                            <p className="text-gray-500">Preparing questions for you</p>
+                            <div className="practice-spinner"></div>
+                            <p className="practice-overlay-title">Starting Practice Session...</p>
+                            <p className="practice-overlay-text">Preparing questions for you</p>
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -317,77 +318,63 @@ export default function PracticePage() {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="space-y-12"
                 >
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div className="practice-setup-header">
                         <div>
-                            <h1 className="text-3xl sm:text-6xl font-black text-slate-900 mb-2 sm:mb-4">
-                                Practice <span className="text-gradient">Hub</span>
-                            </h1>
-                            <p className="text-slate-500 text-sm sm:text-xl font-medium">Refine your understanding through targeted exercises.</p>
-                        </div>
-
-                        <div className="flex bg-white p-1 rounded-2xl border border-gray-200 shadow-sm opacity-0 pointer-events-none hidden">
-                            {/* Difficulty selector removed as per user request */}
+                            <h1 className="practice-title">
+                            Practice <span className="practice-title-accent">Hub</span>
+                        </h1>
+                            <p className="practice-subtitle">Refine your understanding through targeted exercises.</p>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="practice-grid">
                         {/* Subject List */}
-                        <div className="lg:col-span-1 space-y-6">
-                            <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-                                <span className="w-10 h-10 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 border border-indigo-500/20 text-sm font-bold">1</span>
+                        <div className="practice-subject-list">
+                            <h2 className="practice-list-title">
+                                <span className="practice-step-icon step-icon-indigo">1</span>
                                 Select Course
                             </h2>
-                            <div className="space-y-4 max-h-[40vh] sm:max-h-[60vh] overflow-y-auto pr-2 sm:pr-4 custom-scrollbar">
+                            <div className="practice-list-container custom-scrollbar">
                                 {subjects.map(s => (
                                     <button
                                         key={s.subjectCode}
                                         onClick={() => handleSubjectSelect(s.subjectCode, s)}
-                                        className={`w-full text-left p-4 sm:p-6 rounded-2xl sm:rounded-3xl transition-all border ${selectedSubject === s.subjectCode
-                                            ? 'bg-primary border-transparent text-white shadow-lg'
-                                            : 'bg-white border-slate-100 text-slate-500 hover:bg-slate-50 hover:border-slate-200'
-                                            }`}
+                                        className={`practice-subject-btn ${selectedSubject === s.subjectCode ? 'active' : 'inactive'}`}
                                     >
-                                        <div className={`font-bold text-base sm:text-lg ${selectedSubject === s.subjectCode ? 'text-white' : 'text-slate-900'}`}>{s.subjectName}</div>
-                                        <div className={`text-[10px] sm:text-xs mt-1 ${selectedSubject === s.subjectCode ? 'text-white/80' : 'text-slate-500'}`}>{s.subjectCode} • Regulation {s.regulation}</div>
+                                        <div className={`practice-subject-name ${selectedSubject === s.subjectCode ? 'active' : 'inactive'}`}>{s.subjectName}</div>
+                                        <div className={`practice-subject-code ${selectedSubject === s.subjectCode ? 'active' : 'inactive'}`}>{s.subjectCode} • Regulation {s.regulation}</div>
                                     </button>
                                 ))}
                             </div>
                         </div>
 
                         {/* Units Grid */}
-                        <div className={`lg:col-span-2 space-y-6 transition-opacity ${!selectedSubject ? 'opacity-20 pointer-events-none' : ''}`}>
-                            <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-                                <span className="w-10 h-10 rounded-2xl bg-pink-500/10 flex items-center justify-center text-pink-600 border border-pink-500/20 text-sm font-bold">2</span>
+                        <div className={`practice-coverage-scope ${!selectedSubject ? 'disabled' : ''}`}>
+                            <h2 className="practice-list-title">
+                                <span className="practice-step-icon step-icon-pink">2</span>
                                 Coverage Scope
                             </h2>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="practice-coverage-grid">
                                 <button
                                     onClick={() => handleCoverageSelection('all')}
-                                    className={`p-6 sm:p-8 rounded-2xl sm:rounded-3xl border transition-all text-left relative overflow-hidden group ${selectedUnit === 'all'
-                                        ? 'bg-gradient-to-br from-indigo-600 to-indigo-800 border-transparent text-white shadow-xl scale-[1.01]'
-                                        : 'bg-white border-slate-100 text-slate-500 hover:bg-slate-50 hover:border-slate-200'
-                                        }`}
+                                    className={`practice-coverage-btn group ${selectedUnit === 'all' ? 'all-active' : 'inactive'}`}
                                 >
-                                    <GlobeAltIcon className="w-8 h-8 sm:w-10 sm:h-10 mb-3 sm:mb-4 opacity-20 group-hover:opacity-100 transition-opacity" />
-                                    <div className="text-xl sm:text-2xl font-bold mb-1">Comprehensive Study</div>
-                                    <div className="text-[11px] sm:text-sm opacity-60">Assess knowledge across all units</div>
+                                    <GlobeAltIcon className="practice-coverage-icon" />
+                                    <div className={`practice-coverage-title ${selectedUnit === 'all' ? 'active' : 'inactive'}`}>Comprehensive Study</div>
+                                    <div className={`practice-coverage-desc ${selectedUnit === 'all' ? 'active' : 'inactive'}`}>Assess knowledge across all units</div>
                                 </button>
 
                                 {units.map((u) => (
                                     <button
                                         key={u.unitNumber}
                                         onClick={() => setSelectedUnit(u.unitNumber)}
-                                        className={`p-6 sm:p-8 rounded-2xl sm:rounded-3xl border transition-all text-left group ${selectedUnit === u.unitNumber
-                                            ? 'bg-slate-800 border-transparent text-white shadow-xl scale-[1.01]'
-                                            : 'bg-white border-slate-100 text-slate-500 hover:bg-slate-50 hover:border-slate-200'
-                                            }`}
+                                        className={`practice-coverage-btn group ${selectedUnit === u.unitNumber ? 'unit-active' : 'inactive'}`}
                                     >
-                                        <div className={`text-2xl sm:text-3xl font-black mb-3 sm:mb-4 transition-opacity ${selectedUnit === u.unitNumber ? 'text-white/20' : 'text-slate-200 group-hover:text-slate-300'}`}>0{u.unitNumber}</div>
-                                        <div className={`text-lg sm:text-2xl font-bold mb-1 truncate ${selectedUnit === u.unitNumber ? 'text-white' : 'text-slate-900'}`}>{u.unitTitle}</div>
-                                        <div className={`text-[11px] sm:text-sm opacity-60 ${selectedUnit === u.unitNumber ? 'text-white/60' : 'text-slate-50'}`}>{u.topics?.length || 0} Topics</div>
+                                        <div className={`practice-coverage-number ${selectedUnit === u.unitNumber ? 'active' : 'inactive'}`}>0{u.unitNumber}</div>
+                                        <div className={`practice-coverage-title ${selectedUnit === u.unitNumber ? 'active' : 'inactive'}`}>{u.unitTitle}</div>
+                                        <div className={`practice-coverage-desc ${selectedUnit === u.unitNumber ? 'active' : 'inactive'}`}>{u.topics?.length || 0} Topics</div>
                                     </button>
                                 ))}
                             </div>
@@ -399,16 +386,13 @@ export default function PracticePage() {
                                         initial={{ opacity: 0, x: 20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         exit={{ opacity: 0, x: 20 }}
-                                        className="mt-12 space-y-4"
+                                        className="practice-topics-container"
                                     >
-                                        <h3 className="text-xl font-bold text-gray-900">Focus on a specific topic:</h3>
-                                        <div className="flex flex-wrap gap-3">
+                                        <h3 className="practice-topics-title">Focus on a specific topic:</h3>
+                                        <div className="practice-topics-wrap">
                                             <button
                                                 onClick={() => handleTopicSelection(null)}
-                                                className={`px-6 py-2.5 rounded-2xl text-xs font-bold border transition-all ${!selectedTopic
-                                                    ? 'bg-gray-200 border-gray-300 text-gray-900'
-                                                    : 'bg-white border-gray-100 text-gray-500 hover:bg-gray-50'
-                                                    }`}
+                                                className={`practice-topic-btn all ${!selectedTopic ? 'active' : 'inactive'}`}
                                             >
                                                 All Unit Topics
                                             </button>
@@ -416,10 +400,7 @@ export default function PracticePage() {
                                                 <button
                                                     key={t.topicName}
                                                     onClick={() => handleTopicSelection(t.topicName)}
-                                                    className={`px-6 py-2.5 rounded-2xl text-xs font-bold border transition-all ${selectedTopic === t.topicName
-                                                        ? 'bg-indigo-600 border-transparent text-white shadow-lg'
-                                                        : 'bg-white border-gray-100 text-gray-500 hover:bg-gray-50'
-                                                        }`}
+                                                    className={`practice-topic-btn topic ${selectedTopic === t.topicName ? 'active' : 'inactive'}`}
                                                 >
                                                     {t.topicName}
                                                 </button>
@@ -431,13 +412,13 @@ export default function PracticePage() {
                         </div>
                     </div>
 
-                    <div className="flex justify-center pt-12">
+                    <div className="practice-start-wrapper">
                         <button
                             onClick={startPractice}
                             disabled={!selectedUnit || starting}
-                            className="btn-premium px-8 sm:px-16 py-4 sm:py-5 rounded-2xl sm:rounded-[2rem] text-lg sm:text-xl font-black shadow-xl flex items-center gap-4 w-full sm:w-auto justify-center"
+                            className={`practice-start-btn ${starting ? 'loading' : ''} ${(!selectedUnit || starting) ? 'disabled' : 'enabled'}`}
                         >
-                            {starting ? <ArrowPathIcon className="w-6 h-6 animate-spin" /> : <BeakerIcon className="w-6 h-6" />}
+                            {starting ? <ArrowPathIcon className="practice-start-icon-spin" /> : <BeakerIcon className="practice-start-icon" />}
                             {starting ? 'Preparing...' : 'Start Session'}
                         </button>
                     </div>
@@ -453,7 +434,7 @@ export default function PracticePage() {
 
     return (
         <div 
-            className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-12 select-none"
+            className="practice-container"
         >
             <SecurityLock 
                 isActive={!!session && session.status !== 'completed'} 
@@ -467,101 +448,97 @@ export default function PracticePage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="space-y-8"
                     >
                         {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-12 bg-white p-4 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border border-gray-100 relative overflow-hidden shadow-lg">
-                <div className="absolute top-0 left-0 w-1.5 sm:w-2 h-full bg-gradient-to-b from-primary-500 to-secondary-500"></div>
+            <div className="practice-active-header">
+                <div className="practice-header-marker"></div>
                 <div>
-                    <div className="flex items-center gap-2 sm:gap-3 text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 sm:mb-2">
-                        <span className="truncate max-w-[80px] sm:max-w-none">{session.subject.subjectCode}</span>
-                        <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                    <div className="practice-header-subject">
+                        <span className="practice-subject-code-tag">{session.subject.subjectCode}</span>
+                        <span className="practice-header-dot"></span>
                         <span>Unit {currentQuestion.unit}</span>
                         {isReviewMode && (
                             <>
-                                <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-                                <span className="text-secondary-500 font-bold bg-secondary-50 px-2 py-0.5 rounded-md border border-secondary-200 text-[8px] sm:text-[10px]">Review</span>
+                                <span className="practice-header-dot"></span>
+                                <span className="practice-review-tag">Review</span>
                             </>
                         )}
                     </div>
-                    <h2 className="text-lg sm:text-3xl font-black text-slate-900 truncate max-w-[250px] sm:max-w-none">
-                        <span className="text-primary">{currentQuestion.topic}</span>
+                    <h2 className="practice-header-topic">
+                        <span>{currentQuestion.topic}</span>
                     </h2>
                 </div>
-                <div className="flex items-center justify-between w-full sm:w-auto gap-3 sm:gap-8 border-t sm:border-t-0 pt-3 sm:pt-0 mt-3 sm:mt-0">
-                    <div className="flex items-center gap-4 sm:gap-6">
-                        <div className="bg-slate-50 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl border border-slate-200 flex items-center gap-2">
-                            <ClockIcon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
-                            <span className="text-base sm:text-xl font-black text-slate-700 tracking-mono">
+                <div className="practice-header-controls">
+                    <div className="practice-timer-container">
+                        <div className="practice-timer">
+                            <ClockIcon className="practice-timer-icon" />
+                            <span className="practice-timer-text">
                                 {isReviewMode 
                                     ? `${Math.floor((currentQuestion.timeTaken || 0) / 60)}:${((currentQuestion.timeTaken || 0) % 60).toString().padStart(2, '0')}`
                                     : `${Math.floor(visibleTimer / 60)}:${(visibleTimer % 60).toString().padStart(2, '0')}`
                                 }
                             </span>
                         </div>
-                        <div className="flex flex-col items-end">
-                            <div className="text-gray-500 text-[8px] sm:text-[10px] font-black uppercase tracking-tighter sm:mb-1">Progress</div>
-                            <div className="text-base sm:text-2xl font-black text-gray-900">{currentIdx + 1}<span className="text-gray-400 text-xs sm:text-lg">/{session.questions.length}</span></div>
+                        <div className="practice-progress-box">
+                            <div className="practice-progress-label">Progress</div>
+                            <div className="practice-progress-value">{currentIdx + 1}<span>/{session.questions.length}</span></div>
                         </div>
                     </div>
                     {session.status === 'completed' && (
                         <button
                             onClick={() => setSession(null)}
-                            className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors border border-gray-200"
+                            className="practice-close-btn"
                         >
-                            <XMarkIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+                            <XMarkIcon className="practice-close-icon" />
                         </button>
                     )}
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <div className="practice-main-grid">
                 {/* Question Area */}
-                <div className="lg:col-span-8 space-y-8">
+                <div className="practice-question-col">
                         <motion.div
                             key={currentQuestion.questionId}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-white p-6 sm:p-12 rounded-3xl sm:rounded-[3.5rem] min-h-[400px] sm:min-h-[500px] flex flex-col border border-gray-100 relative overflow-hidden shadow-sm"
+                            className="practice-question-card"
                         >
-                            <div className="absolute top-0 right-12 w-32 h-32 bg-primary-500/5 rounded-full blur-3xl"></div>
+                            <div className="practice-question-blob"></div>
 
-                            <div className="mb-8 sm:mb-12">
-                                <h3 className="text-xl sm:text-3xl font-bold text-gray-900 leading-[1.4]">
+                            <div className="practice-question-text">
+                                <h3>
                                     <MathRenderer content={currentQuestion.question} />
                                 </h3>
                             </div>
 
-                        <div className="flex-1 space-y-4">
+                        <div className="practice-options-list">
                             {currentQuestion.options.map((opt, i) => (
                                 <button
                                     key={i}
                                     onClick={() => !isAnswered && submitAnswer(opt)}
                                     disabled={isAnswered || submitting}
-                                    className={`w-full p-6 rounded-3xl text-left border-2 transition-all group relative overflow-hidden ${isAnswered
+                                    className={`practice-option-btn group ${isAnswered
                                         ? opt === currentQuestion.userAnswer
                                             ? currentQuestion.isCorrect
-                                                ? 'bg-green-500/10 border-green-500/50 shadow-[0_0_30px_rgba(34,197,94,0.1)]'
-                                                : 'bg-red-500/10 border-red-500/50 shadow-[0_0_30px_rgba(239,68,68,0.1)]'
+                                                ? 'correct-selected'
+                                                : 'incorrect-selected'
                                             : opt === currentQuestion.correctAnswer
-                                                ? 'bg-green-500/10 border-green-500/30'
-                                                : 'bg-white/5 border-transparent opacity-40'
-                                        : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-primary-500/50 hover:scale-[1.01]'
+                                                ? 'correct-unselected'
+                                                : 'other-unselected'
+                                        : 'unanswered'
                                         }`}
                                 >
-                                    <div className="flex items-center gap-4 sm:gap-6 relative z-10">
-                                        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl border flex items-center justify-center text-xs sm:text-sm font-black transition-colors ${isAnswered && opt === currentQuestion.userAnswer
-                                            ? 'border-transparent bg-white/30'
-                                            : 'border-slate-100 bg-slate-50 text-slate-500'
-                                            }`}>
+                                    <div className="practice-option-content">
+                                        <div className={`practice-option-marker ${isAnswered && opt === currentQuestion.userAnswer ? 'selected' : 'unselected'}`}>
                                             {String.fromCharCode(65 + i)}
                                         </div>
-                                        <span className={`text-[15px] sm:text-lg font-medium ${isAnswered && opt === currentQuestion.userAnswer ? 'text-white' : 'text-slate-700'}`}>
+                                        <span className={`practice-option-text ${isAnswered && opt === currentQuestion.userAnswer ? 'selected' : 'unselected'}`}>
                                             <MathRenderer content={opt} />
                                         </span>
                                     </div>
                                     {isAnswered && opt === currentQuestion.userAnswer && (
-                                        <div className={`absolute inset-0 opacity-10 ${currentQuestion.isCorrect ? 'bg-green-600' : 'bg-red-600'} animate-pulse`}></div>
+                                        <div className={`practice-option-pulse ${currentQuestion.isCorrect ? 'correct' : 'incorrect'}`}></div>
                                     )}
                                 </button>
                             ))}
@@ -573,23 +550,23 @@ export default function PracticePage() {
                                 <motion.div
                                     initial={{ opacity: 0, y: 30 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="mt-8 sm:mt-12 p-6 sm:p-10 rounded-2xl sm:rounded-[2.5rem] bg-gray-50 border border-gray-100 relative overflow-hidden"
+                                    className="practice-feedback-area"
                                 >
-                                    <div className="absolute top-0 left-0 w-1.5 sm:w-2 h-full bg-primary"></div>
-                                    <h4 className={`text-xl sm:text-2xl font-black mb-3 sm:mb-4 ${currentQuestion.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+                                    <div className="practice-feedback-marker"></div>
+                                    <h4 className={`practice-feedback-title ${currentQuestion.isCorrect ? 'correct' : 'incorrect'}`}>
                                         {currentQuestion.isCorrect ? 'CORRECT' : 'REVIEW NEEDED'}
                                     </h4>
-                                    <div className="text-gray-600 text-[15px] sm:text-lg leading-relaxed mb-6 sm:mb-10">
+                                    <div className="practice-feedback-text">
                                         <MathRenderer content={currentQuestion.aiFeedback.explanation} />
                                     </div>
 
-                                    <div className="flex justify-end">
+                                    <div className="practice-next-wrapper">
                                         <button
                                             onClick={nextQuestion}
-                                            className="btn-premium px-6 sm:px-10 py-3 rounded-xl sm:rounded-2xl flex items-center gap-3 text-base sm:text-lg w-full sm:w-auto justify-center"
+                                            className="practice-next-btn"
                                         >
                                             {currentIdx < session.questions.length - 1 ? 'Next Question' : 'Complete Session'}
-                                            <ArrowRightIcon className="w-5 h-5" />
+                                            <ArrowRightIcon className="practice-next-icon" />
                                         </button>
                                     </div>
                                 </motion.div>
@@ -599,28 +576,28 @@ export default function PracticePage() {
                 </div>
 
                 {/* Sidebar */}
-                <div className="lg:col-span-4 space-y-8">
-                    <div className="bg-white p-6 sm:p-10 rounded-3xl sm:rounded-[3rem] border border-gray-100 shadow-sm">
-                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 sm:mb-6">Mastery Level</h3>
-                        <div className="space-y-4">
-                            <div className="flex justify-between items-end">
-                                <div className="text-3xl sm:text-4xl font-black text-gray-900 leading-none">{Math.round(((currentIdx + (isAnswered ? 1 : 0)) / session.questions.length) * 100)}%</div>
-                                <div className="text-[10px] font-bold text-gray-400 uppercase">PROGRESS</div>
+                <div className="practice-sidebar">
+                    <div className="practice-mastery-card">
+                        <h3 className="practice-mastery-title">Mastery Level</h3>
+                        <div className="practice-mastery-stats">
+                            <div className="practice-mastery-header">
+                                <div className="practice-mastery-percent">{Math.round(((currentIdx + (isAnswered ? 1 : 0)) / session.questions.length) * 100)}%</div>
+                                <div className="practice-mastery-label">PROGRESS</div>
                             </div>
-                            <div className="h-3 sm:h-4 bg-gray-100 rounded-full overflow-hidden p-0.5 sm:p-1 border border-gray-100">
+                            <div className="practice-mastery-bar-container">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${((currentIdx + (isAnswered ? 1 : 0)) / session.questions.length) * 100}%` }}
-                                    className="h-full bg-gradient-to-r from-primary-500 via-purple-500 to-secondary-500 rounded-full"
+                                    className="practice-mastery-bar"
                                 ></motion.div>
                             </div>
                         </div>
                     </div>
 
-                        <div className="glass-card p-10 rounded-[3rem] border border-slate-200 bg-slate-50/50">
-                            <LightBulbIcon className="w-10 h-10 text-amber-500 mb-6" />
-                            <h3 className="text-xl font-bold text-slate-900 mb-4">{isAnswered ? 'Concept Insight' : 'Study Strategy'}</h3>
-                            <p className="text-slate-600 leading-relaxed text-lg">
+                        <div className="practice-insight-card">
+                            <LightBulbIcon className="practice-insight-icon" />
+                            <h3 className="practice-insight-title">{isAnswered ? 'Concept Insight' : 'Study Strategy'}</h3>
+                            <p className="practice-insight-text">
                                 {isAnswered 
                                     ? `${currentQuestion.aiFeedback.explanation.split('.')[0]}. Verbalizing this concept helps reinforce long-term retention.`
                                     : "Focus on understanding the core logic rather than memorizing the pattern. Active recall is the key to mastery."
@@ -628,13 +605,13 @@ export default function PracticePage() {
                             </p>
                         </div>
 
-                    <div className="p-8 rounded-[2.5rem] bg-slate-100 border border-slate-200 text-center">
-                        <div className="flex items-center justify-center gap-2 text-slate-600 font-bold mb-1">
-                            <SparklesIcon className="w-5 h-5" />
+                    <div className="practice-points-card">
+                        <div className="practice-points-header">
+                            <SparklesIcon className="practice-points-icon" />
                             <span>Academic Points</span>
                         </div>
-                        <div className="text-slate-900 font-black text-2xl">+{(currentIdx + 1) * 50}</div>
-                        <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-2">Syncing progress...</p>
+                        <div className="practice-points-value">+{(currentIdx + 1) * 50}</div>
+                        <p className="practice-points-desc">Syncing progress...</p>
                     </div>
                 </div>
             </div>

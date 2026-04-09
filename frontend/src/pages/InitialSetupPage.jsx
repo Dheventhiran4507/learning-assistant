@@ -13,6 +13,7 @@ import {
     EyeIcon,
     EyeSlashIcon
 } from '@heroicons/react/24/outline';
+import './InitialSetupPage.css'; // Import the new CSS
 
 const InitialSetupPage = () => {
     const [formData, setFormData] = useState({
@@ -71,152 +72,152 @@ const InitialSetupPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-slate-50">
+        <div className="setup-page-container">
             {/* Design patterns similar to Login Page */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-primary-500/10 rounded-full blur-[120px]"></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-slate-900/5 rounded-full blur-[120px]"></div>
+            <div className="setup-background-patterns">
+                <div className="pattern-top-left"></div>
+                <div className="pattern-bottom-right"></div>
             </div>
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-5 gap-0 items-stretch bg-white rounded-[3rem] shadow-2xl border border-gray-100 overflow-hidden"
+                className="setup-card"
             >
                 {/* Branding Side (2/5) */}
-                <div className="hidden md:block col-span-2 bg-slate-900 p-12 text-white relative">
-                    <div className="relative z-10 flex flex-col h-full justify-between">
+                <div className="setup-branding-side">
+                    <div className="branding-content">
                         <div>
-                            <AcademicCapIcon className="w-16 h-16 text-primary-400 mb-8" />
-                            <h2 className="text-4xl font-black uppercase tracking-tighter leading-none mb-4">
-                                Lumina <span className="text-primary-400 italic">Portal</span>
+                            <AcademicCapIcon className="brand-icon" />
+                            <h2 className="brand-title">
+                                Lumina <span>Portal</span>
                             </h2>
-                            <p className="text-slate-400 font-medium">
+                            <p className="brand-tagline">
                                 Welcome to Vidal. As the first user, you are establishing the primary root administrator account for this instance.
                             </p>
                         </div>
                         
-                        <div className="space-y-6">
-                            <div className="flex items-start gap-4">
-                                <ShieldCheckIcon className="w-6 h-6 text-primary-400 shrink-0" />
+                        <div className="brand-features">
+                            <div className="feature-item">
+                                <ShieldCheckIcon className="feature-icon" />
                                 <div>
-                                    <p className="font-bold text-sm uppercase">Secure Root Access</p>
-                                    <p className="text-xs text-slate-500">This account has full control over all institutional data.</p>
+                                    <p className="feature-title">Secure Root Access</p>
+                                    <p className="feature-desc">This account has full control over all institutional data.</p>
                                 </div>
                             </div>
-                            <div className="flex items-start gap-4">
-                                <KeyIcon className="w-6 h-6 text-primary-400 shrink-0" />
+                            <div className="feature-item">
+                                <KeyIcon className="feature-icon" />
                                 <div>
-                                    <p className="font-bold text-sm uppercase">Setup Only Once</p>
-                                    <p className="text-xs text-slate-500">This portal will be disabled once the root account is established.</p>
+                                    <p className="feature-title">Setup Only Once</p>
+                                    <p className="feature-desc">This portal will be disabled once the root account is established.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                     {/* Background decoration */}
-                    <div className="absolute bottom-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl -mr-32 -mb-32"></div>
+                    <div className="branding-decoration"></div>
                 </div>
 
                 {/* Form Side (3/5) */}
-                <div className="col-span-3 p-8 md:p-16">
-                    <div className="max-w-md mx-auto">
-                        <div className="mb-10">
-                            <h1 className="text-2xl font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
-                                <UserPlusIcon className="w-8 h-8 text-primary-500" />
+                <div className="setup-form-side">
+                    <div className="setup-form-wrapper">
+                        <div className="form-header">
+                            <h1 className="form-title">
+                                <UserPlusIcon className="form-title-icon" />
                                 Initial Setup
                             </h1>
-                            <p className="text-slate-500 text-sm font-medium mt-1">Configure your root admin credentials</p>
+                            <p className="form-subtitle">Configure your root admin credentials</p>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-5">
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Full Name</label>
+                        <form onSubmit={handleSubmit} className="setup-form">
+                            <div className="setup-input-group">
+                                <label className="setup-input-label">Full Name</label>
                                 <input
                                     type="text"
                                     required
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary-500/5 focus:border-primary-500 text-slate-900 outline-none transition-all font-bold placeholder:text-slate-300"
+                                    className="setup-input"
                                     placeholder="Enter your full name"
                                 />
                             </div>
 
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Admin Email</label>
-                                <div className="relative">
-                                    <EnvelopeIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                            <div className="setup-input-group">
+                                <label className="setup-input-label">Admin Email</label>
+                                <div className="setup-input-wrapper">
+                                    <EnvelopeIcon className="setup-input-icon" />
                                     <input
                                         type="email"
                                         required
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        className="w-full pl-12 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary-500/5 focus:border-primary-500 text-slate-900 outline-none transition-all font-bold placeholder:text-slate-300"
+                                        className="setup-input setup-input-with-icon"
                                         placeholder="institutional@admin.edu"
                                     />
                                 </div>
                             </div>
 
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Root Password</label>
-                                <div className="relative">
-                                    <LockClosedIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                            <div className="setup-input-group">
+                                <label className="setup-input-label">Root Password</label>
+                                <div className="setup-input-wrapper">
+                                    <LockClosedIcon className="setup-input-icon" />
                                     <input
                                         type={showPassword ? "text" : "password"}
                                         required
                                         value={formData.password}
                                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                        className="w-full pl-12 pr-12 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary-500/5 focus:border-primary-500 text-slate-900 outline-none transition-all font-bold placeholder:text-slate-300"
+                                        className="setup-input setup-input-with-icon setup-input-padded"
                                         placeholder="••••••••"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                                        className="password-toggle-btn"
                                     >
                                         {showPassword ? (
-                                            <EyeSlashIcon className="w-5 h-5" />
+                                            <EyeSlashIcon className="toggle-icon-small" />
                                         ) : (
-                                            <EyeIcon className="w-5 h-5" />
+                                            <EyeIcon className="toggle-icon-small" />
                                         )}
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Confirm Password</label>
-                                <div className="relative">
-                                    <LockClosedIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                            <div className="setup-input-group">
+                                <label className="setup-input-label">Confirm Password</label>
+                                <div className="setup-input-wrapper">
+                                    <LockClosedIcon className="setup-input-icon" />
                                     <input
                                         type={showConfirmPassword ? "text" : "password"}
                                         required
                                         value={formData.confirmPassword}
                                         onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                                        className="w-full pl-12 pr-12 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary-500/5 focus:border-primary-500 text-slate-900 outline-none transition-all font-bold placeholder:text-slate-300"
+                                        className="setup-input setup-input-with-icon setup-input-padded"
                                         placeholder="••••••••"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                        className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                                        className="password-toggle-btn"
                                     >
                                         {showConfirmPassword ? (
-                                            <EyeSlashIcon className="w-5 h-5" />
+                                            <EyeSlashIcon className="toggle-icon-small" />
                                         ) : (
-                                            <EyeIcon className="w-5 h-5" />
+                                            <EyeIcon className="toggle-icon-small" />
                                         )}
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3 p-4 bg-primary-50 rounded-2xl border border-primary-100 mb-2">
+                            <div className="seed-checkbox-container">
                                 <input
                                     type="checkbox"
                                     id="seedSyllabus"
                                     checked={shouldSeed}
                                     onChange={(e) => setShouldSeed(e.target.checked)}
-                                    className="w-5 h-5 accent-slate-900 cursor-pointer"
+                                    className="seed-checkbox"
                                 />
-                                <label htmlFor="seedSyllabus" className="text-[11px] font-bold text-slate-700 cursor-pointer">
+                                <label htmlFor="seedSyllabus" className="seed-label">
                                     Import Default Anna University R2021 Syllabus
                                 </label>
                             </div>
@@ -224,7 +225,7 @@ const InitialSetupPage = () => {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full py-5 font-black text-white bg-slate-900 rounded-2xl hover:bg-slate-800 transition-all shadow-xl active:scale-95 disabled:opacity-50 mt-4 uppercase tracking-widest text-xs flex items-center justify-center gap-2"
+                                className="setup-submit-btn"
                             >
                                 {loading ? 'Initializing System...' : 'Establish Root Instance'}
                             </button>
