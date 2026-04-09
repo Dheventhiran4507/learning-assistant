@@ -256,107 +256,95 @@ const AdminDashboardPage = () => {
 
     if (loading) {
         return (
-            <div className="loading-screen">
-                <div className="loading-container">
-                    <div className="no-students-view">
-                        <p className="no-students-text">Accessing Intelligence Dashboard...</p>
-                    </div>
+            <div className="flex items-center justify-center min-h-screen bg-slate-50">
+                <div className="text-center">
+                    <div className="w-12 h-12 border-4 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-slate-600 font-bold text-lg uppercase tracking-widest">Accessing Intelligence Dashboard...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="admin-container">
+        <div className="max-w-7xl mx-auto px-4 py-12 space-y-12 text-gray-900">
             {/* Header */}
-            <div className="admin-header">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-gray-200 pb-8">
                 <div>
-                    <h1 className="admin-title">
-                        Academic <span className="admin-title-highlight">Controller</span>
+                    <h1 className="text-5xl font-black tracking-tight text-slate-900 mb-2 uppercase">
+                        Academic <span className="text-primary italic">Controller</span>
                     </h1>
-                    <p className="admin-subtitle">
+                    <p className="text-slate-500 font-medium text-lg italic max-w-xl">
                         {isAdvisor
                             ? `Comprehensive oversight for Semester ${user.semester} standardized curriculum.`
                             : 'Centralized management of student performance and institutional syllabus auditing.'}
                     </p>
                 </div>
-                <div className="admin-header-actions">
-                    <div className="admin-metrics-card">
-                        <span className="admin-metrics-label">Total Students</span>
-                        <span className="admin-metrics-value">{metrics?.totalStudents || 0}</span>
+                <div className="flex gap-4">
+                    <div className="glass-card px-6 py-3 rounded-2xl">
+                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest block">Total Students</span>
+                        <span className="text-2xl font-black text-gray-900">{metrics?.totalStudents || 0}</span>
                     </div>
                 </div>
             </div>
 
             {/* Batch Metrics */}
-            <div className="admin-batch-grid">
-                <div className="admin-batch-card-dark">
-                    <div className="admin-batch-blob"></div>
-                    <div className="admin-batch-header">
-                        <ArrowTrendingUpIcon className="admin-batch-icon-dark" />
-                        <h3 className="admin-batch-title-dark">Batch Progress Audit</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                    <div className="flex items-center gap-3 mb-4">
+                        <ArrowTrendingUpIcon className="w-5 h-5 text-indigo-400" />
+                        <h3 className="text-[10px] font-black text-indigo-200 uppercase tracking-[0.2em]">Batch Progress Audit</h3>
                     </div>
-                    <p className="admin-batch-value-dark">{metrics?.avgProgress || 0}%</p>
+                    <p className="text-5xl font-black text-white">{metrics?.avgProgress || 0}%</p>
                 </div>
-                <div className="admin-batch-card-light">
-                    <div className="admin-batch-header">
-                        <ChatBubbleBottomCenterTextIcon className="admin-batch-icon-light" />
-                        <h3 className="admin-batch-title-light">Queries Resolved</h3>
+                <div className="bg-white border border-slate-200 p-8 rounded-[2.5rem] shadow-sm group">
+                    <div className="flex items-center gap-3 mb-4">
+                        <ChatBubbleBottomCenterTextIcon className="w-5 h-5 text-purple-500" />
+                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Queries Resolved</h3>
                     </div>
-                    <p className="admin-batch-value-light">{metrics?.totalDoubts || 0}</p>
+                    <p className="text-5xl font-black text-slate-900">{metrics?.totalDoubts || 0}</p>
                 </div>
-                <div className="admin-batch-card-light">
-                    <div className="admin-batch-header">
-                        <ChartPieIcon className="admin-batch-icon-light" />
-                        <h3 className="admin-batch-title-light">System Engagement</h3>
+                <div className="bg-white border border-slate-200 p-8 rounded-[2.5rem] shadow-sm group">
+                    <div className="flex items-center gap-3 mb-4">
+                        <ChartPieIcon className="w-5 h-5 text-emerald-500" />
+                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">System Engagement</h3>
                     </div>
-                    <p className="admin-batch-value-light">Optimal</p>
+                    <p className="text-5xl font-black text-slate-900 uppercase">Optimal</p>
                 </div>
             </div>
 
             {/* Main Grid */}
-            <div className="admin-main-grid">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
 
                 {/* Subject Management (1/3) */}
-                <div className="admin-left-col">
-                    <div className="admin-col-header">
-                        <h2 className="admin-section-title">CURRICULUM ENGINE</h2>
+                <div className="lg:col-span-1 space-y-8">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-xl font-bold text-slate-900">CURRICULUM ENGINE</h2>
                     </div>
-                    <div className="admin-controls-wrapper">
+                    <div className="flex items-center gap-3">
                         {isAdmin ? (
                             <select
                                 value={selectedSemester}
                                 onChange={(e) => setSelectedSemester(parseInt(e.target.value))}
-                                className="admin-select"
+                                className="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 font-bold text-slate-700 outline-none focus:ring-4 ring-primary/5 grow uppercase text-xs tracking-widest"
                             >
                                 {[1, 2, 3, 4, 5, 6, 7, 8].map(s => <option key={s} value={s}>Semester {s}</option>)}
                             </select>
                         ) : (
-                            <div className="admin-select-display">
+                            <div className="bg-slate-50 text-slate-900 px-6 py-3 rounded-2xl font-black border border-slate-200 flex items-center gap-2 grow text-xs tracking-widest uppercase">
                                 Semester {selectedSemester}
                             </div>
                         )}
-                        <div className="admin-actions-flex">
-                            <button 
-                                onClick={() => {
-                                    setEditingStudent(null);
-                                    setStudentFormData({ name: '', studentId: '', email: '', role: 'student', semester: selectedSemester, subjectsHandled: [] });
-                                    setShowStudentModal(true);
-                                }}
-                                className="admin-add-btn"
-                            >
-                                <PlusIcon className="admin-btn-icon" />
-                            </button>
-                            <button 
-                                onClick={() => setShowElectiveModal(true)}
-                                className="admin-elective-btn"
-                            >
-                                <SparklesIcon className="admin-btn-icon" />
-                            </button>
-                        </div>
+                        <button
+                            onClick={() => setShowElectiveModal(true)}
+                            className="bg-slate-900 text-white p-3.5 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-lg shrink-0"
+                            title="Add Elective"
+                        >
+                            <PlusIcon className="w-5 h-5" />
+                        </button>
                     </div>
 
-                    <div className="admin-subjects-list">
+                    <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8 space-y-3">
                         {subjects.map((subject, idx) => (
                             <motion.div
                                 key={subject.subjectCode}
@@ -364,36 +352,36 @@ const AdminDashboardPage = () => {
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: idx * 0.05 }}
                                 onClick={() => setSelectedSubject(selectedSubject?.subjectCode === subject.subjectCode ? null : subject)}
-                                className={`admin-subject-item ${selectedSubject?.subjectCode === subject.subjectCode ? 'active' : 'inactive'}`}
+                                className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between group ${selectedSubject?.subjectCode === subject.subjectCode ? 'bg-slate-900 border-slate-900' : 'bg-slate-50 border-slate-200 hover:border-primary/30'}`}
                             >
                                 <div>
-                                    <div className="admin-subject-meta">
-                                        <span className={`admin-subject-code ${selectedSubject?.subjectCode === subject.subjectCode ? 'active' : 'inactive'}`}>{subject.subjectCode}</span>
-                                        <span className={`admin-subject-badge ${selectedSubject?.subjectCode === subject.subjectCode ? 'active' : 'inactive'}`}>
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <span className={`text-[10px] font-black uppercase tracking-widest ${selectedSubject?.subjectCode === subject.subjectCode ? 'text-primary' : 'text-primary'}`}>{subject.subjectCode}</span>
+                                        <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold italic ${selectedSubject?.subjectCode === subject.subjectCode ? 'bg-slate-800 border-slate-700 text-slate-400' : 'bg-white border-slate-200 text-slate-400'}`}>
                                             {subject.subjectCode.startsWith('C') && !subject.subjectCode.startsWith('CS') ? 'ELECTIVE' : 'CORE'}
                                         </span>
                                     </div>
-                                    <h4 className={`admin-subject-name ${selectedSubject?.subjectCode === subject.subjectCode ? 'active' : 'inactive'}`}>
+                                    <h4 className={`font-bold transition-colors uppercase text-[11px] line-clamp-1 ${selectedSubject?.subjectCode === subject.subjectCode ? 'text-white' : 'text-slate-900 group-hover:text-primary'}`}>
                                         {subject.subjectName}
                                     </h4>
                                 </div>
-                                <div className="admin-subject-actions">
+                                <div className="flex items-center gap-2">
                                     <button
                                         onClick={(e) => { e.stopPropagation(); handleRegenerateSyllabus(subject.subjectCode, e); }}
-                                        className={`action-icon-btn ${regeneratingSubjects[subject.subjectCode] ? 'active' : ''}`}
+                                        className={`p-1.5 rounded-lg hover:bg-white/10 transition-all ${regeneratingSubjects[subject.subjectCode] ? 'text-primary' : 'text-slate-300 hover:text-primary'}`}
                                         title="Re-generate Syllabus Structure"
                                         disabled={regeneratingSubjects[subject.subjectCode]}
                                     >
-                                        <ArrowPathIcon className={`action-icon ${regeneratingSubjects[subject.subjectCode] ? 'animate-spin' : ''}`} />
+                                        <ArrowPathIcon className={`w-4 h-4 ${regeneratingSubjects[subject.subjectCode] ? 'animate-spin' : ''}`} />
                                     </button>
                                     <button
                                         onClick={(e) => handleDeleteSubject(subject.subjectCode, e)}
-                                        className="action-icon-btn delete"
+                                        className="p-1.5 rounded-lg hover:bg-red-50 text-slate-300 hover:text-red-500 transition-all"
                                         title="Delete Subject"
                                     >
-                                        <TrashIcon className="action-icon" />
+                                        <TrashIcon className="w-4 h-4" />
                                     </button>
-                                    <AcademicCapIcon className={`action-icon ${selectedSubject?.subjectCode === subject.subjectCode ? 'active' : 'inactive'}`} />
+                                    <AcademicCapIcon className={`w-4 h-4 transition-colors ${selectedSubject?.subjectCode === subject.subjectCode ? 'text-primary' : 'text-slate-300 group-hover:text-primary'}`} />
                                 </div>
                             </motion.div>
                         ))}
@@ -401,25 +389,25 @@ const AdminDashboardPage = () => {
                 </div>
 
                 {/* Management Section (2/3) */}
-                <div className="admin-right-col">
+                <div className="lg:col-span-2 space-y-8">
                     {/* Tabs for HOD / Advisor */}
                     {(isAdmin || isAdvisor) && (
-                        <div className="admin-tabs-wrapper">
+                        <div className="flex gap-4 border-b border-slate-100 pb-4">
                             <button
                                 onClick={() => setActiveTab('students')}
-                                className={`admin-tab ${activeTab === 'students' ? 'active' : 'inactive'}`}
+                                className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${activeTab === 'students' ? 'bg-slate-900 text-white shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
                             >
                                 Student Metrics
                             </button>
                             <button
                                 onClick={() => setActiveTab('staff')}
-                                className={`admin-tab ${activeTab === 'staff' ? 'active' : 'inactive'}`}
+                                className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${activeTab === 'staff' ? 'bg-slate-900 text-white shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
                             >
                                 Institutional Staff
                             </button>
                             <button
                                 onClick={() => setActiveTab('doubts')}
-                                className={`admin-tab ${activeTab === 'doubts' ? 'active' : 'inactive'}`}
+                                className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${activeTab === 'doubts' ? 'bg-slate-900 text-white shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
                             >
                                 Doubt Desk
                             </button>
@@ -427,76 +415,76 @@ const AdminDashboardPage = () => {
                     )}
 
                     {isStaff && (
-                         <div className="admin-tabs-wrapper">
+                         <div className="flex gap-4 border-b border-slate-100 pb-4">
                             <button
                                 onClick={() => setActiveTab('students')}
-                                className={`admin-tab ${activeTab === 'students' ? 'active' : 'inactive'}`}
+                                className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${activeTab === 'students' ? 'bg-slate-900 text-white shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
                             >
                                 Student Metrics
                             </button>
                             <button
                                 onClick={() => setActiveTab('doubts')}
-                                className={`admin-tab ${activeTab === 'doubts' ? 'active' : 'inactive'}`}
+                                className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${activeTab === 'doubts' ? 'bg-slate-900 text-white shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
                             >
                                 Doubt Desk
                             </button>
                          </div>
                     )}
 
-                    <div className="admin-list-header">
-                        <h2 className="admin-section-title">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <h2 className="text-xl font-bold text-slate-900 uppercase tracking-tighter">
                             {activeTab === 'students' ? 'Cohort Intelligence' : activeTab === 'staff' ? 'Institutional Directory' : 'Student Doubts'}
                         </h2>
-                        <div className="admin-controls-wrapper-search">
-                            <div className="admin-list-search">
-                                <MagnifyingGlassIcon className="admin-search-icon" />
+                        <div className="flex gap-4 w-full md:w-auto">
+                            <div className="relative flex-1 md:w-64">
+                                <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <input
                                     type="text"
                                     placeholder={`Filter ${activeTab === 'students' ? 'Students' : 'Personnel'}...`}
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="admin-search-input"
+                                    className="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold outline-none focus:ring-4 ring-primary/5 transition-all"
                                 />
                             </div>
                             <button
                                 onClick={() => openStudentModal(null, activeTab === 'students' ? 'student' : 'staff')}
-                                className="admin-add-btn"
+                                className="bg-slate-900 text-white p-3.5 rounded-2xl shadow-xl hover:bg-slate-800 transition-all shrink-0"
                             >
-                                <PlusIcon className="admin-btn-icon" />
+                                <PlusIcon className="w-5 h-5" />
                             </button>
                         </div>
                     </div>
 
-                    <div className="admin-table-wrapper">
-                        <table className="admin-table">
-                            <thead className="admin-thead">
+                    <div className="glass-card rounded-[2rem] overflow-hidden border-gray-100">
+                        <table className="w-full text-left">
+                            <thead className="bg-gray-50 border-b border-gray-100">
                                 {activeTab === 'students' ? (
                                     <tr>
-                                        <th className="admin-th">Student</th>
-                                        <th className="admin-th-center">
+                                        <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest">Student</th>
+                                        <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-center">
                                             {selectedSubject ? `${selectedSubject.subjectCode} Progress` : 'Overall Progress'}
                                         </th>
-                                        <th className="admin-th-center">Doubts</th>
-                                        <th className="admin-th-right">Predicted Score</th>
-                                        <th className="admin-th"></th>
+                                        <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-center">Doubts</th>
+                                        <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-right">Predicted Score</th>
+                                        <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest"></th>
                                     </tr>
                                 ) : activeTab === 'staff' ? (
                                     <tr>
-                                        <th className="admin-th">Staff Member</th>
-                                        <th className="admin-th-center">Assigned Semester</th>
-                                        <th className="admin-th-center">Role</th>
-                                        <th className="admin-th-right">Status</th>
-                                        <th className="admin-th"></th>
+                                        <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest">Staff Member</th>
+                                        <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-center">Assigned Semester</th>
+                                        <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-center">Role</th>
+                                        <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-right">Status</th>
+                                        <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest"></th>
                                     </tr>
                                 ) : (
                                     <tr>
-                                        <th className="admin-th">Student / Subject</th>
-                                        <th className="admin-th-center">Query Content</th>
-                                        <th className="admin-th-right">Timestamp</th>
+                                        <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest">Student / Subject</th>
+                                        <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-center">Query Content</th>
+                                        <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-right">Timestamp</th>
                                     </tr>
                                 )}
                             </thead>
-                            <tbody className="admin-tbody">
+                            <tbody className="divide-y divide-gray-100">
                                 {activeTab === 'students' ? (
                                     filteredStudents.map((student, idx) => (
                                         <motion.tr
@@ -504,24 +492,24 @@ const AdminDashboardPage = () => {
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: idx * 0.03 }}
-                                            className="admin-tr"
+                                            className="hover:bg-gray-50/50 transition-colors group"
                                         >
-                                            <td className="admin-td">
-                                                <div className="admin-user-info">
-                                                    <div className="admin-avatar">
+                                            <td className="px-8 py-6">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white font-black text-sm">
                                                         {student.name.charAt(0)}
                                                     </div>
-                                                    <div className="admin-pointer" onClick={() => openStudentModal(student)}>
-                                                        <p className="admin-user-name">
+                                                    <div className="cursor-pointer" onClick={() => openStudentModal(student)}>
+                                                        <p className="font-bold text-slate-900 group-hover:text-primary transition-colors flex items-center gap-2">
                                                             {student.name}
-                                                            <PencilSquareIcon className="admin-edit-icon" />
+                                                            <PencilSquareIcon className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                                                         </p>
-                                                        <p className="admin-user-id">{student.studentId}</p>
+                                                        <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">{student.studentId}</p>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="admin-td">
-                                                <div className="admin-progress-wrapper">
+                                            <td className="px-8 py-6">
+                                                <div className="flex flex-col items-center">
                                                     {selectedSubject ? (() => {
                                                         const sp = (student.subjectProgress || []).find(p => p.subjectCode.toUpperCase() === selectedSubject.subjectCode.toUpperCase());
                                                         const totalTopicsInSyllabus = (selectedSubject.units || []).reduce((acc, u) => acc + (u.topics?.length || 0), 0);
@@ -529,39 +517,43 @@ const AdminDashboardPage = () => {
                                                         const progress = sp?.progress || 0;
 
                                                         return (
-                                                            <div className="progress-container">
-                                                                <div className="progress-value-large">
-                                                                    {completedCount} <span className="progress-label-small">/ {totalTopicsInSyllabus} Topics</span>
+                                                            <div className="flex flex-col items-center space-y-1">
+                                                                <div className="text-xl font-black text-slate-900 tracking-tighter">
+                                                                    {completedCount} <span className="text-[10px] text-slate-400 font-bold">/ {totalTopicsInSyllabus} Topics</span>
                                                                 </div>
-                                                                <div className="progress-bar-bg">
-                                                                    <div className="progress-bar-fill" style={{ width: `${progress}%` }}></div>
+                                                                <div className="w-full max-w-[120px] h-2 bg-slate-100 rounded-full overflow-hidden">
+                                                                    <div className="h-full bg-primary-500 transition-all duration-500" style={{ width: `${progress}%` }}></div>
                                                                 </div>
-                                                                <span className="progress-percent-label">{progress}% COMPLETED</span>
+                                                                <span className="text-[9px] font-black text-primary uppercase">{progress}% COMPLETED</span>
                                                             </div>
                                                         );
                                                     })() : (
-                                                        <div className="progress-container-small">
-                                                            <div className="progress-bar-bg-small">
-                                                                <div className="progress-bar-fill-small" style={{ width: `${student.progress}%` }}></div>
+                                                        <div className="w-full max-w-[120px] space-y-1 text-center">
+                                                            <div className="h-2 bg-slate-900/10 rounded-full overflow-hidden">
+                                                                <div className="h-full bg-slate-900" style={{ width: `${student.progress}%` }}></div>
                                                             </div>
-                                                            <span className="progress-overall-label">Overall {student.progress}%</span>
+                                                            <span className="text-[10px] font-black text-slate-400 italic">Overall {student.progress}%</span>
                                                         </div>
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="admin-td-center-bold">
+                                            <td className="px-8 py-6 text-center font-bold text-gray-600">
                                                 {student.doubts}
                                             </td>
-                                            <td className="admin-td-right">
-                                                <div className="admin-score-wrapper">
-                                                    <span className={`score-badge ${student.predictedScore > 80 ? 'high' : student.predictedScore > 60 ? 'mid' : 'low'}`}>
+                                            <td className="px-8 py-6 text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <span className={`px-4 py-1.5 rounded-full font-black text-xs ${student.predictedScore > 80 ? 'bg-green-100 text-green-600' :
+                                                        student.predictedScore > 60 ? 'bg-orange-100 text-orange-600' :
+                                                            'bg-red-100 text-red-600'
+                                                        }`}>
                                                         {student.predictedScore} / 100
                                                     </span>
                                                     <button
                                                         onClick={() => handleDeleteAccount(student._id, student.name)}
-                                                        className="action-icon-btn delete"
+                                                        className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
+                                                        title="Delete Account"
                                                     >
-                                                        <TrashIcon className="action-icon" />
+                                                        <TrashIcon className="w-4 h-4" />
                                                     </button>
                                                 </div>
                                             </td>
@@ -574,40 +566,41 @@ const AdminDashboardPage = () => {
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: idx * 0.03 }}
-                                            className="admin-tr"
+                                            className="hover:bg-gray-50/50 transition-colors group"
                                         >
-                                            <td className="admin-td">
-                                                <div className="admin-user-info">
-                                                    <div className="admin-avatar-staff">
+                                            <td className="px-8 py-6">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-black text-sm">
                                                         {member.name.charAt(0)}
                                                     </div>
-                                                    <div className="admin-pointer" onClick={() => openStudentModal(member, 'advisor')}>
-                                                        <p className="admin-user-name">
+                                                    <div className="cursor-pointer" onClick={() => openStudentModal(member, 'advisor')}>
+                                                        <p className="font-bold text-slate-900 group-hover:text-primary transition-colors flex items-center gap-2">
                                                             {member.name}
-                                                            <PencilSquareIcon className="admin-edit-icon" />
+                                                            <PencilSquareIcon className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                                                         </p>
-                                                        <p className="admin-user-id">{member.email}</p>
+                                                        <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">{member.email}</p>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="admin-td-center">
-                                                <span className="admin-semester-badge">
+                                            <td className="px-8 py-6 text-center">
+                                                <span className="bg-gray-100 px-3 py-1 rounded-lg font-black text-xs text-gray-600 uppercase tracking-widest">
                                                     Semester {member.semester}
                                                 </span>
                                             </td>
-                                            <td className="admin-td-center-role">
+                                            <td className="px-8 py-6 text-center uppercase text-[10px] font-black tracking-widest text-primary-600">
                                                 {member.role}
                                             </td>
-                                            <td className="admin-td-right">
-                                                <div className="admin-score-wrapper">
-                                                    <span className={`score-badge ${member.isActive ? 'high' : 'low'}`}>
+                                            <td className="px-8 py-6 text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <span className={`px-4 py-1.5 rounded-full font-black text-xs ${member.isActive ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
                                                         {member.isActive ? 'Active' : 'Inactive'}
                                                     </span>
                                                     <button
                                                         onClick={() => handleDeleteAccount(member._id, member.name)}
-                                                        className="action-icon-btn delete"
+                                                        className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
+                                                        title="Delete Account"
                                                     >
-                                                        <TrashIcon className="action-icon" />
+                                                        <TrashIcon className="w-4 h-4" />
                                                     </button>
                                                 </div>
                                             </td>
@@ -624,24 +617,24 @@ const AdminDashboardPage = () => {
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: idx * 0.03 }}
-                                            className="admin-tr"
+                                            className="hover:bg-gray-50/50 transition-colors group"
                                         >
-                                            <td className="admin-td">
-                                                <div className="admin-doubt-info">
-                                                    <p className="admin-user-name">{doubt.student?.name || 'Anonymous'}</p>
-                                                    <div className="admin-doubt-meta">
-                                                        <span className="admin-doubt-code">{doubt.subject?.subjectCode || 'General'}</span>
-                                                        <span className="admin-doubt-sem">Sem {doubt.student?.semester}</span>
+                                            <td className="px-8 py-6">
+                                                <div className="flex flex-col">
+                                                    <p className="font-bold text-slate-900">{doubt.student?.name || 'Anonymous'}</p>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[9px] font-black text-primary uppercase">{doubt.subject?.subjectCode || 'General'}</span>
+                                                        <span className="text-[9px] text-slate-400 font-bold">Sem {doubt.student?.semester}</span>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="admin-td">
-                                                <p className="admin-doubt-text">
+                                            <td className="px-8 py-6">
+                                                <p className="text-xs text-slate-600 leading-relaxed max-w-md italic overflow-hidden text-ellipsis line-clamp-2">
                                                     "{doubt.userMessage}"
                                                 </p>
-                                                <p className="admin-doubt-ai">AI Resp: {doubt.aiResponse?.substring(0, 60)}...</p>
+                                                <p className="text-[10px] text-slate-400 mt-1 font-medium">AI Resp: {doubt.aiResponse?.substring(0, 60)}...</p>
                                             </td>
-                                            <td className="admin-td-right-date">
+                                            <td className="px-8 py-6 text-right text-[10px] font-bold text-slate-400 uppercase">
                                                 {new Date(doubt.createdAt).toLocaleDateString()}
                                             </td>
                                         </motion.tr>
@@ -655,15 +648,15 @@ const AdminDashboardPage = () => {
             </div>
 
             {/* Footer Insight */}
-            <div className="admin-footer-insight">
-                <div className="admin-footer-blob"></div>
-                <div className="admin-footer-content">
-                    <div className="admin-footer-header">
-                        <LightBulbIcon className="admin-footer-icon" />
-                        <h3 className="admin-footer-title">Predictive Audit</h3>
+            <div className="bg-slate-950 rounded-[3rem] p-12 text-white relative overflow-hidden shadow-2xl">
+                <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px] -mr-48 -mt-48"></div>
+                <div className="relative z-10 max-w-2xl">
+                    <div className="flex items-center gap-3 mb-6">
+                        <LightBulbIcon className="w-8 h-8 text-indigo-400" />
+                        <h3 className="text-2xl font-black uppercase tracking-tighter italic">Predictive Audit</h3>
                     </div>
-                    <p className="admin-footer-text">
-                        Algorithmic analysis of batch performance indicates high friction in <span className="admin-footer-highlight">CS3492 - UNIT 3</span>. System recommendation: Targeted institutional intervention suggested for the upcoming assessment cycle.
+                    <p className="text-slate-400 text-lg leading-relaxed font-medium">
+                        Algorithmic analysis of batch performance indicates high friction in <span className="text-primary-400 underline decoration-indigo-400/30 underline-offset-8 font-black">CS3492 - UNIT 3</span>. System recommendation: Targeted institutional intervention suggested for the upcoming assessment cycle.
                     </p>
                 </div>
             </div>
@@ -671,55 +664,56 @@ const AdminDashboardPage = () => {
             {/* Manage Student Modal */}
             {
                 showStudentModal && (
-                    <div className="modal-overlay">
-                        <div className="modal-backdrop" onClick={() => setShowStudentModal(false)}></div>
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setShowStudentModal(false)}></div>
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="modal-content"
+                            className="bg-white rounded-[2rem] p-8 max-w-lg w-full relative z-10 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
                         >
-                            <h1 className="modal-title">
+                            <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">
                                 {editingStudent ? 'Update' : 'Register'} {studentFormData.role === 'student' ? 'Student' : 'Subject Staff'}
                             </h1>
-                            <form onSubmit={handleManageStudent} className="modal-form">
-                                <div className="form-field-group">
-                                    <label className="form-label">Full Name</label>
+                            <form onSubmit={handleManageStudent} className="space-y-4">
+                                <div>
+                                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-1">Full Name</label>
                                     <input
                                         type="text"
                                         required
                                         value={studentFormData.name}
                                         onChange={(e) => setStudentFormData({ ...studentFormData, name: e.target.value })}
-                                        className="form-input"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 ring-primary-500/20"
                                     />
                                 </div>
-                                <div className="form-field-group">
-                                    <label className="form-label">Email Address</label>
+                                <div>
+                                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-1">Email Address</label>
                                     <input
                                         type="email"
                                         required
                                         value={studentFormData.email}
                                         onChange={(e) => setStudentFormData({ ...studentFormData, email: e.target.value })}
-                                        className="form-input"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 ring-primary-500/20"
                                     />
                                 </div>
-                                <div className="form-row">
-                                    <div className="form-field-group">
-                                        <label className="form-label">Role</label>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-1">Role</label>
                                         <select
                                             disabled={!isAdmin && !isAdvisor}
                                             required
                                             value={studentFormData.role}
                                             onChange={(e) => setStudentFormData({ ...studentFormData, role: e.target.value })}
-                                            className="form-select"
+                                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 ring-primary-500/20 disabled:opacity-50 font-bold"
                                         >
                                             <option value="student">Student</option>
                                             {isAdmin && <option value="advisor">Class Advisor</option>}
                                             {(isAdmin || isAdvisor) && <option value="staff">Subject Staff</option>}
                                         </select>
-                                        {isAdvisor && <p className="form-hint">Role Locked to Semester {user.semester}</p>}
+                                        {isAdvisor && <p className="text-[10px] text-slate-400 mt-1 italic font-bold uppercase">Role Locked to Semester {user.semester}</p>}
+                                        {isStaff && <p className="text-[10px] text-slate-400 mt-1 italic font-bold uppercase">Subject Authority Only</p>}
                                     </div>
-                                    <div className="form-field-group">
-                                        <label className="form-label">
+                                    <div>
+                                        <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-1">
                                             {studentFormData.role === 'student' ? 'Semester' : 'Assign Semester'}
                                         </label>
                                         <select
@@ -727,57 +721,57 @@ const AdminDashboardPage = () => {
                                             disabled={(!isAdmin && studentFormData.role === 'student') || isAdvisor}
                                             value={studentFormData.semester}
                                             onChange={(e) => setStudentFormData({ ...studentFormData, semester: parseInt(e.target.value) })}
-                                            className="form-select"
+                                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 ring-primary-500/20 disabled:opacity-50 font-bold"
                                         >
                                             {[1, 2, 3, 4, 5, 6, 7, 8].map(s => <option key={s} value={s}>Semester {s}</option>)}
                                         </select>
-                                        {isAdvisor && <p className="form-hint">Semester Fixed</p>}
+                                        {isAdvisor && <p className="text-[10px] text-slate-400 mt-1 italic font-bold uppercase">Semester Fixed</p>}
                                     </div>
                                 </div>
 
                                 {studentFormData.role === 'student' && (
-                                    <div className="form-row">
-                                        <div className="form-field-group">
-                                            <label className="form-label">ID / Roll No</label>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-1">ID / Roll No</label>
                                             <input
                                                 type="text"
                                                 required
                                                 value={studentFormData.studentId}
                                                 onChange={(e) => setStudentFormData({ ...studentFormData, studentId: e.target.value })}
-                                                className="form-input"
+                                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 ring-primary-500/20"
                                             />
                                         </div>
-                                        <div className="form-field-group">
-                                            <label className="form-label">Access Password</label>
+                                        <div>
+                                            <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-1">Access Password</label>
                                             <input
                                                 type="text"
                                                 placeholder={editingStudent ? "Keep empty to skip" : "Welcome123"}
                                                 value={studentFormData.password}
                                                 onChange={(e) => setStudentFormData({ ...studentFormData, password: e.target.value })}
-                                                className="form-input"
+                                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 ring-primary-500/20"
                                             />
                                         </div>
                                     </div>
                                 )}
                                 {studentFormData.role !== 'student' && (
-                                    <div className="form-field-group">
-                                        <label className="form-label">Access Password</label>
+                                    <div>
+                                        <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-1">Access Password</label>
                                         <input
                                             type="text"
                                             placeholder={editingStudent ? "Keep empty to skip" : "Welcome123"}
                                             value={studentFormData.password}
                                             onChange={(e) => setStudentFormData({ ...studentFormData, password: e.target.value })}
-                                            className="form-input"
+                                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 ring-primary-500/20"
                                         />
                                     </div>
                                 )}
 
                                 {(studentFormData.role === 'advisor' || studentFormData.role === 'staff') && (
-                                    <div className="staff-subjects-box">
-                                        <label className="form-label-block">Assigned Subjects (Lab Authority)</label>
-                                        <div className="elective-subjects-grid">
+                                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-4">Assigned Subjects (Lab Authority)</label>
+                                        <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
                                             {subjects.map(subject => (
-                                                <label key={subject.subjectCode} className="subject-checkbox-item">
+                                                <label key={subject.subjectCode} className="flex items-center gap-3 p-2 hover:bg-white rounded-xl transition-all cursor-pointer border border-transparent hover:border-slate-100">
                                                     <input
                                                         type="checkbox"
                                                         checked={studentFormData.subjectsHandled.some(sh => sh.subjectCode === subject.subjectCode)}
@@ -785,40 +779,37 @@ const AdminDashboardPage = () => {
                                                             const isChecked = e.target.checked;
                                                             let newHandled = [...studentFormData.subjectsHandled];
                                                             if (isChecked) {
-                                                                 newHandled.push({ subjectCode: subject.subjectCode, semester: studentFormData.semester });
+                                                                newHandled.push({ subjectCode: subject.subjectCode, semester: studentFormData.semester });
                                                             } else {
-                                                                 newHandled = newHandled.filter(sh => sh.subjectCode !== subject.subjectCode);
+                                                                newHandled = newHandled.filter(sh => sh.subjectCode !== subject.subjectCode);
                                                             }
                                                             setStudentFormData({ ...studentFormData, subjectsHandled: newHandled });
                                                         }}
-                                                        className="form-checkbox"
+                                                        className="w-4 h-4 rounded text-primary focus:ring-primary/20"
                                                     />
                                                     <div>
-                                                        <p className="subject-code-label">{subject.subjectCode}</p>
-                                                        <p className="subject-name-label">{subject.subjectName}</p>
+                                                        <p className="text-[11px] font-black text-slate-900 uppercase leading-none">{subject.subjectCode}</p>
+                                                        <p className="text-[9px] text-slate-400 font-bold uppercase truncate">{subject.subjectName}</p>
                                                     </div>
                                                 </label>
                                             ))}
                                             {subjects.length === 0 && (
-                                                <p className="no-subjects-text">No subjects found for Semester {selectedSemester}.</p>
+                                                <p className="text-[10px] text-slate-400 italic">No subjects found for Semester {selectedSemester}.</p>
                                             )}
                                         </div>
                                     </div>
                                 )}
 
-                                <div className="modal-actions-footer">
-                                    <button type="button" onClick={() => setShowStudentModal(false)} disabled={savingStudent} className="modal-cancel-btn">Cancel</button>
-                                    <button type="submit" disabled={savingStudent} className="modal-save-btn">
+                                <div className="pt-4 flex gap-4">
+                                    <button type="button" onClick={() => setShowStudentModal(false)} disabled={savingStudent} className="flex-1 px-6 py-3 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-all uppercase tracking-widest text-xs disabled:opacity-50">Cancel</button>
+                                    <button type="submit" disabled={savingStudent} className="flex-1 bg-gray-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-black transition-all shadow-lg shadow-gray-900/20 uppercase tracking-widest text-xs disabled:opacity-70 flex items-center justify-center gap-2">
                                         {savingStudent ? (
                                             <>
-                                                <div className="loading-spinner-small"></div>
-                                                Saving...
+                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                                Processing...
                                             </>
                                         ) : (
-                                            <>
-                                                <CheckIcon className="modal-save-icon" />
-                                                {editingStudent ? 'Update Account' : 'Establish Account'}
-                                            </>
+                                            editingStudent ? 'Save Changes' : (studentFormData.role === 'student' ? 'Create Student' : 'Create Staff')
                                         )}
                                     </button>
                                 </div>
@@ -831,17 +822,17 @@ const AdminDashboardPage = () => {
             {/* Select Elective Modal */}
             {
                 showElectiveModal && (
-                    <div className="modal-view-overlay">
-                        <div className="modal-blur-bg" onClick={() => setShowElectiveModal(false)}></div>
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setShowElectiveModal(false)}></div>
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="modal-panel-large"
+                            className="bg-white rounded-[2rem] p-8 max-w-2xl w-full relative z-10 shadow-2xl flex flex-col max-h-[80vh]"
                         >
-                            <div className="modal-header-flex">
-                                <h2 className="modal-header-title">Select Elective</h2>
-                                <button onClick={() => setShowElectiveModal(false)} className="modal-close-btn">
-                                    <XMarkIcon className="modal-close-icon" />
+                            <div className="flex items-center justify-between mb-8">
+                                <h2 className="text-2xl font-black uppercase tracking-tighter">Select Elective</h2>
+                                <button onClick={() => setShowElectiveModal(false)} className="text-slate-400 hover:text-slate-900 transition-colors">
+                                    <XMarkIcon className="w-6 h-6" />
                                 </button>
                             </div>
 
