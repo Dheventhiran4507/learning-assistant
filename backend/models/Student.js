@@ -184,6 +184,18 @@ const studentSchema = new mongoose.Schema({
     passwordResetToken: String,
     passwordResetExpires: Date,
 
+    // Session management for concurrent login prevention
+    sessionToken: {
+        type: String,
+        default: null
+    },
+
+    // Staff password hint (for admin reference during edit)
+    staffPasswordHint: {
+        type: String,
+        default: null
+    },
+
     // Timestamps
     createdAt: {
         type: Date,

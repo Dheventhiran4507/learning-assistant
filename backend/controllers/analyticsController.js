@@ -100,7 +100,7 @@ exports.getStaff = async (req, res) => {
         }
 
         const staff = await Student.find(query)
-            .select('name email role semester isActive studentId subjectsHandled');
+            .select('name email role semester isActive studentId subjectsHandled staffPasswordHint');
 
         res.json({
             success: true,

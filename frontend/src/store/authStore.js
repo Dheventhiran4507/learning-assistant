@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import api from '../services/api';
 
 export const useAuthStore = create(
   persist(
@@ -17,8 +18,14 @@ export const useAuthStore = create(
         });
       },
 
-      logout: () => {
+      logout: async () => {
         console.log('AuthStore: Logging out');
+        try {
+          // Clear sessionToken on server so another device can log in
+          await api.post('/auth/logout');
+        } catch (_) {
+          // ignore — still clear locally even if request fails
+        }
         set({
           user: null,
           token: null,

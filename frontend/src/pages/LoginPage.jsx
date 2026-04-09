@@ -11,7 +11,9 @@ import {
     LockClosedIcon,
     ShieldCheckIcon,
     EyeIcon,
-    EyeSlashIcon
+    EyeSlashIcon,
+    KeyIcon,
+    XMarkIcon
 } from '@heroicons/react/24/outline';
 
 const LoginPage = () => {
@@ -19,6 +21,8 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [concurrentModal, setConcurrentModal] = useState(null); // { name, role }
+    const [showForgotModal, setShowForgotModal] = useState(false);
 
     const navigate = useNavigate();
     const login = useAuthStore((state) => state.login);
@@ -47,10 +51,18 @@ const LoginPage = () => {
                 toast.error(msg);
             }
         } catch (error) {
+            const statusCode = error.response?.status;
             const serverMsg = error.response?.data?.message;
+
+            // Handle Concurrent Session
+            if (statusCode === 409 && serverMsg === 'CONCURRENT_SESSION') {
+                const { name, role } = error.response.data.data || {};
+                setConcurrentModal({ name, role });
+                setLoading(false);
+                return;
+            }
+
             const detailMsg = error.response?.data?.error;
-            
-            // Handle cases where serverMsg might be an object {code, message}
             const finalMsg = typeof detailMsg === 'string' ? detailMsg : 
                            (typeof serverMsg === 'string' ? serverMsg : 
                            (serverMsg?.message || 'Login failed'));
@@ -68,6 +80,95 @@ const LoginPage = () => {
                 <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px]"></div>
                 <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-slate-500/10 rounded-full blur-[120px]"></div>
             </div>
+
+            {/* ── Forgot Password Modal ── */}
+            {showForgotModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-gray-900/70 backdrop-blur-sm" onClick={() => setShowForgotModal(false)}></div>
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.85, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        className="relative z-10 bg-white rounded-[2rem] p-8 max-w-sm w-full shadow-2xl"
+                    >
+                        <div className="flex items-start justify-between mb-5">
+                            <div className="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center">
+                                <KeyIcon className="w-6 h-6 text-indigo-600" />
+                            </div>
+                            <button onClick={() => setShowForgotModal(false)} className="text-slate-400 hover:text-slate-900 transition-colors">
+                                <XMarkIcon className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">
+                            Password Recovery
+                        </h2>
+                        <p className="text-slate-500 text-sm mb-5 leading-relaxed font-medium">
+                            Student passwords can only be reset by your Class Advisor or the Department HOD.
+                        </p>
+                        <div className="space-y-3 mb-6">
+                            <div className="flex items-center gap-3 bg-indigo-50 border border-indigo-100 rounded-2xl px-4 py-3">
+                                <div className="w-8 h-8 bg-indigo-100 rounded-xl flex items-center justify-center shrink-0">
+                                    <ShieldCheckIcon className="w-4 h-4 text-indigo-600" />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black text-indigo-700 uppercase tracking-widest">Class Advisor</p>
+                                    <p className="text-xs text-slate-500 font-medium mt-0.5">Contact them to update your portal key.</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3">
+                                <div className="w-8 h-8 bg-slate-100 rounded-xl flex items-center justify-center shrink-0">
+                                    <AcademicCapIcon className="w-4 h-4 text-slate-600" />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black text-slate-700 uppercase tracking-widest">HOD Office</p>
+                                    <p className="text-xs text-slate-500 font-medium mt-0.5">Escalate here if advisor is unavailable.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => setShowForgotModal(false)}
+                            className="w-full py-3 bg-slate-900 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-black transition-all"
+                        >
+                            Got it
+                        </button>
+                    </motion.div>
+                </div>
+            )}
+
+            {/* ── Concurrent Session Modal ── */}
+            {concurrentModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-gray-900/70 backdrop-blur-sm" onClick={() => setConcurrentModal(null)}></div>
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.85, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        className="relative z-10 bg-white rounded-[2rem] p-8 max-w-sm w-full shadow-2xl text-center"
+                    >
+                        <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                            <ShieldCheckIcon className="w-9 h-9 text-amber-500" />
+                        </div>
+                        <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight mb-2">
+                            Session Active
+                        </h2>
+                        <p className="text-slate-500 font-medium text-sm mb-4">
+                            Your account is already logged in on another device.
+                        </p>
+                        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6">
+                            <p className="text-[11px] font-black text-amber-700 uppercase tracking-widest text-wrap">
+                                {concurrentModal.name || 'User'} — {concurrentModal.role}
+                            </p>
+                            <p className="text-xs text-amber-600 mt-1 font-medium">
+                                Please log out from the other session or ask your Class Advisor for help.
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => setConcurrentModal(null)}
+                            className="w-full py-3 bg-slate-900 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-black transition-all"
+                        >
+                            Close
+                        </button>
+                    </motion.div>
+                </div>
+            )}
 
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -153,6 +254,18 @@ const LoginPage = () => {
                                         )}
                                     </button>
                                 </div>
+                            </div>
+
+                            {/* Forgot Password Link */}
+                            <div className="flex justify-end mt-[-10px] mb-[-10px]">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowForgotModal(true)}
+                                    className="text-xs font-black text-slate-400 hover:text-primary transition-colors uppercase tracking-widest flex items-center gap-1.5"
+                                >
+                                    <KeyIcon className="w-3.5 h-3.5" />
+                                    Forgot Password?
+                                </button>
                             </div>
 
                             <button

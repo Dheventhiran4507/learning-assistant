@@ -21,4 +21,6 @@ router.post('/manage-account', protect, authController.manageAccount);
 
 router.delete('/account/:id', protect, authController.deleteAccount);
 
+router.post('/logout', protect, authController.logout);
+
 module.exports = router;

@@ -1,5 +1,6 @@
 const Student = require('../models/Student');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const logger = require('../utils/logger');
 const { verifyGmail } = require('../utils/emailVerifier');
 const Syllabus = require('../models/Syllabus');
@@ -11,6 +12,9 @@ const generateToken = (id) => {
         expiresIn: process.env.JWT_EXPIRE || '7d'
     });
 };
+
+// Generate a short random session token
+const generateSessionToken = () => crypto.randomBytes(32).toString('hex');
 
 exports.register = async (req, res) => {
     try {
@@ -200,11 +204,28 @@ exports.login = async (req, res) => {
             logger.info(`Email verification skipped for login: ${email}`);
         }
 
+        // ─── Concurrent Login Prevention (for all roles) ───
+        if (student.sessionToken) {
+            logger.warn(`Concurrent login blocked for ${student.email} - session already active`);
+            return res.status(409).json({
+                success: false,
+                message: 'CONCURRENT_SESSION',
+                data: {
+                    name: student.name,
+                    role: student.role
+                }
+            });
+        }
+
+        // Generate a new session token and store it
+        const sessionToken = generateSessionToken();
+        student.sessionToken = sessionToken;
+
         // Update last active date
         student.learningStats.lastActiveDate = new Date();
         await student.save();
 
-        // Generate token
+        // Generate JWT token
         const token = generateToken(student._id);
 
         // Send login notification email (non-blocking)
@@ -225,7 +246,8 @@ exports.login = async (req, res) => {
                     semester: student.semester,
                     department: student.department,
                     role: student.role,
-                    preferredLanguage: student.preferredLanguage
+                    preferredLanguage: student.preferredLanguage,
+                    sessionToken
                 },
                 token
             }
@@ -327,8 +349,9 @@ exports.changePassword = async (req, res) => {
             });
         }
 
-        // Update password
+        // Update password and clear active session to force re-login on all devices
         student.password = newPassword;
+        student.sessionToken = null;
         await student.save();
 
         logger.info(`Password changed for student: ${student.studentId}`);
@@ -445,6 +468,12 @@ exports.manageAccount = async (req, res) => {
 
             if (password) {
                 userAccount.password = password;
+                // Clear session to force re-login with new password
+                userAccount.sessionToken = null;
+                // Store masked hint for admin reference (non-student roles)
+                if (targetRole !== 'student') {
+                    userAccount.staffPasswordHint = password.slice(0, 2) + '*'.repeat(Math.max(0, password.length - 4)) + password.slice(-2);
+                }
             }
 
             await userAccount.save();
@@ -461,6 +490,11 @@ exports.manageAccount = async (req, res) => {
 
             const plainPassword = password || 'Welcome123';
 
+            // Generate password hint for non-student roles
+            const pwHint = targetRole !== 'student'
+                ? plainPassword.slice(0, 2) + '*'.repeat(Math.max(0, plainPassword.length - 4)) + plainPassword.slice(-2)
+                : null;
+
             userAccount = await Student.create({
                 email,
                 password: plainPassword,
@@ -473,7 +507,8 @@ exports.manageAccount = async (req, res) => {
                 role: targetRole,
                 subjectsHandled: subjectsHandled || [],
                 isActive: true,
-                isEmailVerified: true  // Staff vouches for the email
+                isEmailVerified: true,  // Staff vouches for the email
+                staffPasswordHint: pwHint
             });
             logger.info(`New ${targetRole} created by ${req.user.role}: ${email}`);
 
@@ -572,7 +607,8 @@ exports.setupInitialAdmin = async (req, res) => {
             batch: 'STAFF',
             college: 'Anna University', // Default, can be changed later
             isActive: true,
-            isEmailVerified: true
+            isEmailVerified: true,
+            staffPasswordHint: password.slice(0, 2) + '*'.repeat(Math.max(0, password.length - 4)) + password.slice(-2)
         });
 
         logger.info(`Root Admin successfully created: ${email}`);
@@ -688,6 +724,20 @@ exports.deleteAccount = async (req, res) => {
             message: 'Failed to delete account',
             error: error.message
         });
+    }
+};
+
+/**
+ * Logout - clear the active session token so other devices can log in
+ */
+exports.logout = async (req, res) => {
+    try {
+        await Student.findByIdAndUpdate(req.user.id, { sessionToken: null });
+        logger.info(`User logged out: ${req.user.email}`);
+        res.status(200).json({ success: true, message: 'Logged out successfully' });
+    } catch (error) {
+        logger.error('Logout error:', error);
+        res.status(500).json({ success: false, message: 'Logout failed' });
     }
 };
 

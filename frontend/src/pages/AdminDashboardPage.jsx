@@ -763,36 +763,43 @@ const AdminDashboardPage = () => {
                                             onChange={(e) => setStudentFormData({ ...studentFormData, password: e.target.value })}
                                             className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 ring-primary-500/20"
                                         />
+                                        {editingStudent && editingStudent.staffPasswordHint && (
+                                            <p className="text-[10px] text-slate-400 mt-1 font-bold italic">
+                                                Current password hint: <span className="text-primary font-black bg-slate-100 px-2 py-0.5 rounded-lg tracking-widest">{editingStudent.staffPasswordHint}</span>
+                                            </p>
+                                        )}
                                     </div>
                                 )}
 
                                 {(studentFormData.role === 'advisor' || studentFormData.role === 'staff') && (
                                     <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-4">Assigned Subjects (Lab Authority)</label>
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Assign Subject (Lab Authority)</label>
+                                        <p className="text-[9px] text-amber-500 font-bold italic mb-3 uppercase tracking-wide">Select ONE subject only</p>
                                         <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-                                            {subjects.map(subject => (
-                                                <label key={subject.subjectCode} className="flex items-center gap-3 p-2 hover:bg-white rounded-xl transition-all cursor-pointer border border-transparent hover:border-slate-100">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={studentFormData.subjectsHandled.some(sh => sh.subjectCode === subject.subjectCode)}
-                                                        onChange={(e) => {
-                                                            const isChecked = e.target.checked;
-                                                            let newHandled = [...studentFormData.subjectsHandled];
-                                                            if (isChecked) {
-                                                                newHandled.push({ subjectCode: subject.subjectCode, semester: studentFormData.semester });
-                                                            } else {
-                                                                newHandled = newHandled.filter(sh => sh.subjectCode !== subject.subjectCode);
-                                                            }
-                                                            setStudentFormData({ ...studentFormData, subjectsHandled: newHandled });
-                                                        }}
-                                                        className="w-4 h-4 rounded text-primary focus:ring-primary/20"
-                                                    />
-                                                    <div>
-                                                        <p className="text-[11px] font-black text-slate-900 uppercase leading-none">{subject.subjectCode}</p>
-                                                        <p className="text-[9px] text-slate-400 font-bold uppercase truncate">{subject.subjectName}</p>
-                                                    </div>
-                                                </label>
-                                            ))}
+                                            {subjects.map(subject => {
+                                                const isSelected = studentFormData.subjectsHandled.some(sh => sh.subjectCode === subject.subjectCode);
+                                                return (
+                                                    <label key={subject.subjectCode} className={`flex items-center gap-3 p-2 rounded-xl transition-all cursor-pointer border ${isSelected ? 'bg-slate-900 border-slate-900' : 'hover:bg-white border-transparent hover:border-slate-100'}`}>
+                                                        <input
+                                                            type="radio"
+                                                            name="staffSubject"
+                                                            checked={isSelected}
+                                                            onChange={() => {
+                                                                // Single select — replace entire array with just this subject
+                                                                setStudentFormData({
+                                                                    ...studentFormData,
+                                                                    subjectsHandled: [{ subjectCode: subject.subjectCode, semester: studentFormData.semester }]
+                                                                });
+                                                            }}
+                                                            className="w-4 h-4 accent-primary"
+                                                        />
+                                                        <div>
+                                                            <p className={`text-[11px] font-black uppercase leading-none ${isSelected ? 'text-white' : 'text-slate-900'}`}>{subject.subjectCode}</p>
+                                                            <p className={`text-[9px] font-bold uppercase truncate ${isSelected ? 'text-slate-300' : 'text-slate-400'}`}>{subject.subjectName}</p>
+                                                        </div>
+                                                    </label>
+                                                );
+                                            })}
                                             {subjects.length === 0 && (
                                                 <p className="text-[10px] text-slate-400 italic">No subjects found for Semester {selectedSemester}.</p>
                                             )}
