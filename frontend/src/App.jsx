@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
-import './App.css';
 
 // Pages
 import LoginPage from './pages/LoginPage';
@@ -52,15 +51,15 @@ function App() {
 
   if (checkingStatus) {
     return (
-      <div className="app-loading-container">
-        <div className="app-loading-spinner"></div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-12 h-12 border-4 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
     <Router>
-      <div className="app-container">
+      <div className="min-h-screen text-gray-900">
         {isAuthenticated && <Navbar />}
 
         <Routes>

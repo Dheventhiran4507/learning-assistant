@@ -4,7 +4,6 @@ import { useAuthStore } from '../store/authStore';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
-import './LoginPage.css'; // Reusing LoginPage styles since the UI layout is identical
 import {
     UserIcon,
     LockClosedIcon,
@@ -68,57 +67,58 @@ const StaffLoginPage = () => {
     };
 
     return (
-        <div className="login-page-container">
-            {/* Background Blobs */}
-            <div className="login-bg-blobs-wrapper">
-                <div className="login-bg-blob-indigo"></div>
-                <div className="login-bg-blob-slate"></div>
+        <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+            {/* Background Blobs - Using global styles for consistency */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+                <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px]"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-slate-500/10 rounded-full blur-[120px]"></div>
             </div>
 
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5 }}
-                className="login-content-grid"
+                className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8 items-center"
             >
                 {/* 3D Illustration Side */}
-                <div className="login-illustration-side">
+                <div className="hidden md:flex flex-col justify-center items-center text-center p-8">
                     <motion.div
                         animate={{ y: [0, -20, 0] }}
                         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                        className="login-illustration-wrapper"
+                        className="mb-8 relative"
                     >
-                        <div className="login-shape-outer">
-                            <div className="login-shape-inner">
-                                <ShieldCheckIcon className="login-icon-large" />
+                        {/* Abstract 3D shape representation using CSS gradients */}
+                        <div className="w-64 h-64 bg-slate-900 rounded-[3rem] shadow-2xl transform rotate-3 flex items-center justify-center border border-slate-800">
+                            <div className="w-48 h-48 bg-slate-800 rounded-[2.5rem] transform -rotate-3 flex items-center justify-center border border-slate-700">
+                                <ShieldCheckIcon className="w-24 h-24 text-white" />
                             </div>
                         </div>
                     </motion.div>
-                    <h2 className="login-title-large">Institutional Control</h2>
-                    <p className="login-subtitle-large">
+                    <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tighter uppercase">Institutional Control</h2>
+                    <p className="text-slate-500 text-lg max-w-md font-medium">
                         Administrative terminal for managing academic workflows and student performance metrics.
                     </p>
                 </div>
 
                 {/* Login Form Side */}
-                <div className="login-form-side">
-                    <div className="login-form-glass-overlay"></div>
+                <div className="glass p-8 md:p-12 rounded-3xl shadow-2xl border border-gray-100 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none"></div>
 
-                    <div className="login-form-content">
-                        <div className="login-form-header">
-                            <h1 className="login-form-title">
+                    <div className="relative z-10">
+                        <div className="text-center mb-10">
+                            <h1 className="text-3xl font-black text-slate-900 uppercase tracking-widest">
                                 Institutional Portal
                             </h1>
-                            <div className="login-form-subtitle-wrapper">
-                                <p className="login-form-subtitle">Authentication required for secure access</p>
+                            <div className="flex items-center justify-center gap-2 mt-1">
+                                <p className="text-slate-500 font-medium">Authentication required for secure access</p>
                             </div>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="login-form-group">
-                            <div className="login-input-group">
-                                <label className="login-label">Institutional Email</label>
-                                <div className="login-input-wrapper">
-                                    <div className="login-input-icon">
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700 ml-1">Institutional Email</label>
+                                <div className="relative group">
+                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
                                         <UserIcon className="w-5 h-5" />
                                     </div>
                                     <input
@@ -126,16 +126,16 @@ const StaffLoginPage = () => {
                                         required
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="login-input"
+                                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary/5 focus:border-primary text-slate-900 placeholder-slate-400 outline-none transition-all font-medium"
                                         placeholder="name@university.edu.in"
                                     />
                                 </div>
                             </div>
 
-                            <div className="login-input-group">
-                                <label className="login-label">Clearance Key</label>
-                                <div className="login-input-wrapper">
-                                    <div className="login-input-icon">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700 ml-1">Clearance Key</label>
+                                <div className="relative group">
+                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
                                         <LockClosedIcon className="w-5 h-5" />
                                     </div>
                                     <input
@@ -143,13 +143,13 @@ const StaffLoginPage = () => {
                                         required
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="login-input password"
+                                        className="w-full pl-12 pr-12 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary/5 focus:border-primary text-slate-900 placeholder-slate-400 outline-none transition-all font-medium"
                                         placeholder="••••••••"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="login-eye-toggle"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                                     >
                                         {showPassword ? (
                                             <EyeSlashIcon className="w-5 h-5" />
@@ -163,11 +163,11 @@ const StaffLoginPage = () => {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="login-submit-btn"
+                                className="w-full py-5 font-black text-white bg-slate-900 rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed mt-4 flex items-center justify-center gap-2"
                             >
                                 {loading ? (
                                     <>
-                                        <div className="login-spinner"></div>
+                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                                         <span>Verifying...</span>
                                     </>
                                 ) : (
@@ -179,12 +179,12 @@ const StaffLoginPage = () => {
                             </button>
                         </form>
 
-                        <div className="login-footer">
-                            <div className="login-staff-section">
-                                <span className="login-staff-text">Are you a Student?</span>
+                        <div className="mt-8 text-center px-4">
+                            <div className="pt-6 border-t border-gray-100 flex flex-col items-center justify-center gap-3">
+                                <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Are you a Student?</span>
                                 <button 
                                     onClick={() => navigate('/login')}
-                                    className="login-staff-btn"
+                                    className="w-full py-4 bg-white border-2 border-slate-200 rounded-2xl font-black text-sm uppercase tracking-widest text-slate-900 shadow-sm hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-2"
                                 >
                                     <UserIcon className="w-5 h-5" /> Go to Student Login
                                 </button>
@@ -202,7 +202,7 @@ const StaffLoginPage = () => {
                                         window.location.reload(true);
                                     }
                                 }}
-                                className="login-reset-btn"
+                                className="mt-4 text-[10px] text-slate-400 hover:text-indigo-500 transition-colors underline underline-offset-2"
                             >
                                 System issues? Reset application →
                             </button>

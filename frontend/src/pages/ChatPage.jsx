@@ -17,7 +17,6 @@ import {
     ChatBubbleBottomCenterTextIcon,
     XMarkIcon
 } from '@heroicons/react/24/outline';
-import './ChatPage.css'; // Import the new CSS
 
 export default function ChatPage() {
     const [messages, setMessages] = useState([]);
@@ -161,53 +160,53 @@ export default function ChatPage() {
     };
 
     return (
-        <div className="chat-page-container">
+        <div className="flex h-[calc(100dvh-120px)] sm:h-[calc(100vh-100px)] overflow-hidden bg-slate-50/50">
             
             {/* Sidebar Overlay (Mobile) */}
             {isSidebarOpen && (
                 <div 
-                    className="chat-sidebar-overlay"
+                    className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden"
                     onClick={() => setIsSidebarOpen(false)}
                 />
             )}
 
             {/* Sidebar */}
             <aside 
-                className={`chat-sidebar ${isSidebarOpen ? 'open' : ''}`}
+                className={`fixed lg:relative inset-y-0 left-0 w-80 bg-white border-r border-slate-200 z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
             >
-                <div className="chat-sidebar-header">
+                <div className="p-4 border-b border-slate-100 flex items-center justify-between">
                     <button 
                         onClick={startNewChat}
-                        className="chat-new-btn"
+                        className="flex-1 flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-4 py-3 rounded-xl font-bold transition-all shadow-sm active:scale-95"
                     >
-                        <PlusIcon className="new-chat-icon" />
+                        <PlusIcon className="w-5 h-5" />
                         New Chat
                     </button>
                     <button 
                         onClick={() => setIsSidebarOpen(false)}
-                        className="chat-sidebar-close"
+                        className="lg:hidden ml-4 p-2 text-slate-400 hover:bg-slate-100 rounded-lg"
                     >
-                        <XMarkIcon className="sidebar-close-icon" />
+                        <XMarkIcon className="w-6 h-6" />
                     </button>
                 </div>
                 
-                <div className="chat-sessions-list custom-scrollbar">
-                    <div className="chat-sidebar-section-title">Recent Sessions</div>
+                <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
+                    <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 px-2">Recent Sessions</div>
                     {sessions.length === 0 ? (
-                        <p className="chat-no-sessions">No past sessions found.</p>
+                        <p className="text-slate-400 text-sm text-center py-8">No past sessions found.</p>
                     ) : (
                         sessions.map(session => (
                             <button
                                 key={session._id}
                                 onClick={() => loadSession(session._id)}
-                                className={`chat-session-btn ${currentSessionId === session._id ? 'active' : 'inactive'}`}
+                                className={`w-full text-left flex items-start gap-3 p-3 rounded-xl transition-all ${currentSessionId === session._id ? 'bg-indigo-50 border border-indigo-100 text-indigo-900' : 'hover:bg-slate-50 border border-transparent text-slate-600'}`}
                             >
-                                <ChatBubbleBottomCenterTextIcon className={`chat-session-icon ${currentSessionId === session._id ? 'active' : 'inactive'}`} />
-                                <div className="chat-session-details">
-                                    <div className="chat-session-title">
+                                <ChatBubbleBottomCenterTextIcon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${currentSessionId === session._id ? 'text-indigo-500' : 'text-slate-400'}`} />
+                                <div className="flex-1 overflow-hidden">
+                                    <div className="text-sm font-semibold truncate leading-tight">
                                         {session.firstMessage || 'New Conversation'}
                                     </div>
-                                    <div className="chat-session-meta">
+                                    <div className="text-[10px] text-slate-400 mt-1 font-medium">
                                         {new Date(session.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} • {session.messageCount} msg
                                     </div>
                                 </div>
@@ -218,99 +217,105 @@ export default function ChatPage() {
             </aside>
 
             {/* Main Chat Area */}
-            <main className="chat-main">
+            <main className="flex-1 flex flex-col relative w-full lg:w-auto h-full overflow-hidden">
                 {/* Header */}
-                <div className="chat-header">
-                    <div className="chat-header-left">
+                <div className="flex-shrink-0 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 sm:px-8 py-3 sm:py-4 flex items-center justify-between z-10">
+                    <div className="flex items-center gap-3 sm:gap-4">
                         <button 
                             onClick={() => setIsSidebarOpen(true)}
-                            className="chat-menu-btn"
+                            className="lg:hidden p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
                         >
-                             <Bars3Icon className="menu-icon" />
+                            <Bars3Icon className="w-6 h-6" />
                         </button>
                         <div>
-                            <h1 className="chat-header-title">
-                                Academic <span className="header-title-accent">Assistant</span>
+                            <h1 className="text-lg sm:text-2xl font-black text-slate-900 leading-none">
+                                Academic <span className="text-gradient">Assistant</span>
                             </h1>
-                            <p className="chat-header-subtitle">Anna University R2021 Guide</p>
+                            <p className="text-slate-500 text-[10px] sm:text-sm font-medium mt-1 uppercase tracking-tighter sm:normal-case">Anna University R2021 Guide</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Chat Messages */}
-                <div className="chat-messages-container custom-scrollbar">
-                    <div className="chat-messages-wrapper">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-8 custom-scrollbar scroll-smooth">
+                    <div className="max-w-4xl mx-auto w-full">
                         {messages.length === 0 ? (
-                            <div className="chat-empty-state">
+                            <div className="flex items-center justify-center h-[50vh] text-center">
                                 <motion.div
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
-                                    className="chat-welcome-wrapper"
+                                    className="max-w-md"
                                 >
-                                    <div className="chat-welcome-icon">
-                                        <SparklesIcon className="welcome-icon-sparkle" />
+                                    <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-indigo-500/5 flex items-center justify-center border border-indigo-500/10 shadow-sm">
+                                        <SparklesIcon className="w-10 h-10 text-indigo-500" />
                                     </div>
-                                    <h3 className="chat-welcome-title">Professional Academic Support</h3>
-                                    <p className="chat-welcome-subtitle">
+                                    <h3 className="text-2xl font-bold text-slate-900 mb-3">Professional Academic Support</h3>
+                                    <p className="text-slate-500 text-base mb-8 leading-relaxed">
                                         Ask about your syllabus, complex engineering concepts, or exam preparation strategies.
                                     </p>
-                                    <div className="chat-prompt-grid">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
                                         <button
                                             onClick={() => { setInput("Explain the core principles of OOP in Java with real-world examples."); textareaRef.current?.focus(); }}
-                                            className="chat-prompt-btn group"
+                                            className="p-4 bg-white hover:bg-slate-50 border border-slate-200 hover:border-indigo-200 rounded-2xl transition-all shadow-sm group"
                                         >
-                                            <div className="chat-prompt-icon-wrap orange">
-                                                <LightBulbIcon className="prompt-icon" />
+                                            <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                                <LightBulbIcon className="w-5 h-5 text-orange-600" />
                                             </div>
-                                            <p className="chat-prompt-title">Complex Concepts</p>
-                                            <p className="chat-prompt-desc">Detailed explanations with analogies.</p>
+                                            <p className="font-semibold text-slate-800 text-sm">Complex Concepts</p>
+                                            <p className="text-xs text-slate-500 mt-1">Detailed explanations with analogies.</p>
                                         </button>
                                         <button
                                             onClick={() => { setInput("Provide a unit-wise summary for GE3751 Principles of Management."); textareaRef.current?.focus(); }}
-                                            className="chat-prompt-btn group"
+                                            className="p-4 bg-white hover:bg-slate-50 border border-slate-200 hover:border-indigo-200 rounded-2xl transition-all shadow-sm group"
                                         >
-                                            <div className="chat-prompt-icon-wrap blue">
-                                                <AcademicCapIcon className="prompt-icon" />
+                                            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                                <AcademicCapIcon className="w-5 h-5 text-blue-600" />
                                             </div>
-                                            <p className="chat-prompt-title">Syllabus Guide</p>
-                                            <p className="chat-prompt-desc">Official R2021 curriculum support.</p>
+                                            <p className="font-semibold text-slate-800 text-sm">Syllabus Guide</p>
+                                            <p className="text-xs text-slate-500 mt-1">Official R2021 curriculum support.</p>
                                         </button>
                                     </div>
                                 </motion.div>
                             </div>
                         ) : (
-                            <div className="chat-messages-list">
+                            <div className="space-y-10 pb-12">
                                 {messages.map((msg) => (
                                     <motion.div
                                         key={msg.id}
                                         initial={{ opacity: 0, y: 15 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        className={`chat-message-row ${msg.sender === 'user' ? 'user' : 'ai'}`}
+                                        className={`flex gap-3 sm:gap-6 ${msg.sender === 'user' ? 'justify-end' : 'justify-start w-full'}`}
                                     >
                                         {msg.sender === 'ai' && (
-                                            <div className="chat-avatar ai">
-                                                <SparklesIcon className="avatar-icon" />
+                                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-600 flex items-center justify-center flex-shrink-0 shadow-sm mt-1">
+                                                <SparklesIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                                             </div>
                                         )}
-                                        <div className={`chat-bubble ${msg.sender === 'user' ? 'user' : 'ai'}`}>
-                                            <div className="chat-markdown">
+                                        <div
+                                            className={`${msg.sender === 'user'
+                                                ? 'max-w-[85%] sm:max-w-[70%] px-5 py-4 sm:px-6 sm:py-4 rounded-3xl bg-slate-800 text-white shadow-md rounded-tr-sm'
+                                                : 'w-full max-w-[90%] sm:max-w-[85%] bg-transparent text-slate-800'
+                                                }`}
+                                        >
+                                            <div className={`prose max-w-none ${msg.sender === 'user' ? 'text-white prose-headings:text-white prose-strong:text-white' : 'text-slate-800 prose-headings:text-slate-900 prose-headings:font-bold prose-strong:text-slate-900'} 
+                                                prose-p:leading-relaxed prose-p:mb-4 prose-li:mb-1 prose-ul:my-3 prose-ul:list-disc prose-ul:ml-4 prose-ol:list-decimal prose-ol:ml-4 prose-ol:my-3 prose-headings:mt-6 prose-headings:mb-3 prose-code:text-indigo-600 prose-code:bg-indigo-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded-md prose-code:font-bold prose-pre:bg-slate-900 prose-pre:text-slate-100 text-[14px] sm:text-[15.5px] prose-a:text-indigo-600`}>
                                                 {msg.sender === 'ai' ? (
                                                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                                         {msg.text}
                                                     </ReactMarkdown>
                                                 ) : (
-                                                    <p className="chat-user-message-text">{msg.text}</p>
+                                                    <p className="whitespace-pre-wrap leading-relaxed m-0">{msg.text}</p>
                                                 )}
                                             </div>
                                             {msg.sender === 'ai' && (
-                                                <div className="chat-bubble-time">
+                                                <div className="text-[11px] mt-4 uppercase tracking-widest font-semibold text-slate-400 flex items-center gap-2">
                                                     {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </div>
                                             )}
                                         </div>
                                         {msg.sender === 'user' && (
-                                            <div className="chat-avatar user">
-                                                <UserIcon className="avatar-icon" />
+                                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0 border border-slate-300 shadow-sm mt-1">
+                                                <UserIcon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
                                             </div>
                                         )}
                                     </motion.div>
@@ -319,35 +324,35 @@ export default function ChatPage() {
                                     <motion.div
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
-                                        className="chat-message-row ai"
+                                        className="flex gap-4 sm:gap-6 justify-start w-full"
                                     >
-                                        <div className="chat-avatar ai-loading">
-                                            <SparklesIcon className="avatar-icon" />
+                                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-600 flex items-center justify-center flex-shrink-0 shadow-sm mt-1 animate-pulse">
+                                            <SparklesIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                                         </div>
-                                        <div className="chat-loading-dots-container">
-                                            <div className="loading-dots-wrapper">
-                                                <div className="dot dot-1"></div>
-                                                <div className="dot dot-2"></div>
-                                                <div className="dot dot-3"></div>
+                                        <div className="bg-transparent flex items-center gap-3 mt-3">
+                                            <div className="flex gap-1.5">
+                                                <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce"></div>
+                                                <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                                                <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
                                             </div>
                                         </div>
                                     </motion.div>
                                 )}
-                                <div className="chat-scroll-anchor" />
+                                <div ref={messagesEndRef} className="h-4" />
                             </div>
                         )}
                     </div>
                 </div>
 
                 {/* Input Form at bottom */}
-                <div className="chat-input-wrapper">
-                    <div className="chat-input-container">
+                <div className="flex-shrink-0 bg-white/80 backdrop-blur-xl border-t border-slate-200 p-4 sm:p-6 pb-6 lg:pb-8 z-10 w-full">
+                    <div className="max-w-4xl mx-auto">
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="chat-input-box-wrapper"
+                            className="relative"
                         >
-                            <div className="chat-input-box">
+                            <div className="bg-white border sm:border-2 border-slate-200 rounded-2xl sm:rounded-3xl p-1.5 sm:p-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] focus-within:border-indigo-500 focus-within:shadow-[0_8px_30px_rgba(99,102,241,0.1)] transition-all flex flex-row items-end gap-2 group">
                                 <textarea
                                     ref={textareaRef}
                                     rows="1"
@@ -355,25 +360,28 @@ export default function ChatPage() {
                                     onChange={(e) => setInput(e.target.value)}
                                     onKeyDown={handleKeyDown}
                                     disabled={loading}
-                                    className="chat-textarea custom-scrollbar"
+                                    className="flex-1 bg-transparent border-none px-4 sm:px-5 py-3 sm:py-4 text-slate-900 placeholder-slate-400 focus:ring-0 resize-none disabled:opacity-50 transition-all font-medium text-[14px] sm:text-[16px] leading-[1.6]"
                                     placeholder="Message Assistant..."
                                 />
                                 <button
                                     onClick={handleSendMessage}
                                     disabled={loading || !input.trim()}
-                                    className={`chat-submit-btn ${loading || !input.trim() ? 'disabled' : 'active'}`}
+                                    className={`h-11 w-11 sm:h-14 sm:w-auto sm:px-8 rounded-xl sm:rounded-2xl font-black uppercase tracking-wider flex items-center justify-center gap-3 transition-all flex-shrink-0 mb-1 mr-1 sm:mb-0 sm:mr-0 ${loading || !input.trim()
+                                        ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                        : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-500/25 active:scale-95'
+                                        }`}
                                 >
                                     {loading ? (
-                                        <div className="chat-submit-spinner"></div>
+                                        <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
                                     ) : (
                                         <>
-                                            <span className="chat-submit-text-lg">Send</span>
-                                            <PaperAirplaneIcon className="chat-submit-icon" />
+                                            <span className="hidden sm:inline">Send</span>
+                                            <PaperAirplaneIcon className="w-5 h-5 -rotate-45" />
                                         </>
                                     )}
                                 </button>
                             </div>
-                            <p className="chat-input-disclaimer">
+                            <p className="mt-3 text-[11px] text-center text-slate-400 font-bold tracking-wide">
                                 AI responses are grounded in official Anna University R2021 Syllabus.
                             </p>
                         </motion.div>

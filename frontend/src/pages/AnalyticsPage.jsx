@@ -12,7 +12,6 @@ import {
     ArrowTrendingUpIcon,
     ChartBarIcon
 } from '@heroicons/react/24/outline';
-import './AnalyticsPage.css'; // Import the new CSS
 
 export default function AnalyticsPage() {
     const [stats, setStats] = useState(null);
@@ -37,14 +36,12 @@ export default function AnalyticsPage() {
     }, []);
 
     if (loading) {
-        return (
-            <div className="analytics-loading-container">
-                <div className="analytics-loading-content">
-                    <div className="analytics-loading-spinner"></div>
-                    <p className="analytics-loading-text">Analyzing performance data...</p>
-                </div>
+        <div className="flex items-center justify-center h-screen bg-slate-50">
+            <div className="text-center">
+                <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-slate-900 font-bold text-lg">Analyzing performance data...</p>
             </div>
-        );
+        </div>
     }
 
     // Chart Data Preparation
@@ -63,69 +60,69 @@ export default function AnalyticsPage() {
     ].filter(p => p.value > 0);
 
     return (
-        <div className="analytics-container">
-            <div className="analytics-header">
+        <div className="max-w-7xl mx-auto p-3 sm:p-6 md:p-8 text-gray-900 bg-gray-50 min-h-screen">
+            <div className="mb-6 sm:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                    <h1 className="analytics-title">
-                        Semester {stats?.semester} <span className="text-secondary">Performance Analytics</span>
+                    <h1 className="text-2xl sm:text-4xl font-black mb-2 text-slate-900 uppercase tracking-tighter leading-tight">
+                        Semester {stats?.semester} <span className="text-primary italic">Performance Analytics</span>
                     </h1>
-                    <p className="analytics-subtitle">Detailed assessment of speed, accuracy, and standardized curriculum mastery</p>
+                    <p className="text-slate-500 text-xs sm:text-sm font-medium italic">Detailed assessment of speed, accuracy, and standardized curriculum mastery</p>
                 </div>
-                <div className="analytics-status-badge">
-                    <div className="analytics-badge-dot"></div>
-                    <span className="analytics-badge-text">Real-time Analytics</span>
+                <div className="bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-100 flex items-center justify-center sm:justify-start gap-3 w-fit">
+                    <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-[10px] sm:text-sm font-bold text-gray-700 uppercase tracking-widest">Real-time Analytics</span>
                 </div>
             </div>
 
             {/* Key Metrics Dashboard */}
-            <div className="analytics-metrics-grid">
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="analytics-card analytics-card-dark group">
-                    <div className="analytics-card-glow"></div>
-                    <div className="analytics-card-header">
-                        <ClockIcon className="analytics-card-icon" />
-                        <p className="analytics-card-label">Total Practice</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-slate-900 rounded-3xl sm:rounded-[2rem] p-6 sm:p-8 text-white shadow-2xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-indigo-500/20 transition-colors"></div>
+                    <div className="flex items-center gap-3 mb-4">
+                        <ClockIcon className="w-5 h-5 text-indigo-400" />
+                        <p className="text-indigo-200 text-[10px] font-black uppercase tracking-[0.2em]">Total Practice</p>
                     </div>
-                    <p className="analytics-card-value">{(stats?.overallMetrics?.totalPracticeTime / 3600).toFixed(1)}<span>Hrs</span></p>
-                    <div className="analytics-card-footer-badge">
-                        <span className="analytics-badge-dot" style={{ width: '6px', height: '6px' }}></span>
+                    <p className="text-3xl sm:text-5xl font-black mb-1">{(stats?.overallMetrics?.totalPracticeTime / 3600).toFixed(1)}<span className="text-xl sm:text-2xl font-light ml-1 opacity-50">Hrs</span></p>
+                    <div className="mt-4 flex items-center gap-2 bg-white/5 w-fit px-3 py-1.5 rounded-lg text-[9px] sm:text-[10px] font-bold border border-white/5">
+                        <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse"></span>
                         High Engagement
                     </div>
                 </motion.div>
 
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="analytics-card analytics-card-light group">
-                    <div className="analytics-card-header">
-                        <CheckBadgeIcon className="analytics-card-icon emerald" />
-                        <p className="analytics-card-label">Proficiency</p>
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white border border-slate-200 rounded-3xl sm:rounded-[2rem] p-6 sm:p-8 shadow-sm relative overflow-hidden group">
+                    <div className="flex items-center gap-3 mb-4">
+                        <CheckBadgeIcon className="w-5 h-5 text-emerald-500" />
+                        <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">Proficiency</p>
                     </div>
-                    <p className="analytics-card-value card-value-slate">{stats?.overallMetrics?.averageSemesterAccuracy}<span>%</span></p>
-                    <div className="analytics-progress-container">
+                    <p className="text-3xl sm:text-5xl font-black text-slate-900 mb-1">{stats?.overallMetrics?.averageSemesterAccuracy}<span className="text-xl sm:text-2xl font-light ml-1 opacity-50">%</span></p>
+                    <div className="mt-6 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                         <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${stats?.overallMetrics?.averageSemesterAccuracy}%` }}
-                            className="analytics-progress-bar"
+                            className="h-full bg-emerald-500"
                         ></motion.div>
                     </div>
                 </motion.div>
 
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="analytics-card analytics-card-light group">
-                    <div className="analytics-card-header">
-                        <AcademicCapIcon className="analytics-card-icon indigo" />
-                        <p className="analytics-card-label">Curriculum Scope</p>
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white border border-slate-200 rounded-3xl sm:rounded-[2rem] p-6 sm:p-8 shadow-sm relative overflow-hidden group md:col-span-2 lg:col-span-1">
+                    <div className="flex items-center gap-3 mb-4">
+                        <AcademicCapIcon className="w-5 h-5 text-indigo-600" />
+                        <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">Curriculum Scope</p>
                     </div>
-                    <p className="analytics-card-value card-value-slate">{stats?.subjects?.length}</p>
-                    <p className="analytics-card-label card-label-primary">Active Subjects</p>
+                    <p className="text-3xl sm:text-5xl font-black text-slate-900 mb-1">{stats?.subjects?.length}</p>
+                    <p className="mt-4 text-[10px] font-black text-indigo-600 uppercase tracking-widest">Active Subjects</p>
                 </motion.div>
             </div>
 
             {/* Analytics Charts */}
-            <div className="analytics-charts-grid">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 {/* Accuracy vs Speed Radar-like Chart */}
-                <motion.div className="analytics-chart-card">
-                    <div className="analytics-chart-header">
-                        <ChartBarIcon className="chart-header-icon" />
-                        <h2 className="analytics-chart-title">Efficiency Assessment</h2>
+                <motion.div className="bg-white rounded-3xl sm:rounded-[2rem] p-6 sm:p-8 shadow-sm border border-slate-100">
+                    <div className="flex items-center gap-3 mb-8">
+                        <ChartBarIcon className="w-5 h-5 text-indigo-600" />
+                        <h2 className="text-lg sm:text-xl font-bold text-slate-900 uppercase tracking-tighter">Efficiency Assessment</h2>
                     </div>
-                    <div style={{ height: '350px' }}>
+                    <div className="h-[300px] sm:h-[350px]">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={sectorData}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -144,13 +141,13 @@ export default function AnalyticsPage() {
                 </motion.div>
 
                 {/* Level Distribution */}
-                <motion.div transition={{ delay: 0.1 }} className="analytics-chart-card">
-                    <div className="analytics-chart-header">
-                        <ArrowTrendingUpIcon className="chart-header-icon" />
-                        <h2 className="analytics-chart-title">Proficiency Distribution</h2>
+                <motion.div transition={{ delay: 0.1 }} className="bg-white rounded-3xl sm:rounded-[2rem] p-6 sm:p-8 shadow-sm border border-slate-100">
+                    <div className="flex items-center gap-3 mb-8">
+                        <ArrowTrendingUpIcon className="w-5 h-5 text-primary" />
+                        <h2 className="text-lg sm:text-xl font-bold text-slate-900 uppercase tracking-tighter">Proficiency Distribution</h2>
                     </div>
-                    <div className="analytics-pie-chart-container">
-                        <div style={{ height: '300px', width: '100%' }}>
+                    <div className="flex flex-col sm:flex-row items-center h-full">
+                        <div className="h-[250px] sm:h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
@@ -168,14 +165,14 @@ export default function AnalyticsPage() {
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
-                        <div className="analytics-legend">
+                        <div className="space-y-3 w-full sm:w-48 mt-4 sm:mt-0">
                             {performanceLevels.map((lvl, i) => (
-                                <div key={lvl.name} className="analytics-legend-item">
-                                    <div className="analytics-legend-label">
-                                        <div className="analytics-legend-dot" style={{ backgroundColor: lvl.fill }}></div>
-                                        <span className="analytics-legend-text">{lvl.name}</span>
+                                <div key={lvl.name} className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: lvl.fill }}></div>
+                                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{lvl.name}</span>
                                     </div>
-                                    <span className="analytics-legend-value">{lvl.value} sub</span>
+                                    <span className="text-[11px] font-black text-slate-900">{lvl.value} sub</span>
                                 </div>
                             ))}
                         </div>
@@ -184,50 +181,52 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Subject Performance List */}
-            <div className="analytics-table-card">
-                <div className="analytics-chart-header">
-                    <PresentationChartLineIcon className="chart-header-icon dark" />
-                    <h2 className="analytics-chart-title">Curriculum Performance Audit</h2>
+            <div className="bg-white rounded-3xl sm:rounded-[2rem] p-6 sm:p-8 shadow-sm border border-slate-100 mb-12">
+                <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-3">
+                        <PresentationChartLineIcon className="w-5 h-5 text-slate-900" />
+                        <h2 className="text-lg sm:text-xl font-bold text-slate-900 uppercase tracking-tighter">Curriculum Performance Audit</h2>
+                    </div>
                 </div>
-                <div className="analytics-table-wrapper">
-                    <table className="analytics-table">
+                <div className="overflow-x-auto -mx-6 sm:mx-0">
+                    <table className="w-full text-left min-w-[600px] px-6 sm:px-0">
                         <thead>
-                            <tr>
-                                <th className="analytics-th">Subject</th>
-                                <th className="analytics-th text-center">Accuracy</th>
-                                <th className="analytics-th text-center">Speed</th>
-                                <th className="analytics-th text-center">Effort</th>
-                                <th className="analytics-th text-right">Status</th>
+                            <tr className="border-b border-gray-100">
+                                <th className="pb-4 px-6 sm:px-0 text-[10px] font-black text-slate-400 uppercase tracking-widest">Subject</th>
+                                <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Accuracy</th>
+                                <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Speed</th>
+                                <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Effort</th>
+                                <th className="pb-4 px-6 sm:px-0 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Status</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="divide-y divide-gray-50">
                             {stats?.subjects?.map((s) => (
-                                <tr key={s.subjectCode} className="analytics-tr">
-                                    <td className="analytics-td">
-                                        <p className="analytics-subject-code">{s.subjectCode}</p>
-                                        <p className="analytics-subject-name">{s.subjectName}</p>
+                                <tr key={s.subjectCode} className="group hover:bg-gray-50/50 transition-colors">
+                                    <td className="py-6 px-6 sm:px-0">
+                                        <p className="font-black text-slate-900 text-sm truncate max-w-[150px]">{s.subjectCode}</p>
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase truncate max-w-[150px]">{s.subjectName}</p>
                                     </td>
-                                    <td className="analytics-td text-center">
-                                        <div className="analytics-accuracy-badge">
-                                            <span className={`analytics-accuracy-text ${s.avgAccuracy >= 80 ? 'excellent' : s.avgAccuracy >= 60 ? 'good' : 'average'}`}>
+                                    <td className="py-6 text-center">
+                                        <div className="inline-flex flex-col items-center">
+                                            <span className={`text-base font-black ${s.avgAccuracy >= 80 ? 'text-green-600' : s.avgAccuracy >= 60 ? 'text-blue-600' : 'text-orange-600'}`}>
                                                 {s.avgAccuracy}%
                                             </span>
-                                            <div className="analytics-accuracy-mini-bar">
-                                                <div className={`analytics-accuracy-mini-fill ${s.avgAccuracy >= 80 ? 'excellent' : 'average'}`} style={{ width: `${s.avgAccuracy}%` }}></div>
+                                            <div className="w-12 h-1 bg-slate-100 rounded-full mt-1">
+                                                <div className={`h-full rounded-full ${s.avgAccuracy >= 80 ? 'bg-green-500' : 'bg-orange-500'}`} style={{ width: `${s.avgAccuracy}%` }}></div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="analytics-td text-center td-value-bold">
+                                    <td className="py-6 text-center font-black text-slate-700 text-sm">
                                         {s.avgSpeed}s
                                     </td>
-                                    <td className="analytics-td text-center td-value-bold">
+                                    <td className="py-6 text-center font-black text-slate-700 text-sm">
                                         {(s.totalTimeSpent / 60).toFixed(0)}m
                                     </td>
-                                    <td className="analytics-td text-right">
-                                        <span className={`analytics-status-tag ${s.performanceLevel === 'Excellent' ? 'excellent' :
-                                            s.performanceLevel === 'Good' ? 'good' :
-                                                s.performanceLevel === 'Average' ? 'average' :
-                                                    'critical'
+                                    <td className="py-6 text-right px-6 sm:px-0">
+                                        <span className={`px-3 py-1 rounded-full text-[9px] font-black tracking-tighter uppercase shadow-sm ${s.performanceLevel === 'Excellent' ? 'bg-indigo-50 text-indigo-700' :
+                                            s.performanceLevel === 'Good' ? 'bg-blue-50 text-blue-700' :
+                                                s.performanceLevel === 'Average' ? 'bg-green-50 text-green-700' :
+                                                    'bg-gray-50 text-slate-400'
                                             }`}>
                                             {s.performanceLevel}
                                         </span>

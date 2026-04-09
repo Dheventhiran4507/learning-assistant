@@ -6,6 +6,7 @@ import {
     PresentationChartLineIcon, 
     UserGroupIcon, 
     ArrowPathIcon,
+    ChevronDownIcon,
     XMarkIcon,
     CheckCircleIcon,
     XCircleIcon,
@@ -16,7 +17,6 @@ import {
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import './StaffLabResults.css'; // Import the new CSS
 
 const StaffLabResults = () => {
     const [assessments, setAssessments] = useState([]);
@@ -124,80 +124,76 @@ const StaffLabResults = () => {
 
     if (loading) {
         return (
-            <div className="loading-view">
-                <div className="loading-spinner"></div>
-                <p className="sidebar-heading dashboard-loading-text">Loading Dashboard...</p>
+            <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
+                <div className="w-12 h-12 border-4 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Loading Dashboard...</p>
             </div>
         );
     }
 
     return (
-        <div className="results-page-container">
-            <header className="results-header">
+        <div className="max-w-7xl mx-auto px-4 py-12 space-y-12">
+            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-gray-100">
                 <div>
-                    <h1 className="results-title">
-                        <PresentationChartLineIcon className="results-title-icon" />
-                        Lab <span>Analytics</span>
+                    <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-3">
+                        <PresentationChartLineIcon className="w-10 h-10 text-primary" />
+                        Lab <span className="text-primary italic">Analytics</span>
                     </h1>
-                    <p className="results-subtitle">Track student performance and evaluate lab learning outcomes.</p>
+                    <p className="text-slate-500 font-medium mt-2">Track student performance and evaluate lab learning outcomes.</p>
                 </div>
             </header>
 
-            <div className="results-main-grid">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
                 {/* Lab List Sidebar */}
-                <div className="results-sidebar">
-                    <h2 className="sidebar-heading">Active Assessments</h2>
-                    <div className="results-list-wrap">
+                <div className="lg:col-span-1 space-y-4">
+                    <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Active Assessments</h2>
+                    <div className="space-y-2">
                         {assessments.map(lab => (
                             <button
                                 key={lab._id}
                                 onClick={() => fetchResults(lab._id)}
-                                className={`assessment-btn ${selectedAssessment === lab._id ? 'active' : 'inactive'}`}
+                                className={`w-full text-left p-5 rounded-3xl transition-all border ${selectedAssessment === lab._id ? 'bg-slate-900 border-slate-900 text-white shadow-xl' : 'bg-white border-slate-100 hover:border-slate-200 text-slate-600'}`}
                             >
-                                <div className="assessment-btn-meta">
-                                    <span className="assessment-type-tag">{lab.type}</span>
-                                    <span className="assessment-code">{lab.subjectCode}</span>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className={`text-[8px] font-black px-2 py-0.5 rounded-full uppercase italic ${selectedAssessment === lab._id ? 'bg-white/20 text-white' : 'bg-primary/10 text-primary'}`}>{lab.type}</span>
+                                    <span className={`text-[8px] font-black uppercase ${selectedAssessment === lab._id ? 'text-slate-400' : 'text-slate-300'}`}>{lab.subjectCode}</span>
                                 </div>
-                                <p className="assessment-btn-title">{lab.title}</p>
+                                <p className="text-sm font-black uppercase tracking-tight line-clamp-1">{lab.title}</p>
                             </button>
                         ))}
                     </div>
                 </div>
 
                 {/* Results Section */}
-                <div className="results-content-area">
-                    {loadingResults ? (
-                        <div className="loading-view">
-                            <div className="loading-spinner"></div>
-                        </div>
-                    ) : !results ? (
-                        <div className="empty-results-card">
-                            <DocumentMagnifyingGlassIcon className="empty-results-icon" />
-                            <p className="empty-results-text">Select an assessment to view performance data.</p>
+                <div className="lg:col-span-3">
+                    {!results ? (
+                        <div className="bg-slate-50 border border-dashed border-slate-200 rounded-[3rem] py-24 text-center">
+                            <DocumentMagnifyingGlassIcon className="w-16 h-16 text-slate-200 mx-auto mb-4" />
+                            <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">Select an assessment to view performance data.</p>
                         </div>
                     ) : (
                         <motion.div 
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="results-content-inner"
+                            className="space-y-8"
                         >
                             {/* Summary Metrics */}
-                            <div className="results-stats-grid">
-                                <div className="stat-card">
-                                    <p className="stat-label">Total Students</p>
-                                    <p className="stat-value">{results.stats?.totalStudents || 0}</p>
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                                <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm">
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Students</p>
+                                    <p className="text-4xl font-black text-slate-900">{results.stats?.totalStudents || 0}</p>
                                 </div>
-                                <div className="stat-card">
-                                    <p className="stat-label">Appeared</p>
-                                    <p className="stat-value primary">{results.stats?.appeared || 0}</p>
+                                <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm">
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Appeared</p>
+                                    <p className="text-4xl font-black text-primary">{results.stats?.appeared || 0}</p>
                                 </div>
-                                <div className="stat-card">
-                                    <p className="stat-label">Absent</p>
-                                    <p className="stat-value danger">{results.stats?.absent || 0}</p>
+                                <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm">
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Absent</p>
+                                    <p className="text-4xl font-black text-red-500">{results.stats?.absent || 0}</p>
                                 </div>
-                                <div className="stat-card">
-                                    <p className="stat-label">Average Score</p>
-                                    <p className="stat-value success">
+                                <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm">
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Average Score</p>
+                                    <p className="text-4xl font-black text-emerald-600">
                                         {results.stats?.appeared > 0 
                                             ? (results.submissions.filter(s => s.status !== 'absent').reduce((acc, s) => acc + s.percentage, 0) / results.stats.appeared).toFixed(1) 
                                             : 0}%
@@ -206,72 +202,72 @@ const StaffLabResults = () => {
                             </div>
 
                             {/* Student Table */}
-                            <div className="students-table-card">
-                                <div className="table-header">
-                                    <h3 className="table-title">
-                                        <UserGroupIcon className="table-title-icon" />
+                            <div className="bg-white border border-slate-100 rounded-[3rem] overflow-hidden shadow-sm">
+                                <div className="p-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
+                                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3">
+                                        <UserGroupIcon className="w-6 h-6 text-primary" />
                                         Student Performances
                                     </h3>
-                                    <div className="table-actions">
+                                    <div className="flex items-center gap-3">
                                         <button 
                                             onClick={exportToExcel}
-                                            className="export-btn excel"
+                                            className="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-[10px] font-black uppercase hover:bg-emerald-100 transition-all border border-emerald-100"
                                         >
-                                            <ArrowDownTrayIcon className="export-icon" />
+                                            <ArrowDownTrayIcon className="w-3.5 h-3.5" />
                                             Excel
                                         </button>
                                         <button 
                                             onClick={exportToPDF}
-                                            className="export-btn pdf"
+                                            className="flex items-center gap-2 px-4 py-2 bg-primary/5 text-primary rounded-xl text-[10px] font-black uppercase hover:bg-primary/10 transition-all border border-primary/10"
                                         >
-                                            <ArrowDownTrayIcon className="export-icon" />
+                                            <ArrowDownTrayIcon className="w-3.5 h-3.5" />
                                             PDF
                                         </button>
                                     </div>
                                 </div>
-                                <div className="table-scrollable">
-                                    <table className="results-table">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left border-collapse">
                                         <thead>
-                                            <tr className="table-head-row">
-                                                <th className="table-th">Student</th>
-                                                <th className="table-th text-center">Score</th>
-                                                <th className="table-th text-center">Percentage</th>
-                                                <th className="table-th text-center">Status</th>
-                                                <th className="table-th text-right">Actions</th>
+                                            <tr className="bg-slate-50/30">
+                                                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Student</th>
+                                                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Score</th>
+                                                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Percentage</th>
+                                                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
+                                                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="table-body">
+                                        <tbody className="divide-y divide-slate-50">
                                             {results.submissions.map(sub => (
-                                                <motion.tr key={sub._id} className={`table-tr ${sub.status === 'absent' ? 'absent' : ''}`}>
-                                                    <td className="table-td">
-                                                        <div className="student-info">
-                                                            <span className="student-name">{sub.student?.name}</span>
-                                                            <div className="student-sub-info">
-                                                                <span className="id-badge">ID: {sub.student?.studentId}</span>
-                                                                <span className="batch-badge">Batch: {sub.student?.batch}</span>
+                                                <motion.tr key={sub._id} className={`hover:bg-slate-50/50 transition-colors group ${sub.status === 'absent' ? 'opacity-70' : ''}`}>
+                                                    <td className="px-8 py-6">
+                                                        <div className="flex flex-col">
+                                                            <span className="text-sm font-black text-slate-900 uppercase tracking-tight">{sub.student?.name}</span>
+                                                            <div className="flex items-center gap-2 mt-1">
+                                                                <span className="text-[8px] font-bold text-slate-400 uppercase bg-slate-100 px-1.5 py-0.5 rounded">ID: {sub.student?.studentId}</span>
+                                                                <span className="text-[8px] font-bold text-primary-600 uppercase bg-primary/5 px-1.5 py-0.5 rounded">Batch: {sub.student?.batch}</span>
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="table-td td-score">
+                                                    <td className="px-8 py-6 text-center font-bold text-slate-600">
                                                         {sub.status === 'absent' ? '-' : `${sub.score} / ${sub.maxScore}`}
                                                     </td>
-                                                    <td className="table-td td-percent">
-                                                        <span className={sub.status === 'absent' ? 'percent-none' : (sub.percentage >= 70 ? 'percent-good' : 'percent-standard')}>
+                                                    <td className="px-8 py-6 text-center">
+                                                        <span className={`text-sm font-black ${sub.status === 'absent' ? 'text-slate-300' : (sub.percentage >= 70 ? 'text-emerald-600' : 'text-primary')}`}>
                                                             {sub.status === 'absent' ? '0%' : `${sub.percentage.toFixed(0)}%`}
                                                         </span>
                                                     </td>
-                                                    <td className="table-td text-center">
+                                                    <td className="px-8 py-6 text-center">
                                                         {sub.status === 'absent' ? (
-                                                            <span className="status-badge absent">Absent</span>
+                                                            <span className="text-[9px] font-black bg-red-50 text-red-500 px-3 py-1 rounded-full uppercase italic">Absent</span>
                                                         ) : (
-                                                            <span className="status-badge completed">Completed</span>
+                                                            <span className="text-[9px] font-black bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full uppercase italic">Completed</span>
                                                         )}
                                                     </td>
-                                                    <td className="table-td actions-cell">
+                                                    <td className="px-8 py-6 text-right">
                                                         {sub.status !== 'absent' && (
                                                             <button 
                                                                 onClick={() => setViewingStudent(sub)}
-                                                                className="view-btn"
+                                                                className="text-[10px] font-black uppercase text-primary hover:text-slate-900 transition-colors px-4 py-2 bg-primary/5 rounded-xl group-hover:bg-primary/10"
                                                             >
                                                                 View Answers
                                                             </button>
@@ -295,61 +291,61 @@ const StaffLabResults = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="modal-overlay"
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/90 backdrop-blur-md"
                     >
                         <motion.div 
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
-                            className="modal-content"
+                            className="bg-white w-full max-w-3xl h-[80vh] rounded-[3rem] overflow-hidden shadow-2xl relative flex flex-col"
                         >
-                            <div className="modal-header">
+                            <div className="p-8 border-b border-slate-50 flex items-center justify-between sticky top-0 bg-white z-10">
                                 <div>
-                                    <h3 className="modal-title">Student Response Analysis</h3>
-                                    <p className="modal-subtitle">{viewingStudent.student?.name} ({viewingStudent.percentage.toFixed(0)}%)</p>
+                                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter">Student Response Analysis</h3>
+                                    <p className="text-[10px] font-black text-primary uppercase italic">{viewingStudent.student?.name} ({viewingStudent.percentage.toFixed(0)}%)</p>
                                 </div>
-                                <button onClick={() => setViewingStudent(null)} className="modal-close-btn">
-                                    <XMarkIcon className="modal-close-icon" />
+                                <button onClick={() => setViewingStudent(null)} className="p-2 hover:bg-slate-50 rounded-xl transition-all">
+                                    <XMarkIcon className="w-6 h-6 text-slate-300" />
                                 </button>
                             </div>
 
-                            <div className="modal-body custom-scrollbar">
+                            <div className="flex-1 overflow-y-auto p-8 space-y-8">
                                 {results.assessment.questions.map((q, idx) => {
                                     const studentAns = viewingStudent.answers.find(a => a.questionIndex === idx);
                                     return (
-                                        <div key={idx} className="question-review-card">
-                                            <div className="q-review-header">
-                                                <h4 className="q-review-text">
-                                                    <span>Q{idx + 1}.</span>
+                                        <div key={idx} className="bg-slate-50/50 rounded-[2rem] p-8 border border-slate-100">
+                                            <div className="flex items-start justify-between gap-4 mb-4">
+                                                <h4 className="text-base font-black text-slate-900 leading-tight">
+                                                    <span className="text-primary mr-2 italic">Q{idx + 1}.</span>
                                                     {q.question}
                                                 </h4>
                                                 {studentAns?.isCorrect ? (
-                                                    <CheckCircleIcon className="q-result-icon correct" />
+                                                    <CheckCircleIcon className="w-6 h-6 text-emerald-500 shrink-0" />
                                                 ) : (
-                                                    <XCircleIcon className="q-result-icon incorrect" />
+                                                    <XCircleIcon className="w-6 h-6 text-primary shrink-0" />
                                                 )}
                                             </div>
                                             
-                                            <div className="answers-grid">
-                                                <div className="ans-display">
-                                                    <p className="ans-label">Student's Answer</p>
-                                                    <p className={`ans-value ${studentAns?.isCorrect ? 'student-correct' : 'student-incorrect'}`}>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                                                <div className="space-y-1">
+                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Student's Answer</p>
+                                                    <p className={`text-sm font-bold ${studentAns?.isCorrect ? 'text-emerald-700' : 'text-primary'}`}>
                                                         {studentAns?.selectedAnswer || 'Not answered'}
                                                     </p>
                                                 </div>
-                                                <div className="ans-display">
-                                                    <p className="ans-label">Correct Answer</p>
-                                                    <p className="ans-value correct-real">{q.correctAnswer}</p>
+                                                <div className="space-y-1">
+                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Correct Answer</p>
+                                                    <p className="text-sm font-bold text-slate-800">{q.correctAnswer}</p>
                                                 </div>
                                             </div>
 
                                             {!studentAns?.isCorrect && (
-                                                <div className="explanation-section">
-                                                    <p className="explanation-heading">
-                                                        <LightBulbIcon className="explanation-icon" />
+                                                <div className="mt-6 pt-6 border-t border-slate-100">
+                                                    <p className="text-[9px] font-black text-primary uppercase tracking-widest mb-2 flex items-center gap-1">
+                                                        <LightBulbIcon className="w-3 h-3" />
                                                         Explanation
                                                     </p>
-                                                    <p className="explanation-text">{q.explanation || 'Refer to lab manual for more details.'}</p>
+                                                    <p className="text-xs text-slate-500 font-medium italic">{q.explanation || 'Refer to lab manual for more details.'}</p>
                                                 </div>
                                             )}
                                         </div>
@@ -357,10 +353,10 @@ const StaffLabResults = () => {
                                 })}
                             </div>
 
-                            <div className="modal-footer">
+                            <div className="p-8 border-t border-slate-50 bg-slate-50/50">
                                 <button 
                                     onClick={() => setViewingStudent(null)}
-                                    className="modal-done-btn"
+                                    className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg hover:bg-black transition-all"
                                 >
                                     Done Reviewing
                                 </button>
