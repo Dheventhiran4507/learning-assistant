@@ -111,37 +111,55 @@ app.get('*', (req, res) => {
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
-// Database connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/vidal')
+// Database connection with retry logic
+const connectWithRetry = () => {
+    logger.info('Attempting to connect to MongoDB...');
+    mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/vidal', {
+        serverSelectionTimeoutMS: 10000, // Increase selection timeout
+        connectTimeoutMS: 20000,         // Increase connection timeout
+        socketTimeoutMS: 45000,          // Close sockets after 45 seconds of inactivity
+    })
     .then(() => {
         logger.info('✅ MongoDB connected successfully');
 
-        // Start server
-        const server = app.listen(PORT, '0.0.0.0', () => {
-            logger.info(`🚀 Server running on port ${PORT}`);
-            logger.info(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-            logger.info(`🌐 Local: http://localhost:${PORT}`);
-            
-            // Log reachable address for Render debugging
-            const os = require('os');
-            const interfaces = os.networkInterfaces();
-            for (const name of Object.keys(interfaces)) {
-                for (const iface of interfaces[name]) {
-                    if (iface.family === 'IPv4' && !iface.internal) {
-                        logger.info(`📱 Publicly reachable (on Render internal network): http://${iface.address}:${PORT}/api`);
-                    }
-                }
-            }
-        });
-        
-        server.on('error', (error) => {
-            logger.error('❌ Server startup error:', error.message);
-        });
+        // Start server only after successful DB connection on first try
+        // or just log that it's connected if server is already running
+        if (!app.get('serverStarted')) {
+            startServer();
+        }
     })
     .catch((error) => {
-        logger.error('❌ MongoDB connection error:', error);
-        process.exit(1);
+        logger.error('❌ MongoDB connection error:', error.message);
+        logger.info('Retrying in 5 seconds...');
+        setTimeout(connectWithRetry, 5000);
     });
+};
+
+const startServer = () => {
+    const server = app.listen(PORT, '0.0.0.0', () => {
+        app.set('serverStarted', true);
+        logger.info(`🚀 Server running on port ${PORT}`);
+        logger.info(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+        logger.info(`🌐 Local: http://localhost:${PORT}`);
+        
+        // Log reachable address for Render debugging
+        const os = require('os');
+        const interfaces = os.networkInterfaces();
+        for (const name of Object.keys(interfaces)) {
+            for (const iface of interfaces[name]) {
+                if (iface.family === 'IPv4' && !iface.internal) {
+                    logger.info(`📱 Reachable internal IP: http://${iface.address}:${PORT}/api`);
+                }
+            }
+        }
+    });
+    
+    server.on('error', (error) => {
+        logger.error('❌ Server startup error:', error.message);
+    });
+};
+
+connectWithRetry();
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
