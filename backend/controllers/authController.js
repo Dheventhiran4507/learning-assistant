@@ -122,7 +122,8 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const email = req.body.email;
+        const password = req.body.password ? req.body.password.trim() : '';
 
         // Validate input
         if (!email || !password) {
@@ -154,7 +155,7 @@ exports.login = async (req, res) => {
             logger.warn(`Login failed: User not found - ${email}`);
             return res.status(401).json({
                 success: false,
-                message: 'Invalid credentials'
+                message: 'Invalid credentials: User not found'
             });
         }
 
@@ -183,7 +184,7 @@ exports.login = async (req, res) => {
             logger.warn(`Login failed: Invalid password - ${email}`);
             return res.status(401).json({
                 success: false,
-                message: 'Invalid credentials'
+                message: 'Invalid credentials: Incorrect password'
             });
         }
 
