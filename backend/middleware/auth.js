@@ -38,6 +38,16 @@ exports.protect = async (req, res, next) => {
                 });
             }
 
+            // Verify session token (Kick logic)
+            // If the sessionToken in the JWT doesn't match the one in DB, it means a newer login occurred
+            if (req.user.sessionToken && decoded.sessionToken && req.user.sessionToken !== decoded.sessionToken) {
+                logger.warn(`Session invalidated for ${req.user.email} - newer login detected`);
+                return res.status(401).json({
+                    success: false,
+                    message: 'Your session has expired because a new login was detected on another device.'
+                });
+            }
+
             next();
 
         } catch (error) {

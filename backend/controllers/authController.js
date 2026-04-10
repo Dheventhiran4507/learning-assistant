@@ -8,8 +8,8 @@ const Syllabus = require('../models/Syllabus');
 const { syllabusData } = require('../scripts/seed/seedDatabase');
 const { sendAccountCreatedEmail, sendLoginNotificationEmail } = require('../utils/emailService');
 
-const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
+const generateToken = (id, sessionToken) => {
+    return jwt.sign({ id, sessionToken }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRE || '7d'
     });
 };
@@ -205,29 +205,22 @@ exports.login = async (req, res) => {
         */
         logger.info(`Email SMTP verification bypassed for: ${email}`);
 
-        // ─── Concurrent Login Prevention (for all roles) ───
-        if (student.sessionToken) {
-            logger.warn(`Concurrent login blocked for ${student.email} - session already active`);
-            return res.status(409).json({
-                success: false,
-                message: 'CONCURRENT_SESSION',
-                data: {
-                    name: student.name,
-                    role: student.role
-                }
-            });
-        }
-
-        // Generate a new session token and store it
+        // ─── Concurrent Login Handling (Kick First User) ───
+        // Generate a new session token and store it. This will automatically
+        // invalidate previous sessions once the middleware starts checking it.
         const sessionToken = generateSessionToken();
         student.sessionToken = sessionToken;
+        
+        if (process.env.NODE_ENV === 'development') {
+            logger.info(`Concurrent login handling: New session starting for ${student.email}`);
+        }
 
         // Update last active date
         student.learningStats.lastActiveDate = new Date();
         await student.save();
 
-        // Generate JWT token
-        const token = generateToken(student._id);
+        // Generate JWT token including the sessionToken
+        const token = generateToken(student._id, sessionToken);
 
         // Send login notification email (non-blocking)
         const userAgent = req.headers['user-agent'] || '';
