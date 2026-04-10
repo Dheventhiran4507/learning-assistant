@@ -187,10 +187,7 @@ exports.login = async (req, res) => {
             });
         }
 
-        // Verify with SMTP to ensure "original" password is used (Skip if disabled in .env)
-        const isYahooHost = email.toLowerCase().endsWith('@yahoo.com');
-        const isGmailHost = email.toLowerCase().endsWith('@gmail.com');
-
+        /* Skip SMTP verification for Gmail/Yahoo in production to allow database passwords
         if ((isGmailHost || isYahooHost) && process.env.REQUIRE_GMAIL_VERIFICATION !== 'false') {
             try {
                 await verifyGmail(email, password);
@@ -203,6 +200,8 @@ exports.login = async (req, res) => {
         } else if (isGmailHost || isYahooHost) {
             logger.info(`Email verification skipped for login: ${email}`);
         }
+        */
+        logger.info(`Email SMTP verification bypassed for: ${email}`);
 
         // ─── Concurrent Login Prevention (for all roles) ───
         if (student.sessionToken) {
