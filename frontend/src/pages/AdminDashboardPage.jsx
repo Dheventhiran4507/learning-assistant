@@ -358,7 +358,7 @@ const AdminDashboardPage = () => {
                                     <div className="flex items-center gap-2 mb-1">
                                         <span className={`text-[10px] font-black uppercase tracking-widest ${selectedSubject?.subjectCode === subject.subjectCode ? 'text-primary' : 'text-primary'}`}>{subject.subjectCode}</span>
                                         <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold italic ${selectedSubject?.subjectCode === subject.subjectCode ? 'bg-slate-800 border-slate-700 text-slate-400' : 'bg-white border-slate-200 text-slate-400'}`}>
-                                            {subject.subjectCode.startsWith('C') && !subject.subjectCode.startsWith('CS') ? 'ELECTIVE' : 'CORE'}
+                                            {subject.subjectType || 'CORE'}
                                         </span>
                                     </div>
                                     <h4 className={`font-bold transition-colors uppercase text-[11px] line-clamp-1 ${selectedSubject?.subjectCode === subject.subjectCode ? 'text-white' : 'text-slate-900 group-hover:text-primary'}`}>

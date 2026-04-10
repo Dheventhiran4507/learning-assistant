@@ -160,9 +160,14 @@ const SemesterViewPage = () => {
                                 <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100 group-hover:bg-indigo-50 transition-colors">
                                     <BookOpenIcon className="w-8 h-8 text-indigo-600" />
                                 </div>
-                                <span className="px-4 py-1.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-black uppercase tracking-widest border border-slate-200">
-                                    {subject.credits} Credits
-                                </span>
+                                <div className="flex flex-col items-end gap-2">
+                                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${subject.subjectType === 'ELECTIVE' ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-slate-100 text-slate-600 border-slate-200'}`}>
+                                        {subject.subjectType || 'CORE'}
+                                    </span>
+                                    <span className="px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-widest border border-indigo-100">
+                                        {subject.credits} Credits
+                                    </span>
+                                </div>
                             </div>
 
                             <h3 className="text-2xl font-bold text-slate-900 mb-3 group-hover:text-primary transition-all leading-tight">

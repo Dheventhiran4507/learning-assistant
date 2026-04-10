@@ -24,6 +24,11 @@ const syllabusSchema = new mongoose.Schema({
         min: 0,
         max: 8
     },
+    subjectType: {
+        type: String,
+        enum: ['CORE', 'ELECTIVE'],
+        default: 'CORE'
+    },
     credits: Number,
     
     // Syllabus Structure
