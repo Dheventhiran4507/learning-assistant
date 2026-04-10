@@ -3656,6 +3656,6 @@ async function seedDatabase() {
     }
 }
 
-seedDatabase();
+// seedDatabase();
 module.exports = { syllabusData };
 
