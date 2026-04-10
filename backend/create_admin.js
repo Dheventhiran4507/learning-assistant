@@ -30,7 +30,7 @@ const connectDB = async () => {
         // Role is set to 'admin' so they can manage staff/students
         const adminUser = new Student({
             studentId: 'ADMIN_ROOT',
-            name: 'Principal / Admin',
+            name: 'Principal Admin',
             email: adminEmail,
             password: 'AdminPassword123!', // You MUST change this after first login
             phone: '9876543210',
@@ -39,7 +39,8 @@ const connectDB = async () => {
             batch: 'STAFF',      // Indicates staff/admin
             college: 'Anna University', // Default college
             role: 'admin',       // HOD or Admin role (has access to create others)
-            isActive: true
+            isActive: true,
+            isEmailVerified: true
         });
 
         await adminUser.save();
