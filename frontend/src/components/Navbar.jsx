@@ -60,7 +60,7 @@ const Navbar = () => {
         ];
     } else if (isStaff) {
         navLinks = [
-            { name: 'Subject Portal', path: '/staff/dashboard', icon: <UserCircleIcon className="w-5 h-5" /> },
+            { name: 'Academic Admin', path: '/admin/dashboard', icon: <UserCircleIcon className="w-5 h-5" /> },
             { name: 'Lab Manager', path: '/admin/lab-manager', icon: <BeakerIcon className="w-5 h-5" /> },
             { name: 'Lab Results', path: '/admin/lab-results', icon: <ChartPieIcon className="w-5 h-5" /> }
         ];
