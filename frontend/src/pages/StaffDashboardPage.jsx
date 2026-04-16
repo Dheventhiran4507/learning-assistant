@@ -334,7 +334,8 @@ const StaffDashboardPage = () => {
                     </div>
 
                     <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8 space-y-3">
-                        {subjects.map((subject, idx) => (
+                        {subjects.filter(s => (user?.subjectsHandled || []).some(sh => sh.subjectCode === s.subjectCode)).length === 0 && (<div className="p-4 text-center text-slate-400 italic text-[10px] uppercase font-black tracking-widest border border-dashed rounded-2xl">No subjects assigned. Contact Admin.</div>)}
+{subjects.filter(s => (user?.subjectsHandled || []).some(sh => sh.subjectCode === s.subjectCode)).map((subject, idx) => (
                             <motion.div
                                 key={subject.subjectCode}
                                 initial={{ opacity: 0, x: -20 }}
