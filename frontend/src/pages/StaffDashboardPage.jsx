@@ -19,11 +19,12 @@ import {
     TrashIcon
 } from '@heroicons/react/24/outline';
 
-const AdminDashboardPage = () => {
+const StaffDashboardPage = () => {
     const { user, updateUser } = useAuthStore();
-    const isAdmin = user?.role === 'admin' || user?.role === 'hod';
-    const isAdvisor = user?.role === 'advisor';
-    
+    const isAdmin = false;
+    const isAdvisor = false;
+    const isStaff = true;
+
     const [students, setStudents] = useState([]);
     const [metrics, setMetrics] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -70,7 +71,7 @@ const AdminDashboardPage = () => {
 
     // Force semester to advisor/staff's assigned semester
     useEffect(() => {
-        if (user?.role === 'advisor' && user?.semester) {
+        if ((user?.role === 'advisor' || user?.role === 'staff') && user?.semester) {
             setSelectedSemester(user.semester);
         }
     }, [user?.role, user?.semester]);
@@ -269,30 +270,19 @@ const AdminDashboardPage = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-gray-200 pb-8">
                 <div>
-                    <h1 className="text-5xl font-black tracking-tight text-slate-900 mb-2 uppercase">
-                        Academic <span className="text-primary italic">Controller</span>
-                    </h1>
-                    <p className="text-slate-500 font-medium text-lg italic max-w-xl">
-                        {isAdvisor
-                            ? `Comprehensive oversight for Semester ${user.semester} standardized curriculum.`
-                            : 'Centralized management of student performance and institutional syllabus auditing.'}
-                    </p>
+                    <h1 className="text-5xl font-black tracking-tight text-slate-900 mb-2 uppercase">Subject <span className="text-emerald-600 italic">Staff Portal</span></h1>
+                    <p className="text-slate-500 font-medium text-lg italic max-w-xl">Centralized workspace for assigned subject progress, doubt resolution and lab management.</p>
                 </div>
-                <div className="flex gap-4">
-                    <div className="glass-card px-6 py-3 rounded-2xl">
-                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest block">Total Students</span>
-                        <span className="text-2xl font-black text-gray-900">{metrics?.totalStudents || 0}</span>
-                    </div>
-                </div>
+                <div className="flex gap-4"><Link to="/admin/lab-manager" className="glass-card px-6 py-3 rounded-2xl flex items-center gap-2 hover:bg-emerald-50 transition-all border border-slate-200 cursor-pointer"><span className="text-2xl">🧪</span><div className="text-left"><span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest block">Manage</span><span className="text-sm font-black text-slate-900 uppercase">Lab Manuals</span></div></Link><Link to="/admin/lab-results" className="glass-card px-6 py-3 rounded-2xl flex items-center gap-2 hover:bg-emerald-50 transition-all border border-slate-200 cursor-pointer"><span className="text-2xl">📊</span><div className="text-left"><span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest block">Review</span><span className="text-sm font-black text-slate-900 uppercase">Lab Results</span></div></Link></div>
             </div>
 
             {/* Batch Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
                     <div className="flex items-center gap-3 mb-4">
-                        <ArrowTrendingUpIcon className="w-5 h-5 text-indigo-400" />
-                        <h3 className="text-[10px] font-black text-indigo-200 uppercase tracking-[0.2em]">Batch Progress Audit</h3>
+                        <ArrowTrendingUpIcon className="w-5 h-5 text-emerald-500" />
+                        <h3 className="text-[10px] font-black text-emerald-200 uppercase tracking-[0.2em]">Batch Progress Audit</h3>
                     </div>
                     <p className="text-5xl font-black text-white">{metrics?.avgProgress || 0}%</p>
                 </div>
@@ -390,7 +380,8 @@ const AdminDashboardPage = () => {
                 {/* Management Section (2/3) */}
                 <div className="lg:col-span-2 space-y-8">
                     {/* Tabs for HOD / Advisor */}
-                    <div className="flex gap-4 border-b border-slate-100 pb-4">
+                    {(isAdmin || isAdvisor) && (
+                        <div className="flex gap-4 border-b border-slate-100 pb-4">
                             <button
                                 onClick={() => setActiveTab('students')}
                                 className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${activeTab === 'students' ? 'bg-slate-900 text-white shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
@@ -410,8 +401,24 @@ const AdminDashboardPage = () => {
                                 Doubt Desk
                             </button>
                         </div>
+                    )}
 
-                    
+                    {isStaff && (
+                         <div className="flex gap-4 border-b border-slate-100 pb-4">
+                            <button
+                                onClick={() => setActiveTab('students')}
+                                className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${activeTab === 'students' ? 'bg-slate-900 text-white shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
+                            >
+                                Student Metrics
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('doubts')}
+                                className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${activeTab === 'doubts' ? 'bg-slate-900 text-white shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
+                            >
+                                Doubt Desk
+                            </button>
+                         </div>
+                    )}
 
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <h2 className="text-xl font-bold text-slate-900 uppercase tracking-tighter">
@@ -631,14 +638,14 @@ const AdminDashboardPage = () => {
 
             {/* Footer Insight */}
             <div className="bg-slate-950 rounded-[3rem] p-12 text-white relative overflow-hidden shadow-2xl">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px] -mr-48 -mt-48"></div>
+                <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-[120px] -mr-48 -mt-48"></div>
                 <div className="relative z-10 max-w-2xl">
                     <div className="flex items-center gap-3 mb-6">
-                        <LightBulbIcon className="w-8 h-8 text-indigo-400" />
+                        <LightBulbIcon className="w-8 h-8 text-emerald-500" />
                         <h3 className="text-2xl font-black uppercase tracking-tighter italic">Predictive Audit</h3>
                     </div>
                     <p className="text-slate-400 text-lg leading-relaxed font-medium">
-                        Algorithmic analysis of batch performance indicates high friction in <span className="text-primary-400 underline decoration-indigo-400/30 underline-offset-8 font-black">CS3492 - UNIT 3</span>. System recommendation: Targeted institutional intervention suggested for the upcoming assessment cycle.
+                        Algorithmic analysis of batch performance indicates high friction in <span className="text-emerald-400 underline decoration-emerald-400/30 underline-offset-8 font-black">CS3492 - UNIT 3</span>. System recommendation: Targeted institutional intervention suggested for the upcoming assessment cycle.
                     </p>
                 </div>
             </div>
@@ -692,7 +699,7 @@ const AdminDashboardPage = () => {
                                             {(isAdmin || isAdvisor) && <option value="staff">Subject Staff</option>}
                                         </select>
                                         {isAdvisor && <p className="text-[10px] text-slate-400 mt-1 italic font-bold uppercase">Role Locked to Semester {user.semester}</p>}
-                                        
+                                        {isStaff && <p className="text-[10px] text-slate-400 mt-1 italic font-bold uppercase">Subject Authority Only</p>}
                                     </div>
                                     <div>
                                         <label className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-1">
@@ -876,4 +883,4 @@ const AdminDashboardPage = () => {
     );
 };
 
-export default AdminDashboardPage;
+export default StaffDashboardPage;

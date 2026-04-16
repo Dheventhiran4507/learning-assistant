@@ -15,6 +15,7 @@ import PracticePage from './pages/PracticePage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import AdminSyllabusPage from './pages/AdminSyllabusPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import StaffDashboardPage from './pages/StaffDashboardPage';
 import StaffLabManager from './pages/StaffLabManager';
 import StaffLabResults from './pages/StaffLabResults';
 import StudentPreLabPage from './pages/StudentPreLabPage';
@@ -70,7 +71,7 @@ function App() {
           />
           <Route
             path="/staff-login"
-            element={!isAuthenticated ? <StaffLoginPage /> : <Navigate to="/admin/dashboard" />}
+            element={!isAuthenticated ? <StaffLoginPage /> : <Navigate to="/staff/dashboard" />}
           />
 
           <Route
@@ -165,6 +166,14 @@ function App() {
             element={
               <PrivateRoute>
                 <AdminDashboardPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/staff/dashboard"
+            element={
+              <PrivateRoute>
+                <StaffDashboardPage />
               </PrivateRoute>
             }
           />

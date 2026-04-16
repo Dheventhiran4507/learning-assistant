@@ -40,7 +40,11 @@ const StaffLoginPage = () => {
                 }
 
                 // STAFF REDIRECT: Ensure all staff roles go to the Academic Admin Dashboard
-                if (['admin', 'hod', 'advisor', 'staff'].includes(student.role)) {
+                if (student.role === 'staff') {
+                    login(student, token);
+                    toast.success('Access Granted - Welcome back to Subject Staff Portal');
+                    navigate('/staff/dashboard');
+                } else if (['admin', 'hod', 'advisor'].includes(student.role)) {
                     login(student, token);
                     toast.success('Access Granted - Welcome back to Academic Admin');
                     navigate('/admin/dashboard');
